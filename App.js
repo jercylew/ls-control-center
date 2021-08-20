@@ -5,69 +5,48 @@ import {Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-function Feed() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Feed!</Text>
-    </View>
-  );
-}
-
-function Profile() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Profile!</Text>
-    </View>
-  );
-}
-
-function Notifications() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Notifications!</Text>
-    </View>
-  );
-}
+import Home  from './views/home';
+import NetworkConfig from './views/network-config';
+import DeviceControl from './views/device-control';
 
 const Tab = createMaterialBottomTabNavigator();
 
 function MyTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="Feed"
+      initialRouteName="Home"
       tabBarOptions={{
         activeTintColor: '#e91e63',
       }}
     >
       <Tab.Screen
-        name="Feed"
-        component={Feed}
+        name="Home"
+        component={Home}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: '主页',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
+            <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
         }}
       />
       <Tab.Screen
-        name="Notifications"
-        component={Notifications}
+        name="NetworkConfig"
+        component={NetworkConfig}
         options={{
-          tabBarLabel: 'Updates',
+          tabBarLabel: '配网',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={size} />
+            <MaterialCommunityIcons name="wifi" color={color} size={26} />
           ),
           tabBarBadge: 3,
         }}
       />
       <Tab.Screen
         name="Profile"
-        component={Profile}
+        component={DeviceControl}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: '控制',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" color={color} size={size} />
+            <MaterialCommunityIcons name="send" color={color} size={26} />
           ),
         }}
       />
