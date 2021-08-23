@@ -1,45 +1,72 @@
-/* eslint-disable react-native/no-inline-styles */
-//home.js View for displaying device status
-import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import React from 'react';
+import {SafeAreaView, StyleSheet, TextInput, Text, Switch} from 'react-native';
 
-class NetworkConfig extends Component {
-  constructor(props) {
-    super(props);
+const NetworkConfig = () => {
+  const [text, onChangeText] = React.useState('Password');
 
-    this.initialState = {
-      name: '',
-      job: '',
-    };
+  const [number, onChangeNumber] = React.useState(null);
 
-    this.state = this.initialState;
-  }
+  const [isEnabled, setIsEnabled] = React.useState(false);
 
-  handleChange = event => {
-    const {name, value} = event.target; //object as: {name:name, value:value}
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-    this.setState({
-      //Partial update with ES6 computed property
-      [name]: value,
-    });
-  };
+  return (
+    <SafeAreaView>
+      <Text style={styles.label}>SSID:</Text>
 
-  onFormSubmit = event => {
-    event.preventDefault();
+      <Text style={styles.label}>BSSID:</Text>
 
-    this.props.handleSubmit(this.state);
-    this.setState(this.initialState);
-  };
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeText}
+        placeholder="密码"
+        secureTextEntry={true}
+        value={text}
+        label="密码"
+      />
 
-  render() {
-    const {name, job} = this.state;
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeNumber}
+        value={number}
+        placeholder="设备数量"
+        keyboardType="numeric"
+      />
 
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Network Cofig</Text>
-      </View>
-    );
-  }
-}
+      <Switch
+        style={styles.label}
+        trackColor={{false: '#767577', true: '#81b0ff'}}
+        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitch}
+        value={isEnabled}
+      />
+
+      <Switch
+        style={styles.label}
+        trackColor={{false: '#767577', true: '#81b0ff'}}
+        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitch}
+        value={isEnabled}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+
+  label: {
+    height: 20,
+    margin: 12,
+    padding: 2,
+  },
+});
 
 export default NetworkConfig;
