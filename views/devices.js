@@ -11,20 +11,20 @@ import {
 
 const DATA = [
   {
-    title: 'Main dishes',
-    data: ['Pizza', 'Burger', 'Risotto'],
+    title: '广电开源名都酒店',
+    data: ['保温售菜台1', '保温售菜台2', '保温售菜台3'],
   },
   {
-    title: 'Sides',
-    data: ['French Fries', 'Onion Rings', 'Fried Shrimps'],
+    title: '银隆海底捞',
+    data: ['保温售菜台1', '网卡控制器'],
   },
   {
-    title: 'Drinks',
-    data: ['Water', 'Coke', 'Beer'],
+    title: '万象外婆家',
+    data: ['保温售菜台1', '保温售菜台2', '保温售菜台3'],
   },
   {
-    title: 'Desserts',
-    data: ['Cheese Cake', 'Ice Cream'],
+    title: '金迪酒店',
+    data: ['保温售菜台1', '冰箱温湿度控制器'],
   },
 ];
 
@@ -34,7 +34,16 @@ const Item = ({title}) => (
   </View>
 );
 
-class Home extends Component {
+class Devices extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {devices: []};
+  }
+
+  updateDevice(device) {
+    //this.state = this.initialState;
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -71,4 +80,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Devices;
