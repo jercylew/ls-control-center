@@ -6,6 +6,7 @@ const NetworkConfig = () => {
   const [txtPassword, onChangePassword] = React.useState('');
   const [number, onChangeNumber] = React.useState(null);
   const [value, setValue] = React.useState('broadcast');
+  const [securePass, setSecurePass] = React.useState(true);
 
   return (
     <SafeAreaView style={styles.topView}>
@@ -14,17 +15,25 @@ const NetworkConfig = () => {
 
       <TextInput
         style={styles.input}
+        label="密码"
         onChangeText={onChangePassword}
-        placeholder="密码"
-        secureTextEntry={true}
+        secureTextEntry={securePass}
         value={txtPassword}
+        right={
+          <TextInput.Icon
+            name="eye"
+            onPress={() => {
+              setSecurePass(!securePass);
+            }}
+          />
+        }
       />
 
       <TextInput
         style={styles.input}
         onChangeText={onChangeNumber}
         value={number}
-        placeholder="设备数量"
+        label="设备数量"
         keyboardType="numeric"
       />
 

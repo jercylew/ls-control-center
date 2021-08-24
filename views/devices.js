@@ -3,35 +3,69 @@ import React, {Component} from 'react';
 import {
   StyleSheet,
   Text,
-  View,
   SafeAreaView,
   SectionList,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 
 const DATA = [
   {
     title: '广电开源名都酒店',
-    data: ['保温售菜台1', '保温售菜台2', '保温售菜台3'],
-  },
-  {
-    title: '银隆海底捞',
-    data: ['保温售菜台1', '网卡控制器'],
-  },
-  {
-    title: '万象外婆家',
-    data: ['保温售菜台1', '保温售菜台2', '保温售菜台3'],
+    data: [
+      {
+        name: '保温售菜台1',
+        id: 'LS_100001',
+        is_heating: 0,
+        is_up_water: 0,
+        net_type: 1,
+        detection_temperature: 0,
+        water_level_detection: 1000,
+      },
+      {
+        name: '保温售菜台2',
+        id: 'LS_100002',
+        is_heating: 0,
+        is_up_water: 0,
+        net_type: 1,
+        detection_temperature: 0,
+        water_level_detection: 1000,
+      },
+    ],
   },
   {
     title: '金迪酒店',
-    data: ['保温售菜台1', '冰箱温湿度控制器'],
+    data: [
+      {
+        name: '保温售菜台1',
+        id: 'LS_100003',
+        is_heating: 0,
+        is_up_water: 0,
+        net_type: 1,
+        detection_temperature: 0,
+        water_level_detection: 1000,
+      },
+      {
+        name: '保温售菜台',
+        id: 'LS_100004',
+        is_heating: 0,
+        is_up_water: 0,
+        net_type: 1,
+        detection_temperature: 0,
+        water_level_detection: 1000,
+      },
+    ],
   },
 ];
 
-const Item = ({title}) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
+const Item = ({devPros}) => (
+  <TouchableOpacity
+    style={styles.item}
+    onPress={() => {
+      console.log('Item Clicked', devPros);
+    }}>
+    <Text style={styles.title}>{devPros.name}</Text>
+  </TouchableOpacity>
 );
 
 class Devices extends Component {
@@ -49,8 +83,8 @@ class Devices extends Component {
       <SafeAreaView style={styles.container}>
         <SectionList
           sections={DATA}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => <Item title={item} />}
+          keyExtractor={(item, index) => item.id + index}
+          renderItem={({item}) => <Item devPros={item} />}
           renderSectionHeader={({section: {title}}) => (
             <Text style={styles.header}>{title}</Text>
           )}
