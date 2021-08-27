@@ -4,7 +4,7 @@ import {RadioButton, Button, TextInput} from 'react-native-paper';
 
 const NetworkConfig = () => {
   const [txtPassword, onChangePassword] = React.useState('');
-  const [number, onChangeNumber] = React.useState(null);
+  const [number, onChangeNumber] = React.useState('1');
   const [value, setValue] = React.useState('broadcast');
   const [securePass, setSecurePass] = React.useState(true);
 
@@ -32,7 +32,7 @@ const NetworkConfig = () => {
       <TextInput
         style={styles.input}
         onChangeText={onChangeNumber}
-        value={number}
+        value={number.toString()}
         label="设备数量"
         keyboardType="numeric"
       />

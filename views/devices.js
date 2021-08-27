@@ -1,4 +1,3 @@
-//home.js View for displaying device status
 import React, {Component} from 'react';
 import {
   StyleSheet,
@@ -9,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button, Dialog, Portal, Provider, TextInput} from 'react-native-paper';
+import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
 
 const DATA = [
   {
@@ -186,18 +185,16 @@ class Devices extends Component {
 
   render() {
     return (
-      <Provider>
-        <SafeAreaView style={styles.container}>
-          <SectionList
-            sections={DATA}
-            keyExtractor={(item, index) => item.id + index}
-            renderItem={({item}) => <Item devPros={item} />}
-            renderSectionHeader={({section: {title}}) => (
-              <Text style={styles.header}>{title}</Text>
-            )}
-          />
-        </SafeAreaView>
-      </Provider>
+      <SafeAreaView style={styles.container}>
+        <SectionList
+          sections={DATA}
+          keyExtractor={(item, index) => item.id + index}
+          renderItem={({item}) => <Item devPros={item} />}
+          renderSectionHeader={({section: {title}}) => (
+            <Text style={styles.header}>{title}</Text>
+          )}
+        />
+      </SafeAreaView>
     );
   }
 }
