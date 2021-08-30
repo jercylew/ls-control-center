@@ -9,6 +9,8 @@ import {
   View,
 } from 'react-native';
 import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
+import {useSelector, useDispatch} from 'react-redux';
+import {delDevice, selectScenes} from '../data/device-slice';
 
 const DATA = [
   {
@@ -24,6 +26,7 @@ const DATA = [
         net_type: 1,
         detection_temperature: 105,
         water_level_detection: 1000,
+        error: '',
       },
       {
         name: '保温售菜台2',
@@ -35,6 +38,7 @@ const DATA = [
         net_type: 1,
         detection_temperature: 0,
         water_level_detection: 1000,
+        error: '',
       },
     ],
   },
@@ -51,6 +55,7 @@ const DATA = [
         net_type: 1,
         detection_temperature: 0,
         water_level_detection: 1000,
+        error: '',
       },
       {
         name: '保温售菜台',
@@ -62,6 +67,7 @@ const DATA = [
         net_type: 1,
         detection_temperature: 0,
         water_level_detection: 1000,
+        error: '',
       },
     ],
   },
@@ -101,7 +107,28 @@ const Item = ({devPros}) => {
   }
 
   function onDialogOk() {
-    //MQTT publish
+    if (scene_name !== devPros.scene_name) {
+      console.log(
+        'Device with id `' +
+          devPros.id +
+          '` changed to new scene ' +
+          scene_name,
+      );
+
+      devPros.scene_name = scene_name;
+      devPros.name = dev_name;
+      devPros.scene_id = scene_id;
+
+      //Save to local
+      //dispatch(saveDeviceInfo(devPros))
+    }
+
+    //Via MQTT command: saveDeviceInfo
+    //{scene_id, scene_name, device_name, remote_address, remote_port,
+    // mqtt_user_name, mqtt_user_password, mqtt_port, mqtt_client_id, wifi_ssid, wifi_password}
+
+    //Via MQTT command: saveMaxTemp(), saveMaxWaterLevel()
+
     hideDialog();
   }
 
@@ -173,31 +200,23 @@ const Item = ({devPros}) => {
   );
 };
 
-class Devices extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {devices: []};
-  }
+const Devices = () => {
+  const scenes = useSelector(selectScenes);
+  const dispatch = useDispatch();
 
-  updateDevice(device) {
-    //this.state = this.initialState;
-  }
-
-  render() {
-    return (
-      <SafeAreaView style={styles.container}>
-        <SectionList
-          sections={DATA}
-          keyExtractor={(item, index) => item.id + index}
-          renderItem={({item}) => <Item devPros={item} />}
-          renderSectionHeader={({section: {title}}) => (
-            <Text style={styles.header}>{title}</Text>
-          )}
-        />
-      </SafeAreaView>
-    );
-  }
-}
+  return (
+    <SafeAreaView style={styles.container}>
+      <SectionList
+        sections={scenes} //{DATA}
+        keyExtractor={(item, index) => item.id + index}
+        renderItem={({item}) => <Item devPros={item} />}
+        renderSectionHeader={({section: {title}}) => (
+          <Text style={styles.header}>{title}</Text>
+        )}
+      />
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

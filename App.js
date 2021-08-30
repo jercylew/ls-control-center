@@ -6,9 +6,15 @@ import Settings from './views/settings';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
+import store from './data/store';
+import {Provider as StoreProvider} from 'react-redux';
 import MQTT from 'sp-react-native-mqtt';
+import {useSelector, useDispatch} from 'react-redux';
+import {syncDevice} from './data/device-slice';
 
 const Tab = createBottomTabNavigator();
+const TOPIC_DEV_STATUS = '$thing/up/status/sale_table';
+const TOPIC_DEV_PROPERTY = '$thing/up/property/sale_table';
 
 class MyTabs extends Component {
   constructor(props) {
@@ -39,8 +45,9 @@ class MyTabs extends Component {
 
         client.on('connect', function () {
           console.log('connected');
-          client.subscribe('/data', 0);
-          client.publish('/data', 'test', 0, false);
+          client.subscribe(TOPIC_DEV_STATUS, 0);
+          client.subscribe(TOPIC_DEV_PROPERTY, 0);
+          // client.publish('/data', 'test', 0, false);
         });
 
         client.connect();
@@ -124,10 +131,12 @@ class MyTabs extends Component {
 
 export default function App() {
   return (
-    <PaperProvider>
-      <NavigationContainer>
-        <MyTabs />
-      </NavigationContainer>
-    </PaperProvider>
+    <StoreProvider store={store}>
+      <PaperProvider>
+        <NavigationContainer>
+          <MyTabs />
+        </NavigationContainer>
+      </PaperProvider>
+    </StoreProvider>
   );
 }
