@@ -9,7 +9,7 @@ export const slice = createSlice({
   },
   reducers: {
     syncDevice: (state, action) => {
-      //For status report from device
+      //From status report from device
       let device = action.payload;
 
       // state.value += 1;
@@ -52,22 +52,61 @@ export const slice = createSlice({
     },
 
     saveDeviceInfo: (state, action) => {
-      //Save device info
-      //Move to new scene if changed
+      //From user update via APP
       let device = action.payload;
 
-      if (!state.mapDeviceScene.has(device.id)) {
-        return;
-      }
-
-      let scene_name = state.mapDeviceScene.get(device.id);
-      for (let i = 0; i < state.scenes.length; i++) {
-        if (scene_name === state.scenes[i].title) {
-          state.scenes[i].data = state.scenes[i].data.filter(
-            item => item.id !== device.id,
-          );
+      if (
+        !state.mapDeviceScene.has(device.id) &&
+        state.mapDeviceScene.get(device.id) !== device.scene_name
+      ) {
+        //Remove from old scene
+        let old_scene_name = state.mapDeviceScene.get(device.id);
+        for (let i = 0; i < state.scenes.length; i++) {
+          if (old_scene_name === state.scenes[i].title) {
+            state.scenes[i].data = state.scenes[i].data.filter(
+              item => item.id !== device.id,
+            );
+          }
         }
       }
+
+      //Add to new scene
+      let scene_found = false;
+      for (let i = 0; i < state.scenes.length; i++) {
+        if (device.scene_name === state.scenes[i].title) {
+          let device_found = false;
+          for (let j = 0; j < state.scenes[i].data.length; j++) {
+            if (state.scenes[i].data[j].id === device.id) {
+              state.scenes[i].data[j].name = device.name;
+              state.scenes[i].data[j].scene_id = device.scene_id;
+              state.scenes[i].data[j].is_heating = device.is_heating;
+              state.scenes[i].data[j].is_up_water = device.is_up_water;
+              state.scenes[i].data[j].net_type = device.net_type;
+              state.scenes[i].data[j].detection_temperature =
+                device.detection_temperature;
+              state.scenes[i].data[j].water_level_detection =
+                device.water_level_detection;
+              state.scenes[i].data[j].error = device.error;
+              device_found = true;
+            }
+          }
+
+          if (!device_found) {
+            state.scenes[i].data.push(device);
+          }
+          scene_found = true;
+        }
+      }
+
+      if (!scene_found) {
+        let new_scene = {
+          title: device.scene_name,
+          data: [],
+        };
+        new_scene.data.push(device);
+        state.scenes.push(new_scene);
+      }
+      state.scene.mapDeviceScene.set(device.id, device.scene_name);
     },
 
     // increment: state => {
