@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
 import {useSelector, useDispatch} from 'react-redux';
-import {delDevice, selectScenes} from '../data/device-slice';
+import {saveDeviceInfo, selectScenes} from '../data/device-slice';
 
 const DATA = [
   {
@@ -162,9 +162,9 @@ const Item = ({devPros}) => {
             </Text>
             <Text>
               {'温度：' +
-                devPros.detection_temperature.toString() +
+                devPros.detection_temperature +
                 ',\t\t\t\t水位： ' +
-                devPros.water_level_detection.toString()}
+                devPros.water_level_detection}
             </Text>
             <Text>网卡类型： {netTypeToText(devPros.net_type)}</Text>
             <View style={styles.input}>
