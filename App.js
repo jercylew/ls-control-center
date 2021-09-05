@@ -20,6 +20,48 @@ const MyTabs = () => {
   const dispatch = useDispatch();
   const [mqttClient, setMqttClient] = React.useState(null);
 
+  const handleDevStatusReport = (devId, reportData) => {
+    //device status
+    let newDevice = {
+      name: null,
+      id: devId,
+      scene_id: null,
+      scene_name: null,
+      is_heating: reportData.Is_Heating,
+      is_up_water: reportData.Is_Up_water,
+      net_type: reportData.NET_type,
+      detection_temperature: reportData.Detection_temperature,
+      water_level_detection: reportData.Water_level_detection,
+      error: '',
+    };
+    console.log('Now try to sync to slice...');
+    dispatch(syncDevice(newDevice));
+  };
+  const handleDevErrorReport = (devId, error) => {
+    console.log('Device[' + devId + '], ' + ' error: ' + error);
+  };
+  const handleControlReply = (devId, status) => {
+    console.log(
+      'Device[' + devId + '], ' + ' control command reply: ' + status,
+    );
+  };
+
+  const handleDevicePropertyReport = propData => {
+    let newDevice = {
+      name: propData.Device_Name,
+      id: propData.device_id,
+      scene_id: propData.Scene_Id,
+      scene_name: propData.Scene_Name,
+      is_heating: null,
+      is_up_water: null,
+      net_type: null,
+      detection_temperature: null,
+      water_level_detection: null,
+      error: null,
+    };
+    dispatch(syncDevice(newDevice));
+  };
+
   MQTT.createClient({
     host: '118.24.201.167',
     port: 1883,
@@ -42,42 +84,28 @@ const MyTabs = () => {
         let dataJson = JSON.parse(msg.data);
         if (msg.topic === TOPIC_DEV_STATUS) {
           console.log('Device status');
-          console.log(msg.data);
-          console.log(dataJson.device_id);
-          console.log(dataJson.method);
-          console.log(dataJson.params);
-          console.log(dataJson.params.Is_Heating);
-          let newDevice = {
-            name: null,
-            id: dataJson.device_id,
-            scene_id: null,
-            scene_name: null,
-            is_heating: dataJson.params.Is_Heating,
-            is_up_water: dataJson.params.Is_Up_water,
-            net_type: dataJson.params.NET_type,
-            detection_temperature: dataJson.params.Detection_temperature,
-            water_level_detection: dataJson.params.Water_level_detection,
-            error: '',
-          };
-          console.log('Now try to sync to slice...');
-          dispatch(syncDevice(newDevice));
+
+          if ('method' in dataJson) {
+            if (dataJson.method === 'report') {
+              if ('params' in dataJson) {
+                handleDevStatusReport(dataJson.device_id, dataJson.params);
+              }
+              if ('error' in dataJson) {
+                handleDevErrorReport(dataJson.error);
+              }
+            } else if (dataJson.method === 'control_reply') {
+              handleControlReply(dataJson.status);
+            } else {
+              console.log('Unsupported message');
+            }
+          }
         } else if (msg.topic === TOPIC_DEV_PROPERTY) {
           console.log('Device property');
-          let newDevice = {
-            name: dataJson.Device_Name,
-            id: dataJson.device_id,
-            scene_id: dataJson.Scene_Id,
-            scene_name: dataJson.Scene_Name,
-            is_heating: null,
-            is_up_water: null,
-            net_type: null,
-            detection_temperature: null,
-            water_level_detection: null,
-            error: null,
-          };
-          dispatch(syncDevice(newDevice));
+          handleDevicePropertyReport(dataJson);
         } else {
-          console.log('Unknown message, ignore it!');
+          console.log(
+            'Unknown message with topic:' + msg.topic + ', ignore it!',
+          );
         }
       });
 

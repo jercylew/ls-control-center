@@ -1,11 +1,28 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+const getDevSceneName = (deviceId, devSceneMap) => {
+  let sceneName = '';
+  for (let item of devSceneMap) {
+    if (item.deviceId === deviceId) {
+      sceneName = item.sceneName;
+    }
+  }
+
+  return sceneName;
+};
+
+const setDevSceneName = (devIdScene, devSceneMap) => {
+  devSceneMap = devSceneMap.filter(
+    item => item.deviceId !== devIdScene.deviceId,
+  );
+  devSceneMap.push(devIdScene);
+};
+
 export const slice = createSlice({
   name: 'scene',
   initialState: {
-    // value: 0,
     scenes: [], //see DATA at devices.js
-    mapDeviceScene: new Map(),
+    mapDeviceScene: [], //Map cannot be serilized in Redux
   },
   reducers: {
     syncDevice: (state, action) => {
@@ -68,21 +85,22 @@ export const slice = createSlice({
         new_scene.data.push(device);
         state.scenes.push(new_scene);
       }
-      state.mapDeviceScene.set(device.id, device.scene_name);
+
+      setDevSceneName(
+        {deviceId: device.id, sceneName: device.scene_name},
+        state.mapDeviceScene,
+      );
     },
 
     saveDeviceInfo: (state, action) => {
       //From user update via APP
       let device = action.payload;
 
-      if (
-        !state.mapDeviceScene.has(device.id) &&
-        state.mapDeviceScene.get(device.id) !== device.scene_name
-      ) {
+      let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
+      if (oldSceneName !== device.scene_name) {
         //Remove from old scene
-        let old_scene_name = state.mapDeviceScene.get(device.id);
         for (let i = 0; i < state.scenes.length; i++) {
-          if (old_scene_name === state.scenes[i].title) {
+          if (oldSceneName === state.scenes[i].title) {
             state.scenes[i].data = state.scenes[i].data.filter(
               item => item.id !== device.id,
             );
@@ -126,7 +144,11 @@ export const slice = createSlice({
         new_scene.data.push(device);
         state.scenes.push(new_scene);
       }
-      state.scene.mapDeviceScene.set(device.id, device.scene_name);
+
+      setDevSceneName(
+        {deviceId: device.id, sceneName: device.scene_name},
+        state.mapDeviceScene,
+      );
     },
   },
 });
@@ -139,7 +161,6 @@ export const {syncDevice, saveDeviceInfo} = slice.actions;
 //   }, 1000);
 // };
 
-// export const selectCount = state => state.counter.value;
 export const selectScenes = state => state.scene.scenes;
 
 export default slice.reducer;

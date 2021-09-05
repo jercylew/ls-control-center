@@ -214,7 +214,7 @@ const Devices = () => {
   return (
     <SafeAreaView style={styles.container}>
       <SectionList
-        sections={scenes} //{DATA}
+        sections={scenes}
         keyExtractor={(item, index) => item.id + index}
         renderItem={({item}) => <Item devPros={item} />}
         renderSectionHeader={({section: {title}}) => (
