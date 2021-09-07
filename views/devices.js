@@ -5,13 +5,14 @@ import {
   SafeAreaView,
   SectionList,
   StatusBar,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
 import {useSelector, useDispatch} from 'react-redux';
 import {saveDeviceInfo, selectScenes} from '../data/device-slice';
 import {useMqttClient} from '../api/mqtt-hooks';
+
+const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 
 const DATA = [
   {
@@ -75,17 +76,27 @@ const DATA = [
 ];
 
 const Item = ({devPros}) => {
-  const [visible, setVisible] = React.useState(false);
-  const [max_temp, setMaxTemp] = React.useState(100);
-  const [max_water_level, setMaxWaterLevel] = React.useState(600);
-  const [dev_name, setDevName] = React.useState(devPros.name);
-  const [scene_name, setSceneName] = React.useState(devPros.scene_name);
-  const [scene_id, setSceneId] = React.useState(devPros.scene_id);
+  const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
+  const [dlgMaxTempVisible, seDlgMaxTempVisible] = React.useState(false);
+  const [dlgMaxWaterLevelVisible, seDlgMaxWaterLevelVisible] =
+    React.useState(false);
+  const [maxTemp, setMaxTemp] = React.useState(100);
+  const [maxWaterLevel, setMaxWaterLevel] = React.useState(600);
+  const [devName, setDevName] = React.useState(devPros.name);
+  const [sceneName, setSceneName] = React.useState(devPros.sceneName);
+  const [sceneId, setSceneId] = React.useState(devPros.sceneId);
 
-  const {mqttClient, sendCommand} = useMqttClient();
+  const showDialogDevInfo = () => setDlgDevInfoVisible(true);
+  const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
 
-  const showDialog = () => setVisible(true);
-  const hideDialog = () => setVisible(false);
+  const showDialogMaxTemp = () => seDlgMaxTempVisible(true);
+  const hideDialogMaxTemp = () => seDlgMaxTempVisible(false);
+
+  const showDialogMaxWaterLevel = () => seDlgMaxWaterLevelVisible(true);
+  const hideDialogMaxWaterLevel = () => seDlgMaxWaterLevelVisible(false);
+
+  const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
+  const {sendCommand} = useMqttClient();
 
   function boolToText(value) {
     return value ? '是' : '否';
@@ -109,18 +120,15 @@ const Item = ({devPros}) => {
     }
   }
 
-  function onDialogOk() {
-    if (scene_name !== devPros.scene_name) {
+  function onDialogDevInfoOk() {
+    if (sceneName !== devPros.sceneName) {
       console.log(
-        'Device with id `' +
-          devPros.id +
-          '` changed to new scene ' +
-          scene_name,
+        'Device with id `' + devPros.id + '` changed to new scene ' + sceneName,
       );
     }
 
-    devPros.scene_name = scene_name;
-    devPros.name = dev_name;
+    devPros.sceneName = sceneName;
+    devPros.name = devName;
 
     //TODO: Not allowed to edit scene_id
     //If it is the new created device(scene_name: NA, scene_id: NA, scene_name: NA),
@@ -128,7 +136,7 @@ const Item = ({devPros}) => {
     //Otherwise set it readonly
     //Require: a backend server to store the device_id and scene map table,
     //1) HTTP: GET /api/scene/device/LS_100002
-    devPros.scene_id = scene_id;
+    devPros.sceneId = sceneId;
 
     //Save to local
     //dispatch(saveDeviceInfo(devPros))
@@ -138,72 +146,173 @@ const Item = ({devPros}) => {
     // mqtt_user_name, mqtt_user_password, mqtt_port, mqtt_client_id, wifi_ssid, wifi_password}
 
     //Via MQTT command: saveMaxTemp(), saveMaxWaterLevel()
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Scene_Name: devPros.sceneName,
+        Scene_Id: devPros.sceneId,
+        Device_Name: devPros.name,
+        // Remote_address: '',
+        // Remote_port: 1883,
+        // Mqtt_User_Name: '',
+        // Mqtt_password: '',
+        // Mqtt_Client_id: '',
+        // Wifi_ssid: '',
+        // Wifi_password: '',
+      },
+    };
 
-    hideDialog();
-    sendCommand('test_topic', '{test_data: 123456}');
+    hideDialogDevInfo();
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
+
+  function onDialogSetMaxTempOk() {
+    hideDialogMaxTemp();
+
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'control',
+      params: {
+        Temp_Max: maxTemp,
+      },
+    };
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
+
+  function onDialogSetMaxWaterLevelOk() {
+    hideDialogMaxWaterLevel();
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'control',
+      params: {
+        Water_Level_Max: maxWaterLevel,
+      },
+    };
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.item}
-        onPress={() => {
-          console.log('Item Clicked', devPros);
-          showDialog();
-        }}>
-        <Text style={styles.title}>{devPros.name}</Text>
-        <Text style={styles.info}>{devPros.id}</Text>
-      </TouchableOpacity>
+      <View style={styles.item}>
+        <View>
+          <Text
+            style={styles.title}
+            onPress={() => {
+              console.log('Item Clicked, setting device info', devPros);
+              showDialogDevInfo();
+            }}>
+            {devPros.name}
+          </Text>
+          <Text style={styles.info}>{devPros.id}</Text>
+        </View>
+        <View style={styles.itemSetTempWaterLevel}>
+          <Text
+            style={styles.itemSetTempWaterLevelText}
+            onPress={() => {
+              console.log('Item Clicked, setting temperature', devPros);
+              showDialogMaxTemp();
+            }}>
+            设置温度
+          </Text>
+          <Text
+            style={styles.itemSetTempWaterLevelText}
+            onPress={() => {
+              console.log('Item Clicked, setting water level', devPros);
+              showDialogMaxWaterLevel();
+            }}>
+            设置水位
+          </Text>
+        </View>
+      </View>
       <Portal>
-        <Dialog visible={visible} onDismiss={hideDialog}>
+        <Dialog visible={dlgDevInfoVisible} onDismiss={hideDialogDevInfo}>
           <Dialog.Title>设备信息</Dialog.Title>
           <Dialog.Content>
             <Text>
               {'加热中： ' +
-                boolToText(devPros.is_heating) +
+                boolToText(devPros.isHeating) +
                 ',\t\t\t\t上水中： ' +
-                boolToText(devPros.is_up_water)}
+                boolToText(devPros.isUpWater)}
             </Text>
             <Text>
               {'温度：' +
-                devPros.detection_temperature +
+                devPros.detectionTemperature +
                 ',\t\t\t\t水位： ' +
-                devPros.water_level_detection}
+                devPros.waterLevelDetection}
             </Text>
-            <Text>网卡类型： {netTypeToText(devPros.net_type)}</Text>
+            <Text>网卡类型： {netTypeToText(devPros.netType)}</Text>
             <View style={styles.input}>
               <TextInput
                 label="设备名称"
-                value={dev_name}
+                value={devName}
                 onChangeText={text => setDevName(text)}
               />
               <TextInput
                 label="场地名称"
-                value={scene_name}
+                value={sceneName}
                 onChangeText={text => setSceneName(text)}
               />
               <TextInput
                 label="场地ID"
-                value={scene_id}
+                value={sceneId}
                 onChangeText={text => setSceneId(text)}
               />
               <TextInput
                 label="最高温度"
-                value={max_temp.toString()}
+                value={maxTemp.toString()}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
+                disabled={true}
               />
               <TextInput
                 label="最高水位"
-                value={max_water_level.toString()}
+                value={maxWaterLevel.toString()}
+                onChangeText={text => setMaxWaterLevel(textToInt(text))}
+                keyboardType="numeric"
+                disabled={true}
+              />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialogDevInfo}>关闭</Button>
+            <Button onPress={onDialogDevInfoOk}>设置</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog visible={dlgMaxTempVisible} onDismiss={hideDialogMaxTemp}>
+          <Dialog.Title>设置温度</Dialog.Title>
+          <Dialog.Content>
+            <View>
+              <TextInput
+                label="温度"
+                value={maxTemp.toString()}
+                onChangeText={text => setMaxTemp(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialogMaxTemp}>取消</Button>
+            <Button onPress={onDialogSetMaxTempOk}>确定</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgMaxWaterLevelVisible}
+          onDismiss={hideDialogMaxWaterLevel}>
+          <Dialog.Title>设置水位</Dialog.Title>
+          <Dialog.Content>
+            <View>
+              <TextInput
+                label="水位"
+                value={maxWaterLevel.toString()}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
               />
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialog}>关闭</Button>
-            <Button onPress={onDialogOk}>设置</Button>
+            <Button onPress={hideDialogMaxWaterLevel}>取消</Button>
+            <Button onPress={onDialogSetMaxWaterLevelOk}>确定</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -236,6 +345,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   item: {
+    flexDirection: 'row',
     backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
@@ -246,6 +356,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    color: '#2805f2',
   },
   info: {
     fontSize: 15,
@@ -254,6 +365,16 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 18,
     marginTop: 5,
+  },
+  itemSetTempWaterLevel: {
+    paddingHorizontal: 100,
+    paddingVertical: 30,
+    flexDirection: 'row',
+  },
+  itemSetTempWaterLevelText: {
+    fontSize: 17,
+    color: '#2805f2',
+    paddingHorizontal: 5,
   },
 });
 

@@ -75,10 +75,7 @@ const styles = StyleSheet.create({
   },
   input: {
     margin: 5,
-    // borderWidth: 1,
-    // padding: 10,
     borderRadius: 10,
-    // fontSize: 20,
   },
   radioItem: {
     flexDirection: 'row',

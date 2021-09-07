@@ -23,13 +23,13 @@ export const MqttProvider = ({children}) => {
     let newDevice = {
       name: null,
       id: devId,
-      scene_id: null,
-      scene_name: null,
-      is_heating: reportData.Is_Heating,
-      is_up_water: reportData.Is_Up_water,
-      net_type: reportData.NET_type,
-      detection_temperature: reportData.Detection_temperature,
-      water_level_detection: reportData.Water_level_detection,
+      sceneId: null,
+      sceneName: null,
+      isHeating: reportData.Is_Heating,
+      isUpWater: reportData.Is_Up_water,
+      netType: reportData.NET_type,
+      detectionTemperature: reportData.Detection_temperature,
+      waterLevelDetection: reportData.Water_level_detection,
       error: '',
     };
     console.log('Now try to sync to slice...');
@@ -47,27 +47,27 @@ export const MqttProvider = ({children}) => {
   };
 
   const handleDevicePropertyReport = propData => {
-    let in_scene_name = propData.Device_Name;
-    let in_scene_id = propData.device_id;
+    let inSceneName = propData.Device_Name;
+    let inSceneId = propData.device_id;
     if (
       propData.Device_Name === null ||
       propData.Device_Name === 'NA' ||
       propData.Device_Name === ''
     ) {
-      in_scene_name = UNKNOWN_SCENE_NAME;
-      in_scene_id = UNKNOWN_SCENE_ID;
+      inSceneName = UNKNOWN_SCENE_NAME;
+      inSceneId = UNKNOWN_SCENE_ID;
     }
 
     let newDevice = {
       name: propData.Device_Name,
       id: propData.device_id,
-      scene_id: in_scene_id,
-      scene_name: in_scene_name,
-      is_heating: null,
-      is_up_water: null,
-      net_type: null,
-      detection_temperature: null,
-      water_level_detection: null,
+      sceneId: inSceneId,
+      sceneName: inSceneName,
+      isHeating: null,
+      isUpWater: null,
+      netType: null,
+      detectionTemperature: null,
+      waterLevelDetection: null,
       error: null,
     };
     dispatch(syncDevice(newDevice));

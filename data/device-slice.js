@@ -41,17 +41,17 @@ export const slice = createSlice({
       let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
       if (oldSceneName === '') {
         //Not found
-        device.scene_name = UNKNOWN_SCENE_NAME;
-        device.scene_id = UNKNOWN_SCENE_ID;
+        device.sceneName = UNKNOWN_SCENE_NAME;
+        device.sceneId = UNKNOWN_SCENE_ID;
       } else {
-        device.scene_name = oldSceneName;
+        device.sceneName = oldSceneName;
       }
 
       //if not exist creat a new scene and push this device
       //else update the device info in the existing group
       let scene_found = false;
       for (let i = 0; i < state.scenes.length; i++) {
-        if (state.scenes[i].title === device.scene_name) {
+        if (state.scenes[i].title === device.sceneName) {
           //Status report may earlier then property report
           scene_found = true;
           let device_found = false;
@@ -60,25 +60,25 @@ export const slice = createSlice({
               if (device.name !== null) {
                 state.scenes[i].data[j].name = device.name;
               }
-              if (device.scene_id !== null) {
-                state.scenes[i].data[j].scene_id = device.scene_id;
+              if (device.sceneId !== null) {
+                state.scenes[i].data[j].sceneId = device.sceneId;
               }
-              if (device.is_heating !== null) {
-                state.scenes[i].data[j].is_heating = device.is_heating;
+              if (device.isHeating !== null) {
+                state.scenes[i].data[j].isHeating = device.isHeating;
               }
-              if (device.is_up_water !== null) {
-                state.scenes[i].data[j].is_up_water = device.is_up_water;
+              if (device.isUpWater !== null) {
+                state.scenes[i].data[j].isUpWater = device.isUpWater;
               }
-              if (device.net_type !== null) {
-                state.scenes[i].data[j].net_type = device.net_type;
+              if (device.netType !== null) {
+                state.scenes[i].data[j].netType = device.netType;
               }
-              if (device.detection_temperature !== null) {
-                state.scenes[i].data[j].detection_temperature =
-                  device.detection_temperature;
+              if (device.detectionTemperature !== null) {
+                state.scenes[i].data[j].detectionTemperature =
+                  device.detectionTemperature;
               }
-              if (device.water_level_detection !== null) {
-                state.scenes[i].data[j].water_level_detection =
-                  device.water_level_detection;
+              if (device.waterLevelDetection !== null) {
+                state.scenes[i].data[j].waterLevelDetection =
+                  device.waterLevelDetection;
               }
               if (device.error !== null) {
                 state.scenes[i].data[j].error = device.error;
@@ -93,29 +93,29 @@ export const slice = createSlice({
         }
       }
 
-      let new_scene_name = device.scene_name;
+      let newSceneName = device.sceneName;
       if (!scene_found) {
         console.log(
-          'Scene `' + device.scene_name + '` not found, create a new one',
+          'Scene `' + device.sceneName + '` not found, create a new one',
         );
         if (
-          device.scene_name === null ||
-          device.scene_name === '' ||
-          device.scene_name === 'NA'
+          device.sceneName === null ||
+          device.sceneName === '' ||
+          device.sceneName === 'NA'
         ) {
-          new_scene_name = UNKNOWN_SCENE_NAME;
+          newSceneName = UNKNOWN_SCENE_NAME;
         }
 
-        let new_scene = {
-          title: new_scene_name,
+        let newScene = {
+          title: newSceneName,
           data: [],
         };
-        new_scene.data.push(device);
-        state.scenes.push(new_scene);
+        newScene.data.push(device);
+        state.scenes.push(newScene);
       }
 
       setDevSceneName(
-        {deviceId: device.id, sceneName: new_scene_name},
+        {deviceId: device.id, sceneName: newSceneName},
         state.mapDeviceScene,
       );
     },
@@ -125,7 +125,7 @@ export const slice = createSlice({
       let device = action.payload;
 
       let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
-      if (oldSceneName !== device.scene_name) {
+      if (oldSceneName !== device.sceneName) {
         //Remove from old scene
         for (let i = 0; i < state.scenes.length; i++) {
           if (oldSceneName === state.scenes[i].title) {
@@ -139,19 +139,19 @@ export const slice = createSlice({
       //Add to new scene
       let scene_found = false;
       for (let i = 0; i < state.scenes.length; i++) {
-        if (device.scene_name === state.scenes[i].title) {
+        if (device.sceneName === state.scenes[i].title) {
           let device_found = false;
           for (let j = 0; j < state.scenes[i].data.length; j++) {
             if (state.scenes[i].data[j].id === device.id) {
               state.scenes[i].data[j].name = device.name;
-              state.scenes[i].data[j].scene_id = device.scene_id;
-              state.scenes[i].data[j].is_heating = device.is_heating;
-              state.scenes[i].data[j].is_up_water = device.is_up_water;
-              state.scenes[i].data[j].net_type = device.net_type;
-              state.scenes[i].data[j].detection_temperature =
-                device.detection_temperature;
-              state.scenes[i].data[j].water_level_detection =
-                device.water_level_detection;
+              state.scenes[i].data[j].sceneId = device.sceneId;
+              state.scenes[i].data[j].isHeating = device.isHeating;
+              state.scenes[i].data[j].isUpWater = device.isUpWater;
+              state.scenes[i].data[j].netType = device.netType;
+              state.scenes[i].data[j].detectionTemperature =
+                device.detectionTemperature;
+              state.scenes[i].data[j].waterLevelDetection =
+                device.waterLevelDetection;
               state.scenes[i].data[j].error = device.error;
               device_found = true;
             }
@@ -165,17 +165,17 @@ export const slice = createSlice({
       }
 
       if (!scene_found) {
-        let new_scene_name = device.scene_name;
+        let newSceneName = device.sceneName;
         if (
-          device.scene_name === null ||
-          device.scene_name === '' ||
-          device.scene_name === 'NA'
+          device.sceneName === null ||
+          device.sceneName === '' ||
+          device.sceneName === 'NA'
         ) {
-          new_scene_name = UNKNOWN_SCENE_NAME;
+          newSceneName = UNKNOWN_SCENE_NAME;
         }
 
         let new_scene = {
-          title: new_scene_name,
+          title: newSceneName,
           data: [],
         };
         new_scene.data.push(device);
@@ -183,7 +183,7 @@ export const slice = createSlice({
       }
 
       setDevSceneName(
-        {deviceId: device.id, sceneName: device.scene_name},
+        {deviceId: device.id, sceneName: device.sceneName},
         state.mapDeviceScene,
       );
     },
