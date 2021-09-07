@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,7 @@ import {
 import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
 import {useSelector, useDispatch} from 'react-redux';
 import {saveDeviceInfo, selectScenes} from '../data/device-slice';
+import {useMqttClient} from '../api/mqtt-hooks';
 
 const DATA = [
   {
@@ -81,6 +82,8 @@ const Item = ({devPros}) => {
   const [scene_name, setSceneName] = React.useState(devPros.scene_name);
   const [scene_id, setSceneId] = React.useState(devPros.scene_id);
 
+  const {mqttClient, sendCommand} = useMqttClient();
+
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
 
@@ -137,6 +140,7 @@ const Item = ({devPros}) => {
     //Via MQTT command: saveMaxTemp(), saveMaxWaterLevel()
 
     hideDialog();
+    sendCommand('test_topic', '{test_data: 123456}');
   }
 
   return (
