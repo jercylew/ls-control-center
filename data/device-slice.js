@@ -29,7 +29,6 @@ export const slice = createSlice({
   },
   reducers: {
     syncDevice: (state, action) => {
-      //From status report from device
       let device = action.payload;
 
       if (device.id === null || device.id === '') {
@@ -37,7 +36,16 @@ export const slice = createSlice({
         return;
       }
 
-      //Found if exist in a scene group
+      //Found if exist in a scene group, ie., updated from `device property` report
+      //NOTE: status report does not contain scene info (null scene name and scene id)
+      let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
+      if (oldSceneName === '') {
+        //Not found
+        device.scene_name = UNKNOWN_SCENE_NAME;
+        device.scene_id = UNKNOWN_SCENE_ID;
+      } else {
+        device.scene_name = oldSceneName;
+      }
 
       //if not exist creat a new scene and push this device
       //else update the device info in the existing group
@@ -85,11 +93,11 @@ export const slice = createSlice({
         }
       }
 
+      let new_scene_name = device.scene_name;
       if (!scene_found) {
         console.log(
           'Scene `' + device.scene_name + '` not found, create a new one',
         );
-        let new_scene_name = device.scene_name;
         if (
           device.scene_name === null ||
           device.scene_name === '' ||
@@ -107,7 +115,7 @@ export const slice = createSlice({
       }
 
       setDevSceneName(
-        {deviceId: device.id, sceneName: device.scene_name},
+        {deviceId: device.id, sceneName: new_scene_name},
         state.mapDeviceScene,
       );
     },
