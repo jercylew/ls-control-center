@@ -47,12 +47,12 @@ export const MqttProvider = ({children}) => {
   };
 
   const handleDevicePropertyReport = propData => {
-    let inSceneName = propData.Device_Name;
-    let inSceneId = propData.device_id;
+    let inSceneName = propData.Scene_Name;
+    let inSceneId = propData.Scene_Id;
     if (
-      propData.Device_Name === null ||
-      propData.Device_Name === 'NA' ||
-      propData.Device_Name === ''
+      propData.Scene_Name === null ||
+      propData.Scene_Name === 'NA' ||
+      propData.Scene_Name === ''
     ) {
       inSceneName = UNKNOWN_SCENE_NAME;
       inSceneId = UNKNOWN_SCENE_ID;

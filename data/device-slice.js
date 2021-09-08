@@ -15,10 +15,17 @@ const getDevSceneName = (deviceId, devSceneMap) => {
 };
 
 const setDevSceneName = (devIdScene, devSceneMap) => {
-  devSceneMap = devSceneMap.filter(
-    item => item.deviceId !== devIdScene.deviceId,
-  );
-  devSceneMap.push(devIdScene);
+  let found = false;
+  for (let i = 0; i < devSceneMap.length; i++) {
+    if (devIdScene.deviceId === devSceneMap[i].deviceId) {
+      devSceneMap[i].sceneName = devIdScene.sceneName;
+      found = true;
+    }
+  }
+
+  if (!found) {
+    devSceneMap.push(devIdScene);
+  }
 };
 
 export const slice = createSlice({
@@ -39,12 +46,55 @@ export const slice = createSlice({
       //Found if exist in a scene group, ie., updated from `device property` report
       //NOTE: status report does not contain scene info (null scene name and scene id)
       let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
-      if (oldSceneName === '') {
-        //Not found
-        device.sceneName = UNKNOWN_SCENE_NAME;
-        device.sceneId = UNKNOWN_SCENE_ID;
-      } else {
+
+      if (
+        oldSceneName !== '' &&
+        oldSceneName !== UNKNOWN_SCENE_NAME &&
+        device.sceneName === null
+      ) {
         device.sceneName = oldSceneName;
+      } else {
+        if (
+          oldSceneName === '' || //Scene not exist
+          device.sceneName === null || //From status report
+          device.sceneName === '' || //From status report
+          device.sceneName === 'NA' //From property, but not set
+        ) {
+          //Not found, just put into the unknown scene group
+          device.sceneName = UNKNOWN_SCENE_NAME;
+          device.sceneId = UNKNOWN_SCENE_ID;
+        } else {
+          console.log('Old scene found:', oldSceneName);
+        }
+      }
+
+      let oldDevItem = null;
+      if (
+        oldSceneName === UNKNOWN_SCENE_NAME &&
+        device.sceneName !== oldSceneName
+      ) {
+        console.log(
+          'Device scene changed, old:',
+          oldSceneName,
+          ', new:',
+          device.sceneName,
+        );
+
+        //move this device from the unknown group
+        for (let i = 0; i < state.scenes.length; i++) {
+          if (state.scenes[i].title === oldSceneName) {
+            let foundIndex = -1;
+            for (let j = 0; j < state.scenes[i].data.length; j++) {
+              if (state.scenes[i].data[j].id === device.id) {
+                foundIndex = j;
+                oldDevItem = state.scenes[i].data[j];
+              }
+            }
+            if (foundIndex >= 0) {
+              state.scenes[i].data.splice(foundIndex, 1);
+            }
+          }
+        }
       }
 
       //if not exist creat a new scene and push this device
@@ -57,6 +107,36 @@ export const slice = createSlice({
           let device_found = false;
           for (let j = 0; j < state.scenes[i].data.length; j++) {
             if (state.scenes[i].data[j].id === device.id) {
+              //update from old data
+              if (oldDevItem !== null) {
+                if (oldDevItem.name !== null) {
+                  state.scenes[i].data[j].name = oldDevItem.name;
+                }
+                if (oldDevItem.sceneId !== null) {
+                  state.scenes[i].data[j].sceneId = oldDevItem.sceneId;
+                }
+                if (oldDevItem.isHeating !== null) {
+                  state.scenes[i].data[j].isHeating = oldDevItem.isHeating;
+                }
+                if (oldDevItem.isUpWater !== null) {
+                  state.scenes[i].data[j].isUpWater = oldDevItem.isUpWater;
+                }
+                if (oldDevItem.netType !== null) {
+                  state.scenes[i].data[j].netType = oldDevItem.netType;
+                }
+                if (oldDevItem.detectionTemperature !== null) {
+                  state.scenes[i].data[j].detectionTemperature =
+                    oldDevItem.detectionTemperature;
+                }
+                if (oldDevItem.waterLevelDetection !== null) {
+                  state.scenes[i].data[j].waterLevelDetection =
+                    oldDevItem.waterLevelDetection;
+                }
+                if (oldDevItem.error !== null) {
+                  state.scenes[i].data[j].error = oldDevItem.error;
+                }
+              }
+
               if (device.name !== null) {
                 state.scenes[i].data[j].name = device.name;
               }
