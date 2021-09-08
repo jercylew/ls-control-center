@@ -14,7 +14,7 @@ export const MqttProvider = ({children}) => {
   const [mqttClient, setMqttClient] = useState(null);
   const sendCommand = (topic, data) => {
     console.log('MQTT trying to send mqtt command:', data);
-    mqttClient.publish(TOPIC_DEV_STATUS, data, 0, false);
+    mqttClient.publish(topic, data, 0, false);
   };
 
   const dispatch = useDispatch();

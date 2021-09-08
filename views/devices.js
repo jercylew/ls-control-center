@@ -127,16 +127,12 @@ const Item = ({devPros}) => {
       );
     }
 
-    devPros.sceneName = sceneName;
-    devPros.name = devName;
-
     //TODO: Not allowed to edit scene_id
     //If it is the new created device(scene_name: NA, scene_id: NA, scene_name: NA),
     //auto-generate a scene_id and set it editable for the user
     //Otherwise set it readonly
     //Require: a backend server to store the device_id and scene map table,
     //1) HTTP: GET /api/scene/device/LS_100002
-    devPros.sceneId = sceneId;
 
     //Save to local
     //dispatch(saveDeviceInfo(devPros))
@@ -150,9 +146,9 @@ const Item = ({devPros}) => {
       device_id: devPros.id,
       method: 'configure',
       params: {
-        Scene_Name: devPros.sceneName,
-        Scene_Id: devPros.sceneId,
-        Device_Name: devPros.name,
+        Scene_Name: sceneName,
+        Scene_Id: sceneId,
+        Device_Name: devName,
         // Remote_address: '',
         // Remote_port: 1883,
         // Mqtt_User_Name: '',
