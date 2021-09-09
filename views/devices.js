@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import {Button, Dialog, Portal, TextInput} from 'react-native-paper';
 import {useSelector, useDispatch} from 'react-redux';
-import {saveDeviceInfo, selectScenes} from '../data/device-slice';
+import {syncDevice, selectScenes} from '../data/device-slice';
 import {useMqttClient} from '../api/mqtt-hooks';
+import {strToUnicode} from '../api/unicode';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 
@@ -86,6 +87,8 @@ const Item = ({devPros}) => {
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
 
+  const dispatch = useDispatch();
+
   const showDialogDevInfo = () => setDlgDevInfoVisible(true);
   const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
 
@@ -127,28 +130,15 @@ const Item = ({devPros}) => {
       );
     }
 
-    //TODO: Not allowed to edit scene_id
-    //If it is the new created device(scene_name: NA, scene_id: NA, scene_name: NA),
-    //auto-generate a scene_id and set it editable for the user
-    //Otherwise set it readonly
-    //Require: a backend server to store the device_id and scene map table,
-    //1) HTTP: GET /api/scene/device/LS_100002
-
-    //Save to local
-    //dispatch(saveDeviceInfo(devPros))
-
-    //Via MQTT command: saveDeviceInfo
-    //{scene_id, scene_name, device_name, remote_address, remote_port,
-    // mqtt_user_name, mqtt_user_password, mqtt_port, mqtt_client_id, wifi_ssid, wifi_password}
-
-    //Via MQTT command: saveMaxTemp(), saveMaxWaterLevel()
+    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
+    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
       params: {
-        Scene_Name: sceneName,
+        Scene_Name: sceneNameUnicode,
         Scene_Id: sceneId,
-        Device_Name: devName,
+        Device_Name: deviceNameUnicode,
         // Remote_address: '',
         // Remote_port: 1883,
         // Mqtt_User_Name: '',
@@ -160,6 +150,19 @@ const Item = ({devPros}) => {
     };
 
     hideDialogDevInfo();
+    let newDevice = {
+      name: devName.slice(0, 16),
+      id: devPros.id,
+      sceneId: sceneId,
+      sceneName: sceneName.slice(0, 16),
+      isHeating: null,
+      isUpWater: null,
+      netType: null,
+      detectionTemperature: null,
+      waterLevelDetection: null,
+      error: null,
+    };
+    dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
@@ -259,14 +262,14 @@ const Item = ({devPros}) => {
                 value={maxTemp.toString()}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
-                disabled={true}
+                editable={false}
               />
               <TextInput
                 label="最高水位"
                 value={maxWaterLevel.toString()}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
-                disabled={true}
+                editable={false}
               />
             </View>
           </Dialog.Content>
@@ -363,7 +366,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   itemSetTempWaterLevel: {
-    paddingHorizontal: 100,
+    paddingHorizontal: 50,
     paddingVertical: 30,
     flexDirection: 'row',
   },

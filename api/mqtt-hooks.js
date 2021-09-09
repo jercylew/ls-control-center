@@ -2,6 +2,7 @@ import MQTT from 'sp-react-native-mqtt';
 import {useDispatch} from 'react-redux';
 import {syncDevice} from '../data/device-slice';
 import React, {createContext, useState, useContext} from 'react';
+import {strFromUnicode} from './unicode';
 
 const TOPIC_DEV_STATUS = '$thing/up/status/sale_table';
 const TOPIC_DEV_PROPERTY = '$thing/up/property/sale_table';
@@ -56,10 +57,17 @@ export const MqttProvider = ({children}) => {
     ) {
       inSceneName = UNKNOWN_SCENE_NAME;
       inSceneId = UNKNOWN_SCENE_ID;
+    } else {
+      inSceneName = strFromUnicode(propData.Scene_Name);
+    }
+
+    let inDevName = propData.Device_Name;
+    if (propData.Device_Name.length >= 4) {
+      inDevName = strFromUnicode(propData.Device_Name);
     }
 
     let newDevice = {
-      name: propData.Device_Name,
+      name: inDevName,
       id: propData.device_id,
       sceneId: inSceneId,
       sceneName: inSceneName,
