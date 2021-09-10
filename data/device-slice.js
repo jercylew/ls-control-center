@@ -69,10 +69,7 @@ export const slice = createSlice({
       }
 
       let oldDevItem = null;
-      if (
-        oldSceneName === UNKNOWN_SCENE_NAME &&
-        device.sceneName !== oldSceneName
-      ) {
+      if (device.sceneName !== oldSceneName) {
         console.log(
           'Device scene changed, old:',
           oldSceneName,
