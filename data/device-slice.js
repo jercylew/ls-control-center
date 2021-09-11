@@ -129,8 +129,21 @@ export const slice = createSlice({
                   state.scenes[i].data[j].waterLevelDetection =
                     oldDevItem.waterLevelDetection;
                 }
-                if (oldDevItem.error !== null) {
-                  state.scenes[i].data[j].error = oldDevItem.error;
+                if (oldDevItem.errorWaterLevel !== null) {
+                  state.scenes[i].data[j].errorWaterLevel =
+                    oldDevItem.errorWaterLevel;
+                }
+                if (oldDevItem.errorTemperature !== null) {
+                  state.scenes[i].data[j].errorTemperature =
+                    oldDevItem.errorTemperature;
+                }
+                if (oldDevItem.maxWaterLevel !== null) {
+                  state.scenes[i].data[j].maxWaterLevel =
+                    oldDevItem.maxWaterLevel;
+                }
+                if (oldDevItem.maxTemperature !== null) {
+                  state.scenes[i].data[j].maxTemperature =
+                    oldDevItem.maxTemperature;
                 }
               }
 
@@ -157,8 +170,19 @@ export const slice = createSlice({
                 state.scenes[i].data[j].waterLevelDetection =
                   device.waterLevelDetection;
               }
-              if (device.error !== null) {
-                state.scenes[i].data[j].error = device.error;
+              if (device.errorWaterLevel !== null) {
+                state.scenes[i].data[j].errorWaterLevel =
+                  device.errorWaterLevel;
+              }
+              if (device.errorTemperature !== null) {
+                state.scenes[i].data[j].errorTemperature =
+                  device.errorTemperature;
+              }
+              if (device.maxWaterLevel !== null) {
+                state.scenes[i].data[j].maxWaterLevel = device.maxWaterLevel;
+              }
+              if (device.maxTemperature !== null) {
+                state.scenes[i].data[j].maxTemperature = device.maxTemperature;
               }
               device_found = true;
             }

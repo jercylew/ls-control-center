@@ -31,7 +31,10 @@ export const MqttProvider = ({children}) => {
       netType: reportData.NET_type,
       detectionTemperature: reportData.Detection_temperature,
       waterLevelDetection: reportData.Water_level_detection,
-      error: '',
+      errorWaterLevel: reportData.error_water_level,
+      errorTemperature: reportData.error_temperature,
+      maxWaterLevel: null,
+      maxTemperature: null,
     };
     console.log('Now try to sync to slice...');
     dispatch(syncDevice(newDevice));
@@ -76,7 +79,10 @@ export const MqttProvider = ({children}) => {
       netType: null,
       detectionTemperature: null,
       waterLevelDetection: null,
-      error: null,
+      errorWaterLevel: null,
+      errorTemperature: null,
+      maxWaterLevel: propData.params.Water_level_Threshold_Max,
+      maxTemperature: propData.params.Temp_Threshold_Max,
     };
     dispatch(syncDevice(newDevice));
   };

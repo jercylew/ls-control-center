@@ -81,8 +81,10 @@ const Item = ({devPros}) => {
   const [dlgMaxTempVisible, seDlgMaxTempVisible] = React.useState(false);
   const [dlgMaxWaterLevelVisible, seDlgMaxWaterLevelVisible] =
     React.useState(false);
-  const [maxTemp, setMaxTemp] = React.useState(100);
-  const [maxWaterLevel, setMaxWaterLevel] = React.useState(600);
+  const [maxTemp, setMaxTemp] = React.useState(devPros.maxTemperature);
+  const [maxWaterLevel, setMaxWaterLevel] = React.useState(
+    devPros.maxWaterLevel,
+  );
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
@@ -123,6 +125,14 @@ const Item = ({devPros}) => {
     }
   }
 
+  function intToText(value) {
+    if (value === null) {
+      return '0';
+    }
+
+    return value.toString();
+  }
+
   function onDialogDevInfoOk() {
     if (sceneName !== devPros.sceneName) {
       console.log(
@@ -160,7 +170,10 @@ const Item = ({devPros}) => {
       netType: null,
       detectionTemperature: null,
       waterLevelDetection: null,
-      error: null,
+      errorWaterLevel: null,
+      errorTemperature: null,
+      maxWaterLevel: null,
+      maxTemperature: null,
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -236,9 +249,9 @@ const Item = ({devPros}) => {
             </Text>
             <Text>
               {'温度：' +
-                devPros.detectionTemperature +
+                intToText(devPros.detectionTemperature) +
                 ',\t\t\t\t水位： ' +
-                devPros.waterLevelDetection}
+                intToText(devPros.waterLevelDetection)}
             </Text>
             <Text>网卡类型： {netTypeToText(devPros.netType)}</Text>
             <View style={styles.input}>
@@ -259,14 +272,14 @@ const Item = ({devPros}) => {
               />
               <TextInput
                 label="最高温度"
-                value={maxTemp.toString()}
+                value={intToText(maxTemp)}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
                 editable={false}
               />
               <TextInput
                 label="最高水位"
-                value={maxWaterLevel.toString()}
+                value={intToText(maxWaterLevel)}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
                 editable={false}
@@ -284,7 +297,7 @@ const Item = ({devPros}) => {
             <View>
               <TextInput
                 label="温度"
-                value={maxTemp.toString()}
+                value={intToText(maxTemp)}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
               />
@@ -303,7 +316,7 @@ const Item = ({devPros}) => {
             <View>
               <TextInput
                 label="水位"
-                value={maxWaterLevel.toString()}
+                value={intToText(maxWaterLevel)}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
               />
