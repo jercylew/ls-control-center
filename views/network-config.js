@@ -1,24 +1,67 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {RadioButton, Button, TextInput} from 'react-native-paper';
 
+import ESPTouchModule from '../api/esptouch-wrapper';
+
 const NetworkConfig = () => {
-  const [txtPassword, onChangePassword] = React.useState('');
-  const [number, onChangeNumber] = React.useState('1');
-  const [value, setValue] = React.useState('broadcast');
+  const [ssid, setSsid] = React.useState('');
+  const [bssid, setBssid] = React.useState('');
+  const [password, onChangePassword] = React.useState('');
+  const [numDev, onChangeNumDev] = React.useState(1);
+  const [broadcast, onChangeBroadcast] = React.useState('broadcast');
   const [securePass, setSecurePass] = React.useState(true);
+
+  const onConfirmConnEspDev = () => {
+    ESPTouchModule.connectESPDevice(
+      ssid,
+      bssid,
+      password,
+      numDev,
+      broadcast,
+      (error, bSucceed) => {
+        if (error) {
+          console.error(`Error found! ${error}`);
+        }
+
+        if (bSucceed) {
+          console.log('Connecting ESP device succeed!');
+        } else {
+          console.log('Failed to connect ESP device');
+        }
+      },
+    );
+  };
+
+  useEffect(() => {
+    ESPTouchModule.getSSID((error, retSsid) => {
+      if (error) {
+        console.error(`Error found! ${error}`);
+      }
+      console.log(`SSID ${retSsid} returned`);
+      setSsid(retSsid);
+    });
+
+    ESPTouchModule.getBSSID((error, retBssid) => {
+      if (error) {
+        console.error(`Error found! ${error}`);
+      }
+      console.log(`BSSID ${retBssid} returned`);
+      setBssid(retBssid);
+    });
+  });
 
   return (
     <SafeAreaView style={styles.topView}>
-      <Text style={styles.headerText}>SSID:</Text>
-      <Text style={styles.headerText}>BSSID:</Text>
+      <Text style={styles.headerText}>{`SSID: ${ssid}`}</Text>
+      <Text style={styles.headerText}>{`BSSID: ${bssid}`}</Text>
 
       <TextInput
         style={styles.input}
         label="密码"
         onChangeText={onChangePassword}
         secureTextEntry={securePass}
-        value={txtPassword}
+        value={password}
         right={
           <TextInput.Icon
             name="eye"
@@ -31,15 +74,15 @@ const NetworkConfig = () => {
 
       <TextInput
         style={styles.input}
-        onChangeText={onChangeNumber}
-        value={number.toString()}
+        onChangeText={onChangeNumDev}
+        value={numDev.toString()}
         label="设备数量"
         keyboardType="numeric"
       />
 
       <RadioButton.Group
-        onValueChange={newValue => setValue(newValue)}
-        value={value}>
+        onValueChange={newValue => onChangeBroadcast(newValue)}
+        value={broadcast}>
         <View style={styles.radiosGroup}>
           <View style={styles.radioItem}>
             <Text style={styles.labelText}>广播</Text>
@@ -55,7 +98,7 @@ const NetworkConfig = () => {
       <Button
         mode="contained"
         icon="set-center"
-        onPress={() => console.log('Pressed')}
+        onPress={onConfirmConnEspDev}
         style={styles.confirmButton}>
         确认
       </Button>
