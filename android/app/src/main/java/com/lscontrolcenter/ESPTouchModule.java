@@ -26,6 +26,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 
 public class ESPTouchModule extends ReactContextBaseJavaModule {
@@ -79,7 +80,8 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
         if (mTask != null) {
             mTask.cancelEsptouch();
         }
-        mTask = new EsptouchAsyncTask4(this.getCurrentActivity().getApplicationContext(), callBack);
+        mTask = new EsptouchAsyncTask4(this.getCurrentActivity().getApplicationContext(),
+                this.getReactApplicationContext());
         mTask.execute(ssid, bssid, password, deviceCount, broadcast);
 
         String strMsgJson = "{\"is_succeed\": true, \"message\": \"Connecting...\"," +
@@ -114,56 +116,47 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
 
     private static class EsptouchAsyncTask4 extends AsyncTask<byte[], IEsptouchResult,
                 List<IEsptouchResult>> {
-        private final WeakReference<Callback> mCallBackRef;
         private Context mContext;
+        private ReactApplicationContext mReactAppContext;
 
         private final Object mLock = new Object();
-//        private AlertDialog mResultDialog;
         private IEsptouchTask mEsptouchTask;
 
-        EsptouchAsyncTask4(Context context, Callback callback) {
+        EsptouchAsyncTask4(Context context, ReactApplicationContext reactAppContext) {
             mContext = context;
-            mCallBackRef = new WeakReference<>(callback);
+            mReactAppContext = reactAppContext;
         }
 
         void cancelEsptouch() {
             cancel(true);
-            Callback callback = mCallBackRef.get();
-            if (callback != null) {
-                String strMsgJson = "{\"is_succeed\": false, \"message\": \"Cancelled\"," +
-                        " \"exec_status\": -1}";
-                callback.invoke(strMsgJson, null);
-            }
             if (mEsptouchTask != null) {
                 mEsptouchTask.interrupt();
             }
+
+            String strMsgJson = "{\"is_succeed\": false, \"message\": \"Cancelled\"," +
+                        " \"exec_status\": -1}";
+            sendEventToJs("esp_conn_update", strMsgJson);
         }
 
         @Override
         protected void onPreExecute() {
-            Callback callback = mCallBackRef.get();
-            if (callback != null) {
-                String strMsgJson = "{\"is_succeed\": true, \"message\": \"Started\"," +
-                        " \"exec_status\": 0}";
-                callback.invoke(null, strMsgJson);
-            }
+            String strMsgJson = "{\"is_succeed\": true, \"message\": \"Started\"," +
+                    " \"exec_status\": 0}";
+            sendEventToJs("esp_conn_update", strMsgJson);
         }
 
         @Override
         protected void onProgressUpdate(IEsptouchResult... values) {
-            Callback callback = mCallBackRef.get();
-            if (callback != null) {
-                IEsptouchResult result = values[0];
-                Log.i(TAG, "EspTouchResult: " + result);
+            IEsptouchResult result = values[0];
+            Log.i(TAG, "EspTouchResult: " + result);
 
-                String strDevDetails = String.format(Locale.ENGLISH,
-                        "{\"bssid\": \"%s\", \"ip\": \"%s\"}",
-                        result.getBssid(), result.getInetAddress().getHostAddress());
-                String strMsgJson = String.format(Locale.ENGLISH,
-                        "{\"is_succeed\": true, \"message\": \"Current device connected\"," +
-                        " \"exec_status\": 0, \"dev_details\": \"%s\"}", strDevDetails);
-                callback.invoke(null, strMsgJson);
-            }
+            String strDevDetails = String.format(Locale.ENGLISH,
+                    "{\"bssid\": \"%s\", \"ip\": \"%s\"}",
+                    result.getBssid(), result.getInetAddress().getHostAddress());
+            String strMsgJson = String.format(Locale.ENGLISH,
+                    "{\"is_succeed\": true, \"message\": \"Current device connected\"," +
+                            " \"exec_status\": 0, \"dev_details\": \"%s\"}", strDevDetails);
+            sendEventToJs("esp_conn_update", strMsgJson);
         }
 
         @Override
@@ -185,15 +178,10 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
 
         @Override
         protected void onPostExecute(List<IEsptouchResult> result) {
-            Callback callback = mCallBackRef.get();
-            if (callback == null) {
-                return;
-            }
-
             if (result == null) {
                 String strErrJson = "{\"is_succeed\": false, \"message\": " +
                         "\"Failed to connect ESP device\", \"exec_status\": -1}";
-                callback.invoke(strErrJson, null);
+                sendEventToJs("esp_conn_update", strErrJson);
                 return;
             }
 
@@ -209,7 +197,7 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
                 String strMsgJson =
                         "{\"is_succeed\": false, \"message\": \"Failed to connect ESP device\"," +
                                 " \"exec_status\": -1}";
-                callback.invoke(null, strMsgJson);
+                sendEventToJs("esp_conn_update", strMsgJson);
                 return;
             }
 
@@ -234,7 +222,11 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
             String strMsgJson = String.format(Locale.ENGLISH,
                     "{\"is_succeed\": true, \"message\": \"All device connected\"," +
                             " \"exec_status\": 1, \"dev_details\": \"%s\"}", strListDevDetails);
-            callback.invoke(null, strMsgJson);
+            sendEventToJs("esp_conn_update", strMsgJson);
+        }
+
+        public void sendEventToJs(String eventName,Object obj){
+            mReactAppContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName,obj);
         }
     }
 }

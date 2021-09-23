@@ -1,7 +1,16 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  NativeEventEmitter,
+  NativeModules,
+} from 'react-native';
 import {RadioButton, Button, TextInput} from 'react-native-paper';
 import ESPTouchModule from '../api/esptouch-wrapper';
+
+const {ReactNativeLoading} = NativeModules;
 
 const NetworkConfig = () => {
   const [ssid, setSsid] = React.useState('');
@@ -12,9 +21,11 @@ const NetworkConfig = () => {
   const [securePass, setSecurePass] = React.useState(true);
   const [connStatus, setConnStatus] = React.useState('');
   const [connSucc, setConnSucc] = React.useState(false);
+  const [connBtnEnabled, setConnBtnEnabled] = React.useState(true);
 
   const onConfirmConnEspDev = () => {
     setConnStatus('');
+    setConnBtnEnabled(false);
     ESPTouchModule.connectESPDevice(
       ssid,
       bssid,
@@ -25,23 +36,7 @@ const NetworkConfig = () => {
         if (error) {
           setConnStatus('连接失败！');
           setConnSucc(false);
-          return;
-        }
-
-        let respJson = JSON.parse(resp);
-        if (respJson.is_succeed) {
-          if (respJson.exec_status === 0) {
-            setConnStatus('正在连接...');
-          } else if (respJson.exec_status === 1) {
-            setConnStatus('连接成功!');
-            setConnSucc(true);
-          } else if (respJson.exec_status === -1) {
-            setConnStatus('连接失败！');
-          } else {
-            setConnStatus('');
-          }
-        } else {
-          setConnStatus('连接失败！');
+          setConnBtnEnabled(true);
         }
       },
     );
@@ -63,6 +58,37 @@ const NetworkConfig = () => {
       console.log(`BSSID ${retBssid} returned`);
       setBssid(retBssid);
     });
+
+    const loadingManagerEmitter = new NativeEventEmitter(ReactNativeLoading);
+    const subscription = loadingManagerEmitter.addListener(
+      'esp_conn_update',
+      updateMsg => {
+        console.log(updateMsg);
+        let respJson = JSON.parse(updateMsg);
+        if (respJson.is_succeed) {
+          if (respJson.exec_status === 0) {
+            setConnStatus('正在连接...');
+            setConnBtnEnabled(false);
+          } else if (respJson.exec_status === 1) {
+            setConnStatus('连接成功!');
+            setConnSucc(true);
+            setConnBtnEnabled(true);
+          } else if (respJson.exec_status === -1) {
+            setConnStatus('连接失败！');
+            setConnBtnEnabled(true);
+          } else {
+            setConnStatus('');
+          }
+        } else {
+          setConnStatus('连接失败！');
+          setConnBtnEnabled(true);
+        }
+      },
+    );
+
+    return function cleanup() {
+      subscription.remove();
+    };
   });
 
   return (
@@ -117,6 +143,7 @@ const NetworkConfig = () => {
       <Button
         mode="contained"
         icon="set-center"
+        disabled={!connBtnEnabled}
         onPress={onConfirmConnEspDev}
         style={styles.confirmButton}>
         确认

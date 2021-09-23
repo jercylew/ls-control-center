@@ -1,7 +1,18 @@
 package com.lscontrolcenter;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.LocationManager;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -9,7 +20,9 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,6 +47,27 @@ public class MainApplication extends Application implements ReactApplication {
         }
       };
 
+  private static MainApplication app;
+  private MutableLiveData<String> mBroadcastData;
+  private Map<String, Object> mCacheMap;
+
+  private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        if (action == null) {
+            return;
+        }
+
+        switch (action) {
+            case WifiManager.NETWORK_STATE_CHANGED_ACTION:
+            case LocationManager.PROVIDERS_CHANGED_ACTION:
+                mBroadcastData.setValue(action);
+                break;
+        }
+    }
+ };
+
   @Override
   public ReactNativeHost getReactNativeHost() {
     return mReactNativeHost;
@@ -44,7 +78,26 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+
+    app = this;
+    mCacheMap = new HashMap<>();
+    mBroadcastData = new MutableLiveData<>();
+    IntentFilter filter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
+    }
+    registerReceiver(mReceiver, filter);
   }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        unregisterReceiver(mReceiver);
+    }
+
+    public static MainApplication getInstance() {
+        return app;
+    }
 
   /**
    * Loads Flipper in React Native templates. Call this in the onCreate method with something like
@@ -76,4 +129,24 @@ public class MainApplication extends Application implements ReactApplication {
       }
     }
   }
+
+    public void observeBroadcast(LifecycleOwner owner, Observer<String> observer) {
+        mBroadcastData.observe(owner, observer);
+    }
+
+    public void observeBroadcastForever(Observer<String> observer) {
+        mBroadcastData.observeForever(observer);
+    }
+
+    public void removeBroadcastObserver(Observer<String> observer) {
+        mBroadcastData.removeObserver(observer);
+    }
+
+    public void putCache(String key, Object value) {
+        mCacheMap.put(key, value);
+    }
+
+    public Object takeCache(String key) {
+        return mCacheMap.remove(key);
+    }
 }

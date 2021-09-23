@@ -7,12 +7,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider as PaperProvider} from 'react-native-paper';
 import store from './data/store';
-import {Provider as StoreProvider} from 'react-redux';
+import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
 import {MqttProvider} from './api/mqtt-hooks';
+import {selectScenes} from './data/device-slice';
 
 const Tab = createBottomTabNavigator();
 
 const MyTabs = () => {
+  const scenes = useSelector(selectScenes);
+
   return (
     <Tab.Navigator
       initialRouteName="Devices"
@@ -34,7 +37,7 @@ const MyTabs = () => {
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
           headerTitle: '在线设备',
-          tabBarBadge: 4,
+          tabBarBadge: scenes.length,
         }}
       />
       <Tab.Screen
