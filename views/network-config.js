@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {RadioButton, Button, TextInput} from 'react-native-paper';
-
 import ESPTouchModule from '../api/esptouch-wrapper';
 
 const NetworkConfig = () => {
@@ -11,23 +10,38 @@ const NetworkConfig = () => {
   const [numDev, onChangeNumDev] = React.useState(1);
   const [broadcast, onChangeBroadcast] = React.useState('broadcast');
   const [securePass, setSecurePass] = React.useState(true);
+  const [connStatus, setConnStatus] = React.useState('');
+  const [connSucc, setConnSucc] = React.useState(false);
 
   const onConfirmConnEspDev = () => {
+    setConnStatus('');
     ESPTouchModule.connectESPDevice(
       ssid,
       bssid,
       password,
       numDev,
       broadcast,
-      (error, bSucceed) => {
+      (error, resp) => {
         if (error) {
-          console.error(`Error found! ${error}`);
+          setConnStatus('连接失败！');
+          setConnSucc(false);
+          return;
         }
 
-        if (bSucceed) {
-          console.log('Connecting ESP device succeed!');
+        let respJson = JSON.parse(resp);
+        if (respJson.is_succeed) {
+          if (respJson.exec_status === 0) {
+            setConnStatus('正在连接...');
+          } else if (respJson.exec_status === 1) {
+            setConnStatus('连接成功!');
+            setConnSucc(true);
+          } else if (respJson.exec_status === -1) {
+            setConnStatus('连接失败！');
+          } else {
+            setConnStatus('');
+          }
         } else {
-          console.log('Failed to connect ESP device');
+          setConnStatus('连接失败！');
         }
       },
     );
@@ -95,6 +109,11 @@ const NetworkConfig = () => {
         </View>
       </RadioButton.Group>
 
+      <Text
+        style={
+          connSucc ? styles.statusOkText : styles.statusFailureText
+        }>{`${connStatus}`}</Text>
+
       <Button
         mode="contained"
         icon="set-center"
@@ -140,6 +159,22 @@ const styles = StyleSheet.create({
     // height: 50,
     margin: 5,
     borderRadius: 10,
+  },
+  statusOkText: {
+    marginBottom: 20,
+    marginTop: 20,
+    marginLeft: 8,
+    padding: 2,
+    fontSize: 20,
+    color: '#07f026',
+  },
+  statusFailureText: {
+    marginBottom: 20,
+    marginTop: 20,
+    marginLeft: 8,
+    padding: 2,
+    fontSize: 20,
+    color: '#f01707',
   },
 });
 
