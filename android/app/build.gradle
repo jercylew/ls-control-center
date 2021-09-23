@@ -147,6 +147,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+        if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+            storeFile file(MYAPP_RELEASE_STORE_FILE)
+            storePassword MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias MYAPP_RELEASE_KEY_ALIAS
+            keyPassword MYAPP_RELEASE_KEY_PASSWORD
+          }
+       }
     }
     buildTypes {
         debug {
@@ -155,9 +163,10 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            minifyEnabled true
         }
     }
 
@@ -187,6 +196,10 @@ dependencies {
 
     // implementation ':sp-react-native-mqtt'
     implementation project(':sp-react-native-mqtt')
+
+    // implementation 'ESPTouch'
+    implementation 'com.github.EspressifApp:lib-esptouch-android:1.0.0'
+    implementation 'com.github.EspressifApp:lib-esptouch-v2-android:2.1.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
