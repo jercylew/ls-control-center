@@ -8,6 +8,8 @@ import {strFromUnicode} from './unicode';
 
 const TOPIC_DEV_STATUS = '$thing/up/status/sale_table';
 const TOPIC_DEV_PROPERTY = '$thing/up/property/sale_table';
+const TOPIC_REFRG_STATUS = '$thing/up/status/refrigerator';
+const TOPIC_REFRG_PROPERTY = '$thing/up/property/refrigerator';
 const UNKNOWN_SCENE_NAME = '未知场地';
 const UNKNOWN_SCENE_ID = '00000-0000000000';
 
@@ -141,6 +143,8 @@ export const MqttProvider = ({children}) => {
           console.log('connected');
           client.subscribe(TOPIC_DEV_STATUS, 0);
           client.subscribe(TOPIC_DEV_PROPERTY, 0);
+          client.subscribe(TOPIC_REFRG_STATUS, 0);
+          client.subscribe(TOPIC_REFRG_PROPERTY, 0);
         });
 
         setMqttClient(client);

@@ -28,6 +28,10 @@ import android.util.Log;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class ESPTouchModule extends ReactContextBaseJavaModule {
     private static final String TAG = ESPTouchModule.class.getSimpleName();
@@ -63,8 +67,15 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
 
         if (strSSID.isEmpty() || strBSSID == null ||
                 strBSSID.equals("02:00:00:00:00:00")) {
-            String strErrJson = "{\"is_succeed\": false, \"message\": " +
-                    "\"App not connected to Wifi\"}";
+            JSONObject jsonMsg = new JSONObject();
+            try {
+                jsonMsg.accumulate("is_succeed", false);
+                jsonMsg.accumulate("message", "App not connected to Wifi");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String strErrJson = jsonMsg.toString();
             callBack.invoke(strErrJson, null);
 
             return;
@@ -84,8 +95,16 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
                 this.getReactApplicationContext());
         mTask.execute(ssid, bssid, password, deviceCount, broadcast);
 
-        String strMsgJson = "{\"is_succeed\": true, \"message\": \"Connecting...\"," +
-                " \"exec_status\": 0}";
+        JSONObject jsonMsg = new JSONObject();
+        try {
+            jsonMsg.accumulate("is_succeed", true);
+            jsonMsg.accumulate("message", "Connecting...");
+            jsonMsg.accumulate("exec_status", 0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String strMsgJson = jsonMsg.toString();
         callBack.invoke(null, strMsgJson);
     }
 
@@ -97,7 +116,7 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
                 .getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 //        wifiManager.setWifiEnabled(true);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        strOutSsid = wifiInfo.getSSID();
+        strOutSsid = com.espressif.iot.esptouch2.provision.TouchNetUtil.getSsidString(wifiInfo);
         Log.d("ESPTouchModule", "Got SSID: " + strOutSsid);
         callBack.invoke(null, strOutSsid);
     }
@@ -133,15 +152,31 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
                 mEsptouchTask.interrupt();
             }
 
-            String strMsgJson = "{\"is_succeed\": false, \"message\": \"Cancelled\"," +
-                        " \"exec_status\": -1}";
+            JSONObject jsonMsg = new JSONObject();
+            try {
+                jsonMsg.accumulate("is_succeed", false);
+                jsonMsg.accumulate("message", "Cancelled");
+                jsonMsg.accumulate("exec_status", -1);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String strMsgJson = jsonMsg.toString();
             sendEventToJs("esp_conn_update", strMsgJson);
         }
 
         @Override
         protected void onPreExecute() {
-            String strMsgJson = "{\"is_succeed\": true, \"message\": \"Started\"," +
-                    " \"exec_status\": 0}";
+            JSONObject jsonMsg = new JSONObject();
+            try {
+                jsonMsg.accumulate("is_succeed", true);
+                jsonMsg.accumulate("message", "Started");
+                jsonMsg.accumulate("exec_status", 0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String strMsgJson = jsonMsg.toString();
             sendEventToJs("esp_conn_update", strMsgJson);
         }
 
@@ -150,12 +185,21 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
             IEsptouchResult result = values[0];
             Log.i(TAG, "EspTouchResult: " + result);
 
-            String strDevDetails = String.format(Locale.ENGLISH,
-                    "{\"bssid\": \"%s\", \"ip\": \"%s\"}",
-                    result.getBssid(), result.getInetAddress().getHostAddress());
-            String strMsgJson = String.format(Locale.ENGLISH,
-                    "{\"is_succeed\": true, \"message\": \"Current device connected\"," +
-                            " \"exec_status\": 0, \"dev_details\": \"%s\"}", strDevDetails);
+            JSONObject jsonMsg = new JSONObject();
+            JSONObject jsonDevDetails = new JSONObject();
+            try {
+                jsonMsg.accumulate("is_succeed", true);
+                jsonMsg.accumulate("message", "Current device connected");
+                jsonMsg.accumulate("exec_status", 0);
+
+                jsonDevDetails.accumulate("bssid", result.getBssid());
+                jsonDevDetails.accumulate("ip", result.getInetAddress().getHostAddress());
+                jsonMsg.accumulate("dev_details", jsonDevDetails);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String strMsgJson = jsonMsg.toString();
             sendEventToJs("esp_conn_update", strMsgJson);
         }
 
@@ -172,6 +216,10 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
                 mEsptouchTask = new EsptouchTask(apSsid, apBssid, apPassword, mContext);
                 mEsptouchTask.setPackageBroadcast(broadcastData[0] == 1);
                 mEsptouchTask.setEsptouchListener(this::publishProgress);
+
+                Log.d(TAG, "apSsid: " + apSsid + ", apBssid: " + apBssid + ", apPassword: " +
+                        apPassword + ", deviceCountData: " + deviceCountData +
+                        ", broadcastData: " + broadcastData);
             }
             return mEsptouchTask.executeForResults(taskResultCount);
         }
@@ -179,49 +227,61 @@ public class ESPTouchModule extends ReactContextBaseJavaModule {
         @Override
         protected void onPostExecute(List<IEsptouchResult> result) {
             if (result == null) {
-                String strErrJson = "{\"is_succeed\": false, \"message\": " +
-                        "\"Failed to connect ESP device\", \"exec_status\": -1}";
+                JSONObject jsonMsg = new JSONObject();
+                try {
+                    jsonMsg.accumulate("is_succeed", false);
+                    jsonMsg.accumulate("message", "Failed to connect ESP device");
+                    jsonMsg.accumulate("exec_status", -1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String strErrJson = jsonMsg.toString();
                 sendEventToJs("esp_conn_update", strErrJson);
                 return;
             }
 
-            // check whether the task is cancelled and no results received
             IEsptouchResult firstResult = result.get(0);
             if (firstResult.isCancelled()) {
                 return;
             }
-            // the task received some results including cancelled while
-            // executing before receiving enough results
 
             if (!firstResult.isSuc()) {
-                String strMsgJson =
-                        "{\"is_succeed\": false, \"message\": \"Failed to connect ESP device\"," +
-                                " \"exec_status\": -1}";
-                sendEventToJs("esp_conn_update", strMsgJson);
+                JSONObject jsonMsg = new JSONObject();
+                try {
+                    jsonMsg.accumulate("is_succeed", false);
+                    jsonMsg.accumulate("message", "Failed to connect ESP device");
+                    jsonMsg.accumulate("exec_status", -1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String strErrJson = jsonMsg.toString();
+                sendEventToJs("esp_conn_update", strErrJson);
                 return;
             }
 
-            String strListDevDetails = "[";
-            boolean bFirstItem = true;
-            for (IEsptouchResult touchResult : result) {
-                String strDevDetails = String.format(Locale.ENGLISH,
-                        "{\"bssid\": \"%s\", \"ip\": \"%s\"}",
-                        touchResult.getBssid(), touchResult.getInetAddress().getHostAddress());
 
-                if (bFirstItem) {
-                    bFirstItem = false;
-                }
-                else {
-                    strDevDetails = "," + strDevDetails;
+            JSONObject jsonMsg = new JSONObject();
+            try {
+                jsonMsg.accumulate("is_succeed", true);
+                jsonMsg.accumulate("message", "All device connected");
+                jsonMsg.accumulate("exec_status", 1);
+
+                JSONArray jaDevDetails = new JSONArray();
+                for (IEsptouchResult touchResult : result) {
+                    JSONObject jsonDev = new JSONObject();
+                    jsonDev.accumulate("bssid", touchResult.getBssid());
+                    jsonDev.accumulate("ip", touchResult.getInetAddress().getHostAddress());
+                    jaDevDetails.put(jsonDev);
                 }
 
-                strListDevDetails += strDevDetails;
+                jsonMsg.accumulate("dev_details", jaDevDetails);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            strListDevDetails += "]";
 
-            String strMsgJson = String.format(Locale.ENGLISH,
-                    "{\"is_succeed\": true, \"message\": \"All device connected\"," +
-                            " \"exec_status\": 1, \"dev_details\": \"%s\"}", strListDevDetails);
+            String strMsgJson = jsonMsg.toString();
             sendEventToJs("esp_conn_update", strMsgJson);
         }
 
