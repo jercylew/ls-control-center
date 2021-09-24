@@ -1,4 +1,6 @@
 import MQTT from 'sp-react-native-mqtt';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
 import {useDispatch} from 'react-redux';
 import {syncDevice} from '../data/device-slice';
 import React, {createContext, useState, useContext} from 'react';
@@ -94,7 +96,7 @@ export const MqttProvider = ({children}) => {
       user: 'tkt_iot_user',
       pass: 'tkt1qazm,./',
       auth: true,
-      clientId: 'app-clt-0a1234ef5b',
+      clientId: 'app-clt-' + uuidv4(),
     })
       .then(function (client) {
         client.on('closed', function () {
