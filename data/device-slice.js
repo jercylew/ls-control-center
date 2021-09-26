@@ -16,9 +16,9 @@ const getDevSceneName = (deviceId, devSceneMap) => {
 
 const setDevSceneName = (devIdScene, devSceneMap) => {
   let found = false;
-  for (let i = 0; i < devSceneMap.length; i++) {
-    if (devIdScene.deviceId === devSceneMap[i].deviceId) {
-      devSceneMap[i].sceneName = devIdScene.sceneName;
+  for (let item of devSceneMap) {
+    if (devIdScene.deviceId === item.deviceId) {
+      item.sceneName = devIdScene.sceneName;
       found = true;
     }
   }
@@ -27,6 +27,101 @@ const setDevSceneName = (devIdScene, devSceneMap) => {
     devSceneMap.push(devIdScene);
   }
 };
+
+const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
+  if (devData !== null) {
+    if (devData.name !== null) {
+      scenes[sceneIndex].data[devIndex].name = devData.name;
+    }
+    if (devData.sceneId !== null) {
+      scenes[sceneIndex].data[devIndex].sceneId = devData.sceneId;
+    }
+    if (devData.netType !== null) {
+      scenes[sceneIndex].data[devIndex].netType = devData.netType;
+    }
+
+    if (devData.devType === DEV_TYPE_SALE_TABLE) {
+      if (devData.isHeating !== null) {
+        scenes[sceneIndex].data[devIndex].isHeating = devData.isHeating;
+      }
+      if (devData.isUpWater !== null) {
+        scenes[sceneIndex].data[devIndex].isUpWater = devData.isUpWater;
+      }
+      if (devData.detectionTemperature !== null) {
+        scenes[sceneIndex].data[devIndex].detectionTemperature =
+          devData.detectionTemperature;
+      }
+      if (devData.waterLevelDetection !== null) {
+        scenes[sceneIndex].data[devIndex].waterLevelDetection =
+          devData.waterLevelDetection;
+      }
+      if (devData.errorWaterLevel !== null) {
+        scenes[sceneIndex].data[devIndex].errorWaterLevel =
+          devData.errorWaterLevel;
+      }
+      if (devData.errorTemperature !== null) {
+        scenes[sceneIndex].data[devIndex].errorTemperature =
+          devData.errorTemperature;
+      }
+      if (devData.maxWaterLevel !== null) {
+        scenes[sceneIndex].data[devIndex].maxWaterLevel = devData.maxWaterLevel;
+      }
+      if (devData.maxTemperature !== null) {
+        scenes[sceneIndex].data[devIndex].maxTemperature =
+          devData.maxTemperature;
+      }
+    }
+
+    if (devData.devType === DEV_TYPE_REFRIGERATOR) {
+      if (devData.cabinetTemp !== null) {
+        scenes[sceneIndex].data[devIndex].cabinetTemp = devData.cabinetTemp;
+      }
+      if (devData.evaporatorTempe !== null) {
+        scenes[sceneIndex].data[devIndex].evaporatorTempe =
+          devData.evaporatorTempe;
+      }
+      if (devData.condenserTempe !== null) {
+        scenes[sceneIndex].data[devIndex].condenserTempe =
+          devData.condenserTempe;
+      }
+      if (devData.ntcTempe !== null) {
+        scenes[sceneIndex].data[devIndex].ntcTempe = devData.ntcTempe;
+      }
+      if (devData.sht30OneTempe !== null) {
+        scenes[sceneIndex].data[devIndex].sht30OneTempe = devData.sht30OneTempe;
+      }
+      if (devData.sht30OneHumi !== null) {
+        scenes[sceneIndex].data[devIndex].sht30OneHumi = devData.sht30OneHumi;
+      }
+      if (devData.sht30TwoTempe !== null) {
+        scenes[sceneIndex].data[devIndex].sht30TwoTempe = devData.sht30TwoTempe;
+      }
+      if (devData.sht30TwoHumi !== null) {
+        scenes[sceneIndex].data[devIndex].sht30TwoHumi = devData.sht30TwoHumi;
+      }
+      if (devData.doorDetection1 !== null) {
+        scenes[sceneIndex].data[devIndex].doorDetection1 =
+          devData.doorDetection1;
+      }
+      if (devData.doorDetection2 !== null) {
+        scenes[sceneIndex].data[devIndex].doorDetection2 =
+          devData.doorDetection2;
+      }
+      if (devData.doorStatusOut !== null) {
+        scenes[sceneIndex].data[devIndex].doorStatusOut = devData.doorStatusOut;
+      }
+      if (devData.relay1Status !== null) {
+        scenes[sceneIndex].data[devIndex].relay1Status = devData.relay1Status;
+      }
+      if (devData.relay2Status !== null) {
+        scenes[sceneIndex].data[devIndex].relay2Status = devData.relay2Status;
+      }
+    }
+  }
+};
+
+export const DEV_TYPE_REFRIGERATOR = 'refrgtor';
+export const DEV_TYPE_SALE_TABLE = 'sale_table';
 
 export const slice = createSlice({
   name: 'scene',
@@ -78,8 +173,11 @@ export const slice = createSlice({
         );
 
         //move this device from the unknown group
+        let foundSceneIndex = -1;
         for (let i = 0; i < state.scenes.length; i++) {
           if (state.scenes[i].title === oldSceneName) {
+            foundSceneIndex = i;
+
             let foundIndex = -1;
             for (let j = 0; j < state.scenes[i].data.length; j++) {
               if (state.scenes[i].data[j].id === device.id) {
@@ -92,6 +190,12 @@ export const slice = createSlice({
             }
           }
         }
+
+        // if (foundSceneIndex >= 0) {
+        //   if (state.scenes[foundSceneIndex].data.length === 0) {
+        //     state.scenes.splice(foundSceneIndex, 1);
+        //   }
+        // }
       }
 
       //if not exist creat a new scene and push this device
@@ -105,85 +209,8 @@ export const slice = createSlice({
           for (let j = 0; j < state.scenes[i].data.length; j++) {
             if (state.scenes[i].data[j].id === device.id) {
               //update from old data
-              if (oldDevItem !== null) {
-                if (oldDevItem.name !== null) {
-                  state.scenes[i].data[j].name = oldDevItem.name;
-                }
-                if (oldDevItem.sceneId !== null) {
-                  state.scenes[i].data[j].sceneId = oldDevItem.sceneId;
-                }
-                if (oldDevItem.isHeating !== null) {
-                  state.scenes[i].data[j].isHeating = oldDevItem.isHeating;
-                }
-                if (oldDevItem.isUpWater !== null) {
-                  state.scenes[i].data[j].isUpWater = oldDevItem.isUpWater;
-                }
-                if (oldDevItem.netType !== null) {
-                  state.scenes[i].data[j].netType = oldDevItem.netType;
-                }
-                if (oldDevItem.detectionTemperature !== null) {
-                  state.scenes[i].data[j].detectionTemperature =
-                    oldDevItem.detectionTemperature;
-                }
-                if (oldDevItem.waterLevelDetection !== null) {
-                  state.scenes[i].data[j].waterLevelDetection =
-                    oldDevItem.waterLevelDetection;
-                }
-                if (oldDevItem.errorWaterLevel !== null) {
-                  state.scenes[i].data[j].errorWaterLevel =
-                    oldDevItem.errorWaterLevel;
-                }
-                if (oldDevItem.errorTemperature !== null) {
-                  state.scenes[i].data[j].errorTemperature =
-                    oldDevItem.errorTemperature;
-                }
-                if (oldDevItem.maxWaterLevel !== null) {
-                  state.scenes[i].data[j].maxWaterLevel =
-                    oldDevItem.maxWaterLevel;
-                }
-                if (oldDevItem.maxTemperature !== null) {
-                  state.scenes[i].data[j].maxTemperature =
-                    oldDevItem.maxTemperature;
-                }
-              }
-
-              if (device.name !== null) {
-                state.scenes[i].data[j].name = device.name;
-              }
-              if (device.sceneId !== null) {
-                state.scenes[i].data[j].sceneId = device.sceneId;
-              }
-              if (device.isHeating !== null) {
-                state.scenes[i].data[j].isHeating = device.isHeating;
-              }
-              if (device.isUpWater !== null) {
-                state.scenes[i].data[j].isUpWater = device.isUpWater;
-              }
-              if (device.netType !== null) {
-                state.scenes[i].data[j].netType = device.netType;
-              }
-              if (device.detectionTemperature !== null) {
-                state.scenes[i].data[j].detectionTemperature =
-                  device.detectionTemperature;
-              }
-              if (device.waterLevelDetection !== null) {
-                state.scenes[i].data[j].waterLevelDetection =
-                  device.waterLevelDetection;
-              }
-              if (device.errorWaterLevel !== null) {
-                state.scenes[i].data[j].errorWaterLevel =
-                  device.errorWaterLevel;
-              }
-              if (device.errorTemperature !== null) {
-                state.scenes[i].data[j].errorTemperature =
-                  device.errorTemperature;
-              }
-              if (device.maxWaterLevel !== null) {
-                state.scenes[i].data[j].maxWaterLevel = device.maxWaterLevel;
-              }
-              if (device.maxTemperature !== null) {
-                state.scenes[i].data[j].maxTemperature = device.maxTemperature;
-              }
+              updateDeviceInScene(oldDevItem, state.scenes, i, j);
+              updateDeviceInScene(device, state.scenes, i, j);
               device_found = true;
             }
           }
@@ -220,84 +247,10 @@ export const slice = createSlice({
         state.mapDeviceScene,
       );
     },
-
-    saveDeviceInfo: (state, action) => {
-      //From user update via APP
-      let device = action.payload;
-
-      let oldSceneName = getDevSceneName(device.id, state.mapDeviceScene);
-      if (oldSceneName !== device.sceneName) {
-        //Remove from old scene
-        for (let i = 0; i < state.scenes.length; i++) {
-          if (oldSceneName === state.scenes[i].title) {
-            state.scenes[i].data = state.scenes[i].data.filter(
-              item => item.id !== device.id,
-            );
-          }
-        }
-      }
-
-      //Add to new scene
-      let scene_found = false;
-      for (let i = 0; i < state.scenes.length; i++) {
-        if (device.sceneName === state.scenes[i].title) {
-          let device_found = false;
-          for (let j = 0; j < state.scenes[i].data.length; j++) {
-            if (state.scenes[i].data[j].id === device.id) {
-              state.scenes[i].data[j].name = device.name;
-              state.scenes[i].data[j].sceneId = device.sceneId;
-              state.scenes[i].data[j].isHeating = device.isHeating;
-              state.scenes[i].data[j].isUpWater = device.isUpWater;
-              state.scenes[i].data[j].netType = device.netType;
-              state.scenes[i].data[j].detectionTemperature =
-                device.detectionTemperature;
-              state.scenes[i].data[j].waterLevelDetection =
-                device.waterLevelDetection;
-              state.scenes[i].data[j].error = device.error;
-              device_found = true;
-            }
-          }
-
-          if (!device_found) {
-            state.scenes[i].data.push(device);
-          }
-          scene_found = true;
-        }
-      }
-
-      if (!scene_found) {
-        let newSceneName = device.sceneName;
-        if (
-          device.sceneName === null ||
-          device.sceneName === '' ||
-          device.sceneName === 'NA'
-        ) {
-          newSceneName = UNKNOWN_SCENE_NAME;
-        }
-
-        let new_scene = {
-          title: newSceneName,
-          data: [],
-        };
-        new_scene.data.push(device);
-        state.scenes.push(new_scene);
-      }
-
-      setDevSceneName(
-        {deviceId: device.id, sceneName: device.sceneName},
-        state.mapDeviceScene,
-      );
-    },
   },
 });
 
 export const {syncDevice, saveDeviceInfo} = slice.actions;
-
-// export const incrementAsync = amount => dispatch => {
-//   setTimeout(() => {
-//     dispatch(incrementByAmount(amount));
-//   }, 1000);
-// };
 
 export const selectScenes = state => state.scene.scenes;
 export default slice.reducer;
