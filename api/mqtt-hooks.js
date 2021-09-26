@@ -184,6 +184,10 @@ export const MqttProvider = ({children}) => {
       .then(function (client) {
         client.on('closed', function () {
           console.log('mqtt.event.closed');
+          setTimeout(() => {
+            console.log('Mqtt client disconnected, now reconnecting ...');
+            client.connect();
+          }, 5000);
         });
 
         client.on('error', function (msg) {
