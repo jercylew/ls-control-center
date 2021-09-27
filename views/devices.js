@@ -245,14 +245,14 @@ const SaleTableItem = ({devPros}) => {
               />
               <TextInput
                 label="最高温度(°C)"
-                value={intToText(maxTemp)}
+                value={intToText(devPros.maxTemperature)}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
                 editable={false}
               />
               <TextInput
                 label="最高水位(mm)"
-                value={intToText(maxWaterLevel)}
+                value={intToText(devPros.maxWaterLevel)}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
                 editable={false}
