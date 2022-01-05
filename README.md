@@ -17,3 +17,12 @@ The mobile APP manage and control LS devices
 4. **Settings (TODO)**
 - Set the MQTT client info
 - Account settings
+
+## Run this APP
+1. Run the metro server
+
+`npx react-native start`
+
+2.  Run in Android emulator
+
+`npx react-native run-android`
