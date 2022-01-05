@@ -12,4 +12,8 @@ The mobile APP manage and control LS devices
 - Turn on / off relay
 
 3. **Config network via ESP touch chip**
-Connect device to the specified network
+- Connect device to the specified network
+
+4. **Settings (TODO)**
+- Set the MQTT client info
+- Account settings
