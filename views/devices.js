@@ -44,7 +44,7 @@ const textToInt = value => {
 };
 
 const intToText = value => {
-  if (value === null) {
+  if (value === null || value === undefined) {
     return '0';
   }
 
@@ -52,7 +52,7 @@ const intToText = value => {
 };
 
 const floatToText = value => {
-  if (value === null) {
+  if (value === null || value === undefined) {
     return '0';
   }
 
