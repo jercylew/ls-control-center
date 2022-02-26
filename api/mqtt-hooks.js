@@ -264,6 +264,23 @@ export const MqttProvider = ({children}) => {
     console.log('Mqtt already connected!');
   }
 
+  let timerId = setInterval(() => {
+    if (mqttClient) {
+      mqttClient
+        .isConnected()
+        .then(ret => {
+          if (!ret) {
+            console.log('MQTT status:' + ret);
+            console.log('MQTT disconnected, now reconnecting ...');
+            mqttClient.reconnect();
+          }
+        })
+        .catch(msg => {
+          console.log('Error: ' + msg);
+        });
+    }
+  }, 5000);
+
   return (
     <MqttContext.Provider value={{mqttClient, sendCommand}}>
       {children}

@@ -20,6 +20,8 @@ import {strToUnicode} from '../api/unicode';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
+const TOPIC_SALE_TABLE_GET_STATUS = '$thing/up/status/sale_table';
+const TOPIC_REFRGTOR_GET_STATUS = '$thing/up/status/refrigerator';
 
 const boolToText = value => {
   return value ? '是' : '否';
@@ -183,7 +185,15 @@ const SaleTableItem = ({devPros}) => {
                 ', ',
                 sceneId,
               );
-              showDialogDevInfo();
+              let cmdJson = {
+                device_id: devPros.id,
+                method: 'get_status',
+              };
+              sendCommand(TOPIC_SALE_TABLE_GET_STATUS, JSON.stringify(cmdJson));
+
+              setTimeout(() => {
+                showDialogDevInfo();
+              }, 200);
             }}>
             {devPros.name}
           </Text>
@@ -419,7 +429,16 @@ const RefrgtorItem = ({devPros}) => {
             style={styles.title}
             onPress={() => {
               console.log('Item Clicked, setting device info', devPros);
-              showDialogDevInfo();
+
+              let cmdJson = {
+                device_id: devPros.id,
+                method: 'get_status',
+              };
+              sendCommand(TOPIC_REFRGTOR_GET_STATUS, JSON.stringify(cmdJson));
+
+              setTimeout(() => {
+                showDialogDevInfo();
+              }, 200);
             }}>
             {devPros.name}
           </Text>
