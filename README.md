@@ -26,3 +26,16 @@ The mobile APP manage and control LS devices
 2.  Run in Android emulator
 
 `npx react-native run-android`
+
+3.  Create apk for realse
+
+- Android
+`cd android`
+
+`./gradlew assembleRelease`
+
+The signed apk for release is at `app/build/outputs/apk/release/app-release.apk`
+
+
+- iOS
+To be done
