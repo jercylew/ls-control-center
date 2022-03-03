@@ -73,13 +73,22 @@ const binStateToText = value => {
 //which cannot be reflected while using props
 const SaleTableItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
-  const [dlgMaxTempVisible, seDlgMaxTempVisible] = React.useState(false);
-  const [dlgMaxWaterLevelVisible, seDlgMaxWaterLevelVisible] =
-    React.useState(false);
+  const [dlgSettingVisible, setDlgSettingVisible] = React.useState(false);
   const [maxTemp, setMaxTemp] = React.useState(devPros.maxTemperature);
   const [maxWaterLevel, setMaxWaterLevel] = React.useState(
     devPros.maxWaterLevel,
   );
+  const [lowestWaterLevel, setLowestWaterLevel] = React.useState(
+    devPros.lowestWaterLevel,
+  );
+  const [waterStartOut, setWaterStartOut] = React.useState(
+    devPros.waterStartOut,
+  );
+  const [waterStopOut, setWaterStopOut] = React.useState(devPros.waterStopOut);
+  const [tempRetDiff, setTempRetDiff] = React.useState(devPros.tempRetDiff);
+  const [waterRetDiff, setWaterRetDiff] = React.useState(devPros.waterRetDiff);
+  const [tempOutDelay, setTempOutDelay] = React.useState(devPros.tempOutDelay);
+
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
@@ -89,11 +98,8 @@ const SaleTableItem = ({ devPros }) => {
   const showDialogDevInfo = () => setDlgDevInfoVisible(true);
   const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
 
-  const showDialogMaxTemp = () => seDlgMaxTempVisible(true);
-  const hideDialogMaxTemp = () => seDlgMaxTempVisible(false);
-
-  const showDialogMaxWaterLevel = () => seDlgMaxWaterLevelVisible(true);
-  const hideDialogMaxWaterLevel = () => seDlgMaxWaterLevelVisible(false);
+  const showDialogSettingDevInfo = () => setDlgSettingVisible(true);
+  const hideDialogSettingDevInfo = () => setDlgSettingVisible(false);
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
@@ -145,26 +151,21 @@ const SaleTableItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
-  function onDialogSetMaxTempOk() {
-    hideDialogMaxTemp();
+  function onDialogSettingOk() {
+    hideDialogSettingDevInfo();
 
     let cmdJson = {
       device_id: devPros.id,
       method: 'control',
       params: {
         Temp_Max: maxTemp,
-      },
-    };
-    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
-  }
-
-  function onDialogSetMaxWaterLevelOk() {
-    hideDialogMaxWaterLevel();
-    let cmdJson = {
-      device_id: devPros.id,
-      method: 'control',
-      params: {
         Water_Level_Max: maxWaterLevel,
+        Temp_Ret_diff: tempRetDiff,
+        water_Ret_diff: waterRetDiff,
+        Water_Stop_Out: waterStopOut,
+        Water_Start_Out: waterStartOut,
+        Temp_Out_Delay: tempOutDelay,
+        Lowest_water_Level: lowestWaterLevel,
       },
     };
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -204,17 +205,9 @@ const SaleTableItem = ({ devPros }) => {
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
-              showDialogMaxTemp();
+              showDialogSettingDevInfo();
             }}>
-            设置温度
-          </Text>
-          <Text
-            style={styles.itemSetTempWaterLevelText}
-            onPress={() => {
-              console.log('Item Clicked, setting water level', devPros);
-              showDialogMaxWaterLevel();
-            }}>
-            设置水位
+            设置
           </Text>
         </View>
       </View>
@@ -291,7 +284,9 @@ const SaleTableItem = ({ devPros }) => {
             <Button onPress={onDialogDevInfoOk}>设置</Button>
           </Dialog.Actions>
         </Dialog>
-        <Dialog visible={dlgMaxTempVisible} onDismiss={hideDialogMaxTemp}>
+        <Dialog
+          visible={dlgSettingVisible}
+          onDismiss={hideDialogSettingDevInfo}>
           <Dialog.Title>设置</Dialog.Title>
           <Dialog.Content>
             <View style={styles.inputColumnTwo}>
@@ -310,29 +305,58 @@ const SaleTableItem = ({ devPros }) => {
                 keyboardType="numeric"
               />
             </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={hideDialogMaxTemp}>取消</Button>
-            <Button onPress={onDialogSetMaxTempOk}>确定</Button>
-          </Dialog.Actions>
-        </Dialog>
-        <Dialog
-          visible={dlgMaxWaterLevelVisible}
-          onDismiss={hideDialogMaxWaterLevel}>
-          <Dialog.Title>设置水位</Dialog.Title>
-          <Dialog.Content>
-            <View>
+            <View style={styles.inputColumnTwo}>
               <TextInput
-                label="水位(mm)"
-                value={intToText(maxWaterLevel)}
-                onChangeText={text => setMaxWaterLevel(textToInt(text))}
+                style={styles.inputColumnItem}
+                label="温度回差(°C)"
+                value={intToText(tempRetDiff)}
+                onChangeText={text => setTempRetDiff(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="水位回差(mm)"
+                value={intToText(waterRetDiff)}
+                onChangeText={text => setWaterRetDiff(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="最低水位值(mm)"
+                value={intToText(lowestWaterLevel)}
+                onChangeText={text => setLowestWaterLevel(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="加热输出延时"
+                value={intToText(tempOutDelay)}
+                onChangeText={text => setTempOutDelay(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="上水输出延时"
+                value={intToText(waterStartOut)}
+                onChangeText={text => setWaterStartOut(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="停止上水延时"
+                value={intToText(waterStopOut)}
+                onChangeText={text => setWaterStopOut(textToInt(text))}
                 keyboardType="numeric"
               />
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogMaxWaterLevel}>取消</Button>
-            <Button onPress={onDialogSetMaxWaterLevelOk}>确定</Button>
+            <Button onPress={hideDialogSettingDevInfo}>取消</Button>
+            <Button onPress={onDialogSettingOk}>确定</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -669,10 +693,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   itemSetTempWaterLevel: {
-    // paddingHorizontal: 25,
     alignContent: 'flex-end',
     paddingVertical: 30,
     flexDirection: 'row',
+    marginHorizontal: 30,
   },
   itemSetTempWaterLevelText: {
     fontSize: 17,
@@ -698,10 +722,11 @@ const styles = StyleSheet.create({
   inputColumnTwo: {
     display: 'flex',
     flexDirection: 'row',
+    marginVertical: 4,
   },
   inputColumnItem: {
-    width: '45%',
-    marginHorizontal: 5,
+    width: '50%',
+    marginHorizontal: 2,
   },
 });
 
