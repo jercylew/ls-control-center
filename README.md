@@ -30,6 +30,7 @@ The mobile APP manage and control LS devices
 3.  Create apk for realse
 
 - Android
+
 `cd android`
 
 `./gradlew assembleRelease`
