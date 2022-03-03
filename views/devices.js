@@ -292,13 +292,21 @@ const SaleTableItem = ({ devPros }) => {
           </Dialog.Actions>
         </Dialog>
         <Dialog visible={dlgMaxTempVisible} onDismiss={hideDialogMaxTemp}>
-          <Dialog.Title>设置温度</Dialog.Title>
+          <Dialog.Title>设置</Dialog.Title>
           <Dialog.Content>
-            <View>
+            <View style={styles.inputColumnTwo}>
               <TextInput
+                style={styles.inputColumnItem}
                 label="温度(°C)"
                 value={intToText(maxTemp)}
                 onChangeText={text => setMaxTemp(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="水位(mm)"
+                value={intToText(maxWaterLevel)}
+                onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
               />
             </View>
@@ -642,6 +650,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
+    borderRadius: 5,
   },
   header: {
     fontSize: 32,
@@ -685,6 +694,14 @@ const styles = StyleSheet.create({
   labelSwitch: {
     margin: 5,
     fontSize: 20,
+  },
+  inputColumnTwo: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  inputColumnItem: {
+    width: '45%',
+    marginHorizontal: 5,
   },
 });
 
