@@ -1,14 +1,14 @@
 import MQTT from 'sp-react-native-mqtt';
 import 'react-native-get-random-values';
-import {v4 as uuidv4} from 'uuid';
-import {useDispatch} from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
+import { useDispatch } from 'react-redux';
 import {
   syncDevice,
   DEV_TYPE_REFRIGERATOR,
   DEV_TYPE_SALE_TABLE,
 } from '../data/device-slice';
-import React, {createContext, useState, useContext} from 'react';
-import {strFromUnicode} from './unicode';
+import React, { createContext, useState, useContext } from 'react';
+import { strFromUnicode } from './unicode';
 
 const TOPIC_SALE_TABLE_STATUS = '$thing/up/status/sale_table';
 const TOPIC_SALE_TABLE_PROPERTY = '$thing/up/property/sale_table';
@@ -19,7 +19,7 @@ const UNKNOWN_SCENE_ID = '00000-0000000000';
 
 const MqttContext = createContext();
 
-export const MqttProvider = ({children}) => {
+export const MqttProvider = ({ children }) => {
   const [mqttClient, setMqttClient] = useState(null);
   const sendCommand = (topic, data) => {
     console.log('MQTT trying to send mqtt command:', data);
@@ -44,6 +44,13 @@ export const MqttProvider = ({children}) => {
       errorTemperature: reportData.error_temperature,
       maxWaterLevel: null,
       maxTemperature: null,
+      firmwareVersion: null,
+      lowestWaterLevel: null,
+      waterStartOut: null,
+      waterStopOut: null,
+      tempRetDiff: null,
+      waterRetDiff: null,
+      tempOutDelay: null,
     };
     console.log('Now try to sync to slice...');
     dispatch(syncDevice(newDevice));
@@ -99,6 +106,13 @@ export const MqttProvider = ({children}) => {
       errorTemperature: null,
       maxWaterLevel: propData.params.Water_level_Threshold_Max,
       maxTemperature: propData.params.Temp_Threshold_Max,
+      firmwareVersion: propData.Firmware_information,
+      lowestWaterLevel: propData.params.Lowest_water_Level,
+      waterStartOut: propData.params.Water_Start_Out,
+      waterStopOut: propData.params.Water_Stop_Out,
+      tempRetDiff: propData.params.Temp_Ret_diff,
+      waterRetDiff: propData.params.water_Ret_diff,
+      tempOutDelay: propData.params.Temp_Out_Delay,
     };
     dispatch(syncDevice(newDevice));
   };
@@ -218,7 +232,7 @@ export const MqttProvider = ({children}) => {
               }
             }
           } else if (msg.topic === TOPIC_SALE_TABLE_PROPERTY) {
-            console.log('Device property');
+            console.log('Sale table property');
             handleSaleTablePropertyReport(dataJson);
           } else if (msg.topic === TOPIC_REFRG_STATUS) {
             console.log('Refrigerator status report');
@@ -282,7 +296,7 @@ export const MqttProvider = ({children}) => {
   }, 5000);
 
   return (
-    <MqttContext.Provider value={{mqttClient, sendCommand}}>
+    <MqttContext.Provider value={{ mqttClient, sendCommand }}>
       {children}
     </MqttContext.Provider>
   );

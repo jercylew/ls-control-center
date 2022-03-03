@@ -70,6 +70,29 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
         scenes[sceneIndex].data[devIndex].maxTemperature =
           devData.maxTemperature;
       }
+      if (devData.firmwareVersion !== null) {
+        scenes[sceneIndex].data[devIndex].firmwareVersion =
+          devData.firmwareVersion;
+      }
+      if (devData.lowestWaterLevel !== null) {
+        scenes[sceneIndex].data[devIndex].lowestWaterLevel =
+          devData.lowestWaterLevel;
+      }
+      if (devData.waterStartOut !== null) {
+        scenes[sceneIndex].data[devIndex].waterStartOut = devData.waterStartOut;
+      }
+      if (devData.waterStopOut !== null) {
+        scenes[sceneIndex].data[devIndex].waterStopOut = devData.waterStopOut;
+      }
+      if (devData.tempRetDiff !== null) {
+        scenes[sceneIndex].data[devIndex].tempRetDiff = devData.tempRetDiff;
+      }
+      if (devData.waterRetDiff !== null) {
+        scenes[sceneIndex].data[devIndex].waterRetDiff = devData.waterRetDiff;
+      }
+      if (devData.tempOutDelay !== null) {
+        scenes[sceneIndex].data[devIndex].tempOutDelay = devData.tempOutDelay;
+      }
     }
 
     if (devData.devType === DEV_TYPE_REFRIGERATOR) {

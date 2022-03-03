@@ -7,16 +7,16 @@ import {
   StatusBar,
   View,
 } from 'react-native';
-import {Button, Dialog, Portal, TextInput, Switch} from 'react-native-paper';
-import {useSelector, useDispatch} from 'react-redux';
+import { Button, Dialog, Portal, TextInput, Switch } from 'react-native-paper';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   syncDevice,
   selectScenes,
   DEV_TYPE_SALE_TABLE,
   DEV_TYPE_REFRIGERATOR,
 } from '../data/device-slice';
-import {useMqttClient} from '../api/mqtt-hooks';
-import {strToUnicode} from '../api/unicode';
+import { useMqttClient } from '../api/mqtt-hooks';
+import { strToUnicode } from '../api/unicode';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
@@ -71,7 +71,7 @@ const binStateToText = value => {
 
 //TODO: Using state not props in this component, the sstate and name may always change,
 //which cannot be reflected while using props
-const SaleTableItem = ({devPros}) => {
+const SaleTableItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
   const [dlgMaxTempVisible, seDlgMaxTempVisible] = React.useState(false);
   const [dlgMaxWaterLevelVisible, seDlgMaxWaterLevelVisible] =
@@ -96,7 +96,7 @@ const SaleTableItem = ({devPros}) => {
   const hideDialogMaxWaterLevel = () => seDlgMaxWaterLevelVisible(false);
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
-  const {sendCommand} = useMqttClient();
+  const { sendCommand } = useMqttClient();
 
   function onDialogDevInfoOk() {
     if (sceneName !== devPros.sceneName) {
@@ -225,18 +225,49 @@ const SaleTableItem = ({devPros}) => {
             <Text>
               {'加热中： ' +
                 boolToText(devPros.isHeating) +
-                ',\t\t\t\t上水中： ' +
-                boolToText(devPros.isUpWater)}
+                ',\t\t\t上水中：' +
+                boolToText(devPros.isUpWater) +
+                ',\t\t\t最高温度： ' +
+                intToText(devPros.maxTemperature) +
+                '°C'}
             </Text>
             <Text>
               {'温度：' +
                 intToText(devPros.detectionTemperature) +
                 '°C' +
-                ',\t\t\t\t水位： ' +
+                ',\t\t\t水位： ' +
                 intToText(devPros.waterLevelDetection) +
+                'mm' +
+                ',\t\t\t最高水位： ' +
+                intToText(devPros.maxWaterLevel) +
                 'mm'}
             </Text>
-            <Text>网卡类型： {netTypeToText(devPros.netType)}</Text>
+            <Text>
+              {'温度回差：' +
+                intToText(devPros.tempRetDiff) +
+                ',\t\t\t水位回差： ' +
+                intToText(devPros.waterRetDiff) +
+                ',\t\t\t最低水位值： ' +
+                intToText(devPros.lowestWaterLevel) +
+                'mm'}
+            </Text>
+            <Text>
+              {'加热输出延时：' +
+                intToText(devPros.tempOutDelay) +
+                '秒' +
+                ',\t\t\t上水输出延时： ' +
+                intToText(devPros.waterStartOut) +
+                '秒' +
+                ',\t\t\t停止上水延时： ' +
+                intToText(devPros.waterStopOut) +
+                '秒'}
+            </Text>
+            <Text>
+              {'网卡类型：' +
+                netTypeToText(devPros.netType) +
+                ',\t\t\t固件版本：' +
+                devPros.firmwareVersion}
+            </Text>
             <View style={styles.input}>
               <TextInput
                 label="设备名称"
@@ -252,20 +283,6 @@ const SaleTableItem = ({devPros}) => {
                 label="场地ID"
                 value={sceneId}
                 onChangeText={text => setSceneId(text)}
-              />
-              <TextInput
-                label="最高温度(°C)"
-                value={intToText(devPros.maxTemperature)}
-                onChangeText={text => setMaxTemp(textToInt(text))}
-                keyboardType="numeric"
-                editable={false}
-              />
-              <TextInput
-                label="最高水位(mm)"
-                value={intToText(devPros.maxWaterLevel)}
-                onChangeText={text => setMaxWaterLevel(textToInt(text))}
-                keyboardType="numeric"
-                editable={false}
               />
             </View>
           </Dialog.Content>
@@ -315,7 +332,7 @@ const SaleTableItem = ({devPros}) => {
   );
 };
 
-const RefrgtorItem = ({devPros}) => {
+const RefrgtorItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
   const [dlgRelay1Visible, setDlgRelay1Visible] = React.useState(false);
   const [dlgRelay2Visible, setDlgRelay2Visible] = React.useState(false);
@@ -341,7 +358,7 @@ const RefrgtorItem = ({devPros}) => {
   const hideDialogRelay2 = () => setDlgRelay2Visible(false);
 
   const devCmdTopic = TOPIC_REFRGTOR_CMD_PREFIX + devPros.id;
-  const {sendCommand} = useMqttClient();
+  const { sendCommand } = useMqttClient();
 
   function onDialogDevInfoOk() {
     if (sceneName !== devPros.sceneName) {
@@ -579,11 +596,11 @@ const RefrgtorItem = ({devPros}) => {
   );
 };
 
-const Item = ({devPros}) => {
+const Item = ({ devPros }) => {
   if (devPros.devType === DEV_TYPE_SALE_TABLE) {
-    return SaleTableItem({devPros});
+    return SaleTableItem({ devPros });
   } else if (devPros.devType === DEV_TYPE_REFRIGERATOR) {
-    return RefrgtorItem({devPros});
+    return RefrgtorItem({ devPros });
   } else {
     console.log('@@@@@@ERROR   Unknown device type');
   }
@@ -605,8 +622,8 @@ const Devices = () => {
       <SectionList
         sections={renderScenes} //scenes
         keyExtractor={(item, index) => item.id + index}
-        renderItem={({item}) => <Item devPros={item} />}
-        renderSectionHeader={({section: {title}}) => (
+        renderItem={({ item }) => <Item devPros={item} />}
+        renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.header}>{title}</Text>
         )}
       />
