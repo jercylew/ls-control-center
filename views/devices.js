@@ -154,6 +154,8 @@ const SaleTableItem = ({ devPros }) => {
   function onDialogSettingOk() {
     hideDialogSettingDevInfo();
 
+    //Check if setting meet conditions
+
     let cmdJson = {
       device_id: devPros.id,
       method: 'control',
@@ -220,19 +222,19 @@ const SaleTableItem = ({ devPros }) => {
                 boolToText(devPros.isHeating) +
                 ',\t\t\t上水中：' +
                 boolToText(devPros.isUpWater) +
-                ',\t\t\t最高温度： ' +
+                ',\t\t\t设置温度： ' +
                 intToText(devPros.maxTemperature) +
                 '°C'}
             </Text>
             <Text>
-              {'温度：' +
+              {'当前温度：' +
                 intToText(devPros.detectionTemperature) +
                 '°C' +
-                ',\t\t\t水位： ' +
-                intToText(devPros.waterLevelDetection) +
-                'mm' +
-                ',\t\t\t最高水位： ' +
+                ',\t\t\t设置水位： ' +
                 intToText(devPros.maxWaterLevel) +
+                'mm' +
+                ',\t\t\t当前水位： ' +
+                intToText(devPros.waterLevelDetection) +
                 'mm'}
             </Text>
             <Text>
@@ -292,14 +294,14 @@ const SaleTableItem = ({ devPros }) => {
             <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
-                label="温度(°C)"
+                label="设置温度(°C)"
                 value={intToText(maxTemp)}
                 onChangeText={text => setMaxTemp(textToInt(text))}
                 keyboardType="numeric"
               />
               <TextInput
                 style={styles.inputColumnItem}
-                label="水位(mm)"
+                label="设置水位(mm)"
                 value={intToText(maxWaterLevel)}
                 onChangeText={text => setMaxWaterLevel(textToInt(text))}
                 keyboardType="numeric"
