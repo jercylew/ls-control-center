@@ -92,6 +92,8 @@ const SaleTableItem = ({ devPros }) => {
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
+  const [tempMessageShow, setTempMessageShow] = React.useState(false);
+  const [waterMessageShow, setWaterMessageShow] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -152,10 +154,27 @@ const SaleTableItem = ({ devPros }) => {
   }
 
   function onDialogSettingOk() {
-    hideDialogSettingDevInfo();
-
     //Check if setting meet conditions
+    let skipSet = false;
+    if (devPros.lowTempAlarm < maxTemp - tempRetDiff) {
+      setTempMessageShow(true);
+      skipSet = true;
+    }
 
+    if (devPros.lowWaterLevelAlarm < maxWaterLevel - waterRetDiff) {
+      setWaterMessageShow(true);
+      skipSet = true;
+    }
+
+    if (skipSet) {
+      setTimeout(() => {
+        setTempMessageShow(false);
+        setWaterMessageShow(false);
+      }, 5000);
+      return;
+    }
+
+    hideDialogSettingDevInfo();
     let cmdJson = {
       device_id: devPros.id,
       method: 'control',
@@ -355,6 +374,12 @@ const SaleTableItem = ({ devPros }) => {
                 keyboardType="numeric"
               />
             </View>
+            <Text style={styles.errorMessage}>
+              {tempMessageShow ? '温度设置值不得高于报警值！' : ''}
+            </Text>
+            <Text style={styles.errorMessage}>
+              {waterMessageShow ? '水位设置值不得高于报警值！' : ''}
+            </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={hideDialogSettingDevInfo}>取消</Button>
@@ -685,6 +710,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     color: '#2805f2',
+  },
+  errorMessage: {
+    fontSize: 18,
+    color: '#ff0000',
   },
   info: {
     fontSize: 15,

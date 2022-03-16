@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const UNKNOWN_SCENE_NAME = '未知场地';
 const UNKNOWN_SCENE_ID = '00000-0000000000';
@@ -92,6 +92,22 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
       }
       if (devData.tempOutDelay !== null) {
         scenes[sceneIndex].data[devIndex].tempOutDelay = devData.tempOutDelay;
+      }
+      if (devData.waterSensorType !== null) {
+        scenes[sceneIndex].data[devIndex].waterSensorType = devData.waterSensorType;
+      }
+      if (devData.highTempAlarm !== null) {
+        scenes[sceneIndex].data[devIndex].highTempAlarm = devData.highTempAlarm;
+      }
+      if (devData.lowTempAlarm !== null) {
+        scenes[sceneIndex].data[devIndex].lowTempAlarm = devData.lowTempAlarm;
+      }
+      if (devData.lowWaterLevelAlarm !== null) {
+        scenes[sceneIndex].data[devIndex].lowWaterLevelAlarm =
+          devData.lowWaterLevelAlarm;
+      }
+      if (devData.alarmDelay !== null) {
+        scenes[sceneIndex].data[devIndex].alarmDelay = devData.alarmDelay;
       }
     }
 
@@ -213,12 +229,6 @@ export const slice = createSlice({
             }
           }
         }
-
-        // if (foundSceneIndex >= 0) {
-        //   if (state.scenes[foundSceneIndex].data.length === 0) {
-        //     state.scenes.splice(foundSceneIndex, 1);
-        //   }
-        // }
       }
 
       //if not exist creat a new scene and push this device
@@ -266,14 +276,14 @@ export const slice = createSlice({
       }
 
       setDevSceneName(
-        {deviceId: device.id, sceneName: newSceneName},
+        { deviceId: device.id, sceneName: newSceneName },
         state.mapDeviceScene,
       );
     },
   },
 });
 
-export const {syncDevice, saveDeviceInfo} = slice.actions;
+export const { syncDevice, saveDeviceInfo } = slice.actions;
 
 export const selectScenes = state => state.scene.scenes;
 export default slice.reducer;

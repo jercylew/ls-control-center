@@ -51,6 +51,11 @@ export const MqttProvider = ({ children }) => {
       tempRetDiff: null,
       waterRetDiff: null,
       tempOutDelay: null,
+      waterSensorType: null,
+      highTempAlarm: null,
+      lowTempAlarm: null,
+      lowWaterLevelAlarm: null, //To confirm
+      alarmDelay: null,
     };
     console.log('Now try to sync to slice...');
     dispatch(syncDevice(newDevice));
@@ -113,6 +118,11 @@ export const MqttProvider = ({ children }) => {
       tempRetDiff: propData.params.Temp_Ret_diff,
       waterRetDiff: propData.params.water_Ret_diff,
       tempOutDelay: propData.params.Temp_Out_Delay,
+      waterSensorType: propData.params.Water_Sen_Type,
+      highTempAlarm: propData.params.High_Temp_Alarm,
+      lowTempAlarm: propData.params.Low_Temp_Alarm,
+      lowWaterLevelAlarm: propData.params.Low_Water_Level_Alarm, //To confirm
+      alarmDelay: propData.params.Alarm_Delay,
     };
     dispatch(syncDevice(newDevice));
   };
