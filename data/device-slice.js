@@ -94,7 +94,8 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
         scenes[sceneIndex].data[devIndex].tempOutDelay = devData.tempOutDelay;
       }
       if (devData.waterSensorType !== null) {
-        scenes[sceneIndex].data[devIndex].waterSensorType = devData.waterSensorType;
+        scenes[sceneIndex].data[devIndex].waterSensorType =
+          devData.waterSensorType;
       }
       if (devData.highTempAlarm !== null) {
         scenes[sceneIndex].data[devIndex].highTempAlarm = devData.highTempAlarm;

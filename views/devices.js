@@ -69,6 +69,10 @@ const binStateToText = value => {
   return '关闭';
 };
 
+const waterSensorType = value => {
+  return value === 1 ? '超声波' : '传统';
+};
+
 //TODO: Using state not props in this component, the sstate and name may always change,
 //which cannot be reflected while using props
 const SaleTableItem = ({ devPros }) => {
@@ -241,26 +245,26 @@ const SaleTableItem = ({ devPros }) => {
                 boolToText(devPros.isHeating) +
                 ',\t\t\t上水中：' +
                 boolToText(devPros.isUpWater) +
-                ',\t\t\t设置温度： ' +
+                ',\t设置温度： ' +
                 intToText(devPros.maxTemperature) +
                 '°C'}
             </Text>
             <Text>
               {'当前温度：' +
                 intToText(devPros.detectionTemperature) +
-                '°C' +
-                ',\t\t\t设置水位： ' +
+                '°C, 温度回差：' +
+                intToText(devPros.tempRetDiff) +
+                ',\t水位回差： ' +
+                intToText(devPros.waterRetDiff)}
+            </Text>
+            <Text
+              style={devPros.waterSensorType === 1 ? styles.show : styles.hide}>
+              {'设置水位： ' +
                 intToText(devPros.maxWaterLevel) +
                 'mm' +
                 ',\t\t\t当前水位： ' +
                 intToText(devPros.waterLevelDetection) +
-                'mm'}
-            </Text>
-            <Text>
-              {'温度回差：' +
-                intToText(devPros.tempRetDiff) +
-                ',\t\t\t水位回差： ' +
-                intToText(devPros.waterRetDiff) +
+                'mm' +
                 ',\t\t\t最低水位值： ' +
                 intToText(devPros.lowestWaterLevel) +
                 'mm'}
@@ -269,18 +273,20 @@ const SaleTableItem = ({ devPros }) => {
               {'加热输出延时：' +
                 intToText(devPros.tempOutDelay) +
                 '秒' +
-                ',\t\t\t上水输出延时： ' +
+                ',\t上水输出延时： ' +
                 intToText(devPros.waterStartOut) +
                 '秒' +
-                ',\t\t\t停止上水延时： ' +
+                ',\t停止上水延时： ' +
                 intToText(devPros.waterStopOut) +
                 '秒'}
             </Text>
             <Text>
               {'网卡类型：' +
                 netTypeToText(devPros.netType) +
-                ',\t\t\t固件版本：' +
-                devPros.firmwareVersion}
+                ',\t固件版本：' +
+                devPros.firmwareVersion +
+                ',\t传感器类型：' +
+                waterSensorType(devPros.waterSensorType)}
             </Text>
             <View style={styles.input}>
               <TextInput
@@ -320,34 +326,39 @@ const SaleTableItem = ({ devPros }) => {
               />
               <TextInput
                 style={styles.inputColumnItem}
-                label="设置水位(mm)"
-                value={intToText(maxWaterLevel)}
-                onChangeText={text => setMaxWaterLevel(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
                 label="温度回差(°C)"
                 value={intToText(tempRetDiff)}
                 onChangeText={text => setTempRetDiff(textToInt(text))}
                 keyboardType="numeric"
               />
+            </View>
+            <View
+              style={
+                devPros.waterSensorType === 1
+                  ? styles.inputColumnTwo
+                  : styles.hide
+              }>
               <TextInput
                 style={styles.inputColumnItem}
-                label="水位回差(mm)"
-                value={intToText(waterRetDiff)}
-                onChangeText={text => setWaterRetDiff(textToInt(text))}
+                label="设置水位(mm)"
+                value={intToText(maxWaterLevel)}
+                onChangeText={text => setMaxWaterLevel(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="最低水位值(mm)"
+                value={intToText(lowestWaterLevel)}
+                onChangeText={text => setLowestWaterLevel(textToInt(text))}
                 keyboardType="numeric"
               />
             </View>
             <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
-                label="最低水位值(mm)"
-                value={intToText(lowestWaterLevel)}
-                onChangeText={text => setLowestWaterLevel(textToInt(text))}
+                label="水位回差(mm)"
+                value={intToText(waterRetDiff)}
+                onChangeText={text => setWaterRetDiff(textToInt(text))}
                 keyboardType="numeric"
               />
               <TextInput
@@ -758,6 +769,12 @@ const styles = StyleSheet.create({
   inputColumnItem: {
     width: '50%',
     marginHorizontal: 2,
+  },
+  hide: {
+    display: 'none',
+  },
+  show: {
+    display: 'flex',
   },
 });
 
