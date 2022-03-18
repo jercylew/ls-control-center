@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Button, Dialog, Portal, TextInput, Switch } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
+import { Picker } from '@react-native-picker/picker';
 import {
   syncDevice,
   selectScenes,
@@ -98,6 +99,9 @@ const SaleTableItem = ({ devPros }) => {
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
   const [tempMessageShow, setTempMessageShow] = React.useState(false);
   const [waterMessageShow, setWaterMessageShow] = React.useState(false);
+  const [selectedSensorType, setSelectedSensorType] = React.useState(
+    devPros.waterSensorType,
+  );
 
   const dispatch = useDispatch();
 
@@ -126,6 +130,7 @@ const SaleTableItem = ({ devPros }) => {
         Scene_Name: sceneNameUnicode,
         Scene_Id: sceneId,
         Device_Name: deviceNameUnicode,
+        Water_Sen_Type: selectedSensorType,
         // Remote_address: '',
         // Remote_port: 1883,
         // Mqtt_User_Name: '',
@@ -205,11 +210,9 @@ const SaleTableItem = ({ devPros }) => {
             onPress={() => {
               console.log(
                 'Item Clicked, setting device info',
-                devName,
-                ', ',
-                sceneName,
-                ', ',
-                sceneId,
+                devPros,
+                'selectedSensorType=',
+                selectedSensorType,
               );
               let cmdJson = {
                 device_id: devPros.id,
@@ -284,11 +287,22 @@ const SaleTableItem = ({ devPros }) => {
               {'网卡类型：' +
                 netTypeToText(devPros.netType) +
                 ',\t固件版本：' +
-                devPros.firmwareVersion +
-                ',\t传感器类型：' +
-                waterSensorType(devPros.waterSensorType)}
+                devPros.firmwareVersion}
             </Text>
             <View style={styles.input}>
+              <View style={styles.sensorTypePicker}>
+                <Text>传感器类型</Text>
+                <Picker
+                  selectedValue={selectedSensorType}
+                  mode={'dropdown'}
+                  style={styles.inputPicker}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setSelectedSensorType(itemValue)
+                  }>
+                  <Picker.Item label="传统传感器" value={0} />
+                  <Picker.Item label="超声波传感器" value={1} />
+                </Picker>
+              </View>
               <TextInput
                 label="设备名称"
                 value={devName}
@@ -768,6 +782,15 @@ const styles = StyleSheet.create({
   },
   inputColumnItem: {
     width: '50%',
+    marginHorizontal: 2,
+  },
+  sensorTypePicker: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputPicker: {
+    width: '70%',
     marginHorizontal: 2,
   },
   hide: {
