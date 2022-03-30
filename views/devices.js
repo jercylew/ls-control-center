@@ -165,12 +165,12 @@ const SaleTableItem = ({ devPros }) => {
   function onDialogSettingOk() {
     //Check if setting meet conditions
     let skipSet = false;
-    if (devPros.lowTempAlarm < maxTemp - tempRetDiff) {
+    if (devPros.lowTempAlarm > maxTemp - tempRetDiff) {
       setTempMessageShow(true);
       skipSet = true;
     }
 
-    if (devPros.lowWaterLevelAlarm < maxWaterLevel - waterRetDiff) {
+    if (devPros.lowWaterLevelAlarm > maxWaterLevel - waterRetDiff) {
       setWaterMessageShow(true);
       skipSet = true;
     }
