@@ -74,11 +74,16 @@ const waterSensorType = value => {
   return value === 1 ? '超声波' : '传统';
 };
 
-//TODO: Using state not props in this component, the sstate and name may always change,
-//which cannot be reflected while using props
+const WATER_SENSOR_TYPE_TRADITIONAL = 0;
+const WATER_SENSOR_TYPE_ULTRASOUND = 1;
+
 const SaleTableItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
-  const [dlgSettingVisible, setDlgSettingVisible] = React.useState(false);
+  const [dlgSettingTraditionalVisible, setDlgSettingTraditionalVisible] =
+    React.useState(false);
+  const [dlgSettingUltrasoundVisible, setDlgSettingUltrasoundVisible] =
+    React.useState(false);
+
   const [maxTemp, setMaxTemp] = React.useState(devPros.maxTemperature);
   const [maxWaterLevel, setMaxWaterLevel] = React.useState(
     devPros.maxWaterLevel,
@@ -89,27 +94,42 @@ const SaleTableItem = ({ devPros }) => {
   const [waterStartOut, setWaterStartOut] = React.useState(
     devPros.waterStartOut,
   );
+  const [selectedSensorType, setSelectedSensorType] = React.useState(
+    devPros.waterSensorType,
+  );
   const [waterStopOut, setWaterStopOut] = React.useState(devPros.waterStopOut);
   const [tempRetDiff, setTempRetDiff] = React.useState(devPros.tempRetDiff);
   const [waterRetDiff, setWaterRetDiff] = React.useState(devPros.waterRetDiff);
   const [tempOutDelay, setTempOutDelay] = React.useState(devPros.tempOutDelay);
+  const [alarmDelay, setAlarmDelay] = React.useState(devPros.alarmDelay);
+  const [lowTempAlarm, setLowTempAlarm] = React.useState(devPros.lowTempAlarm);
+  const [lowTempAlarmError, setLowTempAlarmError] = React.useState(false);
+  const [highTempAlarm, setHighTempAlarm] = React.useState(
+    devPros.highTempAlarm,
+  );
+  const [highTempAlarmError, setHighTempAlarmError] = React.useState(false);
 
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
+
   const [tempMessageShow, setTempMessageShow] = React.useState(false);
   const [waterMessageShow, setWaterMessageShow] = React.useState(false);
-  const [selectedSensorType, setSelectedSensorType] = React.useState(
-    devPros.waterSensorType,
-  );
+  const [alarmMessage, setAlarmMessage] = React.useState('');
 
   const dispatch = useDispatch();
 
   const showDialogDevInfo = () => setDlgDevInfoVisible(true);
   const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
 
-  const showDialogSettingDevInfo = () => setDlgSettingVisible(true);
-  const hideDialogSettingDevInfo = () => setDlgSettingVisible(false);
+  const showDialogSettingTraditionalDevInfo = () =>
+    setDlgSettingTraditionalVisible(true);
+  const hideDialogSettingTraditionalDevInfo = () =>
+    setDlgSettingTraditionalVisible(false);
+  const showDialogSettingUltrasoundDevInfo = () =>
+    setDlgSettingUltrasoundVisible(true);
+  const hideDialogSettingUltrasoundDevInfo = () =>
+    setDlgSettingUltrasoundVisible(false);
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
@@ -163,7 +183,6 @@ const SaleTableItem = ({ devPros }) => {
   }
 
   function onDialogSettingOk() {
-    //Check if setting meet conditions
     let skipSet = false;
     if (devPros.lowTempAlarm > maxTemp - tempRetDiff) {
       setTempMessageShow(true);
@@ -183,21 +202,62 @@ const SaleTableItem = ({ devPros }) => {
       return;
     }
 
-    hideDialogSettingDevInfo();
-    let cmdJson = {
-      device_id: devPros.id,
-      method: 'control',
-      params: {
-        Temp_Max: maxTemp,
-        Water_Level_Max: maxWaterLevel,
-        Temp_Ret_diff: tempRetDiff,
-        water_Ret_diff: waterRetDiff,
-        Water_Stop_Out: waterStopOut,
-        Water_Start_Out: waterStartOut,
-        Temp_Out_Delay: tempOutDelay,
-        Lowest_water_Level: lowestWaterLevel,
-      },
-    };
+    if (
+      highTempAlarm < 0 ||
+      highTempAlarm > 120 ||
+      lowTempAlarm < 0 ||
+      lowTempAlarm > 120 ||
+      lowTempAlarm >= highTempAlarm
+    ) {
+      setAlarmMessage('高低温报警值需在0～120， 且高温报警必须大于低温报警');
+      setTimeout(() => {
+        setAlarmMessage('');
+      }, 5000);
+      return;
+    }
+
+    let cmdJson = {};
+
+    if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
+      hideDialogSettingTraditionalDevInfo();
+      cmdJson = {
+        device_id: devPros.id,
+        method: 'control',
+        params: {
+          Temp_Max: maxTemp,
+          Temp_Ret_diff: tempRetDiff,
+          High_Temp_Alarm: highTempAlarm,
+          Low_Temp_Alarm: lowTempAlarm,
+          Temp_Out_Delay: tempOutDelay,
+          Water_Start_Out: waterStartOut,
+          Water_Stop_Out: waterStopOut,
+          Alarm_Delay: alarmDelay,
+        },
+      };
+    } else if (devPros.waterSensorType === WATER_SENSOR_TYPE_ULTRASOUND) {
+      hideDialogSettingUltrasoundDevInfo();
+      cmdJson = {
+        device_id: devPros.id,
+        method: 'control',
+        params: {
+          Temp_Max: maxTemp,
+          Temp_Ret_diff: tempRetDiff,
+          High_Temp_Alarm: highTempAlarm,
+          Low_Temp_Alarm: lowTempAlarm,
+          Temp_Out_Delay: tempOutDelay,
+          Water_Start_Out: waterStartOut,
+          Water_Stop_Out: waterStopOut,
+          Alarm_Delay: alarmDelay,
+          Water_Level_Max: maxWaterLevel,
+          water_Ret_diff: waterRetDiff,
+          Lowest_water_Level: lowestWaterLevel,
+        },
+      };
+    } else {
+      console.error('Error, unknown water sensor type');
+      return;
+    }
+
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
@@ -233,7 +293,15 @@ const SaleTableItem = ({ devPros }) => {
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
-              showDialogSettingDevInfo();
+              if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
+                showDialogSettingTraditionalDevInfo();
+              } else if (
+                devPros.waterSensorType === WATER_SENSOR_TYPE_ULTRASOUND
+              ) {
+                showDialogSettingUltrasoundDevInfo();
+              } else {
+                console.error('Unknown water sensor type');
+              }
             }}>
             设置
           </Text>
@@ -326,9 +394,9 @@ const SaleTableItem = ({ devPros }) => {
           </Dialog.Actions>
         </Dialog>
         <Dialog
-          visible={dlgSettingVisible}
-          onDismiss={hideDialogSettingDevInfo}>
-          <Dialog.Title>设置</Dialog.Title>
+          visible={dlgSettingTraditionalVisible}
+          onDismiss={hideDialogSettingTraditionalDevInfo}>
+          <Dialog.Title>设置 - 传统水位传感器</Dialog.Title>
           <Dialog.Content>
             <View style={styles.inputColumnTwo}>
               <TextInput
@@ -346,35 +414,41 @@ const SaleTableItem = ({ devPros }) => {
                 keyboardType="numeric"
               />
             </View>
-            <View
-              style={
-                devPros.waterSensorType === 1
-                  ? styles.inputColumnTwo
-                  : styles.hide
-              }>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="设置水位(mm)"
-                value={intToText(maxWaterLevel)}
-                onChangeText={text => setMaxWaterLevel(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="最低水位值(mm)"
-                value={intToText(lowestWaterLevel)}
-                onChangeText={text => setLowestWaterLevel(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
             <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
-                label="水位回差(mm)"
-                value={intToText(waterRetDiff)}
-                onChangeText={text => setWaterRetDiff(textToInt(text))}
+                label="高温报警"
+                value={intToText(highTempAlarm)}
+                onChangeText={text => {
+                  let temp = textToInt(text);
+                  setHighTempAlarm(temp);
+                  if (temp >= 0 && temp <= 120) {
+                    setHighTempAlarmError(false);
+                  } else {
+                    setHighTempAlarmError(true);
+                  }
+                }}
                 keyboardType="numeric"
+                error={highTempAlarmError}
               />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="低温报警"
+                value={intToText(lowTempAlarm)}
+                onChangeText={text => {
+                  let temp = textToInt(text);
+                  setLowTempAlarm(temp);
+                  if (temp >= 0 && temp <= 120) {
+                    setLowTempAlarmError(false);
+                  } else {
+                    setLowTempAlarmError(true);
+                  }
+                }}
+                keyboardType="numeric"
+                error={lowTempAlarmError}
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
                 label="加热输出延时"
@@ -382,8 +456,6 @@ const SaleTableItem = ({ devPros }) => {
                 onChangeText={text => setTempOutDelay(textToInt(text))}
                 keyboardType="numeric"
               />
-            </View>
-            <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
                 label="上水输出延时"
@@ -391,11 +463,20 @@ const SaleTableItem = ({ devPros }) => {
                 onChangeText={text => setWaterStartOut(textToInt(text))}
                 keyboardType="numeric"
               />
+            </View>
+            <View style={styles.inputColumnTwo}>
               <TextInput
                 style={styles.inputColumnItem}
                 label="停止上水延时"
                 value={intToText(waterStopOut)}
                 onChangeText={text => setWaterStopOut(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="报警延时"
+                value={intToText(alarmDelay)}
+                onChangeText={text => setAlarmDelay(textToInt(text))}
                 keyboardType="numeric"
               />
             </View>
@@ -405,9 +486,135 @@ const SaleTableItem = ({ devPros }) => {
             <Text style={styles.errorMessage}>
               {waterMessageShow ? '水位设置值不得高于报警值！' : ''}
             </Text>
+            <Text style={styles.errorMessage}>{alarmMessage}</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogSettingDevInfo}>取消</Button>
+            <Button onPress={hideDialogSettingTraditionalDevInfo}>取消</Button>
+            <Button onPress={onDialogSettingOk}>确定</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgSettingUltrasoundVisible}
+          onDismiss={hideDialogSettingUltrasoundDevInfo}>
+          <Dialog.Title>设置 - 超声波水位传感器</Dialog.Title>
+          <Dialog.Content>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="设置温度(°C)"
+                value={intToText(maxTemp)}
+                onChangeText={text => setMaxTemp(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="温度回差(°C)"
+                value={intToText(tempRetDiff)}
+                onChangeText={text => setTempRetDiff(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="高温报警"
+                value={intToText(highTempAlarm)}
+                onChangeText={text => {
+                  let temp = textToInt(text);
+                  setHighTempAlarm(temp);
+                  if (temp >= 0 && temp <= 120) {
+                    setHighTempAlarmError(false);
+                  } else {
+                    setHighTempAlarmError(true);
+                  }
+                }}
+                keyboardType="numeric"
+                error={highTempAlarmError}
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="低温报警"
+                value={intToText(lowTempAlarm)}
+                onChangeText={text => {
+                  let temp = textToInt(text);
+                  setLowTempAlarm(temp);
+                  if (temp >= 0 && temp <= 120) {
+                    setLowTempAlarmError(false);
+                  } else {
+                    setLowTempAlarmError(true);
+                  }
+                }}
+                keyboardType="numeric"
+                error={lowTempAlarmError}
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="加热输出延时"
+                value={intToText(tempOutDelay)}
+                onChangeText={text => setTempOutDelay(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="上水输出延时"
+                value={intToText(waterStartOut)}
+                onChangeText={text => setWaterStartOut(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="停止上水延时"
+                value={intToText(waterStopOut)}
+                onChangeText={text => setWaterStopOut(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="报警延时"
+                value={intToText(alarmDelay)}
+                onChangeText={text => setAlarmDelay(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="设置水位(mm)"
+                value={intToText(maxWaterLevel)}
+                onChangeText={text => setMaxWaterLevel(textToInt(text))}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.inputColumnItem}
+                label="水位回差(mm)"
+                value={intToText(waterRetDiff)}
+                onChangeText={text => setWaterRetDiff(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputColumnTwo}>
+              <TextInput
+                style={styles.inputColumnItem}
+                label="最低水位值(mm)"
+                value={intToText(lowestWaterLevel)}
+                onChangeText={text => setLowestWaterLevel(textToInt(text))}
+                keyboardType="numeric"
+              />
+            </View>
+            <Text style={styles.errorMessage}>
+              {tempMessageShow ? '温度设置值不得高于报警值！' : ''}
+            </Text>
+            <Text style={styles.errorMessage}>
+              {waterMessageShow ? '水位设置值不得高于报警值！' : ''}
+            </Text>
+            <Text style={styles.errorMessage}>{alarmMessage}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialogSettingUltrasoundDevInfo}>取消</Button>
             <Button onPress={onDialogSettingOk}>确定</Button>
           </Dialog.Actions>
         </Dialog>
