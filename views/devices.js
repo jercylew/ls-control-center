@@ -261,6 +261,14 @@ const SaleTableItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
+  const isWaterLeverError = () => {
+    return devPros.errorWaterLevel && devPros.errorWaterLevel.length > 0;
+  };
+
+  const isTempError = () => {
+    return devPros.errorTemperature && devPros.errorTemperature.length > 0;
+  };
+
   return (
     <>
       <View style={styles.item}>
@@ -287,6 +295,24 @@ const SaleTableItem = ({ devPros }) => {
             {devPros.name}
           </Text>
           <Text style={styles.info}>{devPros.id}</Text>
+        </View>
+        <View style={styles.itemAlarmMessage}>
+          <Text
+            style={
+              isWaterLeverError()
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            水位异常
+          </Text>
+          <Text
+            style={
+              isTempError()
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            温度异常
+          </Text>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
           <Text
@@ -961,10 +987,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 30,
   },
+  itemAlarmMessage: {
+    alignContent: 'center',
+    paddingVertical: 30,
+    flexDirection: 'row',
+    marginHorizontal: 15,
+  },
   itemSetTempWaterLevelText: {
     fontSize: 17,
     color: '#2805f2',
     paddingHorizontal: 5,
+  },
+  itemAlarmMessageText: {
+    fontSize: 12,
+    color: '#ff0000',
+    paddingHorizontal: 5,
+  },
+  itemAlarmMessageTextHide: {
+    fontSize: 12,
+    color: '#ff0000',
+    paddingHorizontal: 5,
+    opacity: 0,
   },
   switchItem: {
     flexDirection: 'row',
