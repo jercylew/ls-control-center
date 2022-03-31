@@ -378,6 +378,14 @@ const SaleTableItem = ({ devPros }) => {
                 '秒'}
             </Text>
             <Text>
+              {'高温报警：' +
+                intToText(devPros.highTempAlarm) +
+                ',\t低温报警：' +
+                intToText(devPros.lowTempAlarm) +
+                ',\t报警延时：' +
+                intToText(devPros.alarmDelay)}
+            </Text>
+            <Text>
               {'网卡类型：' +
                 netTypeToText(devPros.netType) +
                 ',\t固件版本：' +
