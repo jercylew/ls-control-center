@@ -912,8 +912,21 @@ const RefrgtorItem = ({ devPros }) => {
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogDevInfo}>关闭</Button>
-            <Button onPress={onDialogDevInfoOk}>设置</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogDevInfo}>
+              关闭
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogDevInfoOk}>
+              设置
+            </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog visible={dlgRelay1Visible} onDismiss={hideDialogRelay1}>
@@ -931,8 +944,21 @@ const RefrgtorItem = ({ devPros }) => {
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogRelay1}>取消</Button>
-            <Button onPress={onDialogSetRelay1StatusOk}>确定</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogRelay1}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogSetRelay1StatusOk}>
+              确定
+            </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog visible={dlgRelay2Visible} onDismiss={hideDialogRelay2}>
@@ -950,8 +976,21 @@ const RefrgtorItem = ({ devPros }) => {
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogRelay2}>取消</Button>
-            <Button onPress={onDialogSetRelay2StatusOk}>确定</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogRelay2}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogSetRelay2StatusOk}>
+              确定
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
