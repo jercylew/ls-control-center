@@ -350,21 +350,20 @@ const SaleTableItem = ({ devPros }) => {
               {'当前温度：' +
                 intToText(devPros.detectionTemperature) +
                 '°C, 温度回差：' +
-                intToText(devPros.tempRetDiff) +
-                ',\t水位回差： ' +
-                intToText(devPros.waterRetDiff)}
+                intToText(devPros.tempRetDiff)}
             </Text>
             <Text
               style={devPros.waterSensorType === 1 ? styles.show : styles.hide}>
               {'设置水位： ' +
                 intToText(devPros.maxWaterLevel) +
                 'mm' +
-                ',\t\t\t当前水位： ' +
+                ',\t\t当前水位： ' +
                 intToText(devPros.waterLevelDetection) +
                 'mm' +
-                ',\t\t\t最低水位值： ' +
+                ',\t\t最低水位值： ' +
                 intToText(devPros.lowestWaterLevel) +
-                'mm'}
+                'mm,\t水位回差： ' +
+                intToText(devPros.waterRetDiff)}
             </Text>
             <Text>
               {'加热输出延时：' +
