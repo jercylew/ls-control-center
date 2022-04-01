@@ -422,8 +422,21 @@ const SaleTableItem = ({ devPros }) => {
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogDevInfo}>关闭</Button>
-            <Button onPress={onDialogDevInfoOk}>设置</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogDevInfo}>
+              关闭
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogDevInfoOk}>
+              设置
+            </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog
@@ -522,8 +535,21 @@ const SaleTableItem = ({ devPros }) => {
             <Text style={styles.errorMessage}>{alarmMessage}</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogSettingTraditionalDevInfo}>取消</Button>
-            <Button onPress={onDialogSettingOk}>确定</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogSettingTraditionalDevInfo}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogSettingOk}>
+              确定
+            </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog
@@ -647,8 +673,21 @@ const SaleTableItem = ({ devPros }) => {
             <Text style={styles.errorMessage}>{alarmMessage}</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialogSettingUltrasoundDevInfo}>取消</Button>
-            <Button onPress={onDialogSettingOk}>确定</Button>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogSettingUltrasoundDevInfo}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogSettingOk}>
+              确定
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -1049,6 +1088,9 @@ const styles = StyleSheet.create({
   inputPicker: {
     width: '70%',
     marginHorizontal: 2,
+  },
+  dialogButton: {
+    marginHorizontal: 10,
   },
   hide: {
     display: 'none',
