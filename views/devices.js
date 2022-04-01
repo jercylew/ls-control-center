@@ -71,7 +71,17 @@ const binStateToText = value => {
 };
 
 const waterSensorType = value => {
-  return value === 1 ? '超声波' : '传统';
+  let typeText = '';
+
+  if (value === WATER_SENSOR_TYPE_ULTRASOUND) {
+    typeText = '超声波';
+  } else if (value === WATER_SENSOR_TYPE_TRADITIONAL) {
+    typeText = '传统';
+  } else {
+    typeText = '未知';
+  }
+
+  return typeText;
 };
 
 const WATER_SENSOR_TYPE_TRADITIONAL = 0;
@@ -130,6 +140,21 @@ const SaleTableItem = ({ devPros }) => {
     setDlgSettingUltrasoundVisible(true);
   const hideDialogSettingUltrasoundDevInfo = () =>
     setDlgSettingUltrasoundVisible(false);
+
+  const refreshDevInfos = () => {
+    setMaxTemp(devPros.maxTemperature);
+    setMaxWaterLevel(devPros.maxWaterLevel);
+    setLowestWaterLevel(devPros.lowestWaterLevel);
+    setWaterStartOut(devPros.waterStartOut);
+    setSelectedSensorType(devPros.waterSensorType);
+    setWaterStopOut(devPros.waterStopOut);
+    setTempRetDiff(devPros.tempRetDiff);
+    setWaterRetDiff(devPros.waterRetDiff);
+    setTempOutDelay(devPros.tempOutDelay);
+    setAlarmDelay(devPros.alarmDelay);
+    setLowTempAlarm(devPros.lowTempAlarm);
+    setHighTempAlarm(devPros.highTempAlarm);
+  };
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
@@ -319,6 +344,7 @@ const SaleTableItem = ({ devPros }) => {
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
+              refreshDevInfos();
               if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
                 showDialogSettingTraditionalDevInfo();
               } else if (
@@ -400,8 +426,14 @@ const SaleTableItem = ({ devPros }) => {
                   onValueChange={(itemValue, itemIndex) =>
                     setSelectedSensorType(itemValue)
                   }>
-                  <Picker.Item label="传统传感器" value={0} />
-                  <Picker.Item label="超声波传感器" value={1} />
+                  <Picker.Item
+                    label={waterSensorType(WATER_SENSOR_TYPE_TRADITIONAL)}
+                    value={WATER_SENSOR_TYPE_TRADITIONAL}
+                  />
+                  <Picker.Item
+                    label={waterSensorType(WATER_SENSOR_TYPE_ULTRASOUND)}
+                    value={WATER_SENSOR_TYPE_ULTRASOUND}
+                  />
                 </Picker>
               </View>
               <TextInput
@@ -699,6 +731,7 @@ const RefrgtorItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
   const [dlgRelay1Visible, setDlgRelay1Visible] = React.useState(false);
   const [dlgRelay2Visible, setDlgRelay2Visible] = React.useState(false);
+
   const [relay1Status, setRelay1Status] = React.useState(
     devPros.relay1Status === 1,
   );
@@ -801,6 +834,11 @@ const RefrgtorItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
+  const refreshDevInfos = () => {
+    setRelay1Status(devPros.relay1Status === 1);
+    setRelay2Status(devPros.relay2Status === 1);
+  };
+
   return (
     <>
       <View style={styles.item}>
@@ -829,6 +867,7 @@ const RefrgtorItem = ({ devPros }) => {
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
+              refreshDevInfos();
               showDialogRelay1();
             }}>
             设置继电器1
@@ -837,6 +876,7 @@ const RefrgtorItem = ({ devPros }) => {
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
               console.log('Item Clicked, setting water level', devPros);
+              refreshDevInfos();
               showDialogRelay2();
             }}>
             设置继电器2
@@ -1011,7 +1051,6 @@ const Item = ({ devPros }) => {
 const Devices = () => {
   const scenes = useSelector(selectScenes);
 
-  //Make a copy, and remove the empty scenes
   let renderScenes = [];
   for (let scene of scenes) {
     if (scene.data.length > 0) {
@@ -1019,10 +1058,11 @@ const Devices = () => {
       renderScenes.push(copyScene);
     }
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <SectionList
-        sections={renderScenes} //scenes
+        sections={renderScenes}
         keyExtractor={(item, index) => item.id + index}
         renderItem={({ item }) => <Item devPros={item} />}
         renderSectionHeader={({ section: { title } }) => (

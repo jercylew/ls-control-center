@@ -1,15 +1,15 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import Devices from './views/devices';
 import NetworkConfig from './views/network-config';
 import Settings from './views/settings';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Provider as PaperProvider} from 'react-native-paper';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Provider as PaperProvider } from 'react-native-paper';
 import store from './data/store';
-import {Provider as StoreProvider, useSelector, useDispatch} from 'react-redux';
-import {MqttProvider} from './api/mqtt-hooks';
-import {selectScenes} from './data/device-slice';
+import { Provider as StoreProvider, useSelector } from 'react-redux';
+import { MqttProvider } from './api/mqtt-hooks';
+import { selectScenes } from './data/device-slice';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,7 +33,7 @@ const MyTabs = () => {
         component={Devices}
         options={{
           tabBarLabel: '设备',
-          tabBarIcon: ({color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
           headerTitle: '在线设备',
@@ -45,7 +45,7 @@ const MyTabs = () => {
         component={NetworkConfig}
         options={{
           tabBarLabel: '配网',
-          tabBarIcon: ({color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="wifi" color={color} size={26} />
           ),
           headerTitle: '网络配置',
@@ -56,7 +56,7 @@ const MyTabs = () => {
         component={Settings}
         options={{
           tabBarLabel: '设置',
-          tabBarIcon: ({color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="send" color={color} size={26} />
           ),
           headerTitle: '设置',
