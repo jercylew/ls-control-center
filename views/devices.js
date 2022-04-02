@@ -7,6 +7,7 @@ import {
   StatusBar,
   View,
 } from 'react-native';
+import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
 import { Button, Dialog, Portal, TextInput, Switch } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
@@ -128,6 +129,7 @@ const SaleTableItem = ({ devPros }) => {
   const [tempMessageShow, setTempMessageShow] = React.useState(false);
   const [waterMessageShow, setWaterMessageShow] = React.useState(false);
   const [alarmMessage, setAlarmMessage] = React.useState('');
+  const [devOnline, setDevOnline] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -363,6 +365,26 @@ const SaleTableItem = ({ devPros }) => {
             }>
             温度异常
           </Text>
+          <Svg height="20" width="20" style={styles.itemStatusIcon}>
+            <Defs>
+              <RadialGradient
+                id="grad"
+                cx="50%"
+                cy="50%"
+                r="50%"
+                fx="50%"
+                fy="50%"
+                gradientUnits="userSpaceOnUse">
+                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
+                <Stop
+                  offset="1"
+                  stopColor={devOnline ? '#00ff00' : '#789166'}
+                  stopOpacity="1"
+                />
+              </RadialGradient>
+            </Defs>
+            <Circle cx="10" cy="10" r="10" fill="url(#grad)" />
+          </Svg>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
           <Text
@@ -1178,6 +1200,10 @@ const styles = StyleSheet.create({
   itemAlarmMessageText: {
     fontSize: 12,
     color: '#ff0000',
+    paddingHorizontal: 5,
+  },
+  itemStatusIcon: {
+    marginLeft: 10,
     paddingHorizontal: 5,
   },
   itemAlarmMessageTextHide: {
