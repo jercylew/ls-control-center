@@ -21,6 +21,7 @@ const MqttContext = createContext();
 
 export const MqttProvider = ({ children }) => {
   const [mqttClient, setMqttClient] = useState(null);
+  const [heartbeatTimers, setHeartbeatTimers] = useState({});
   const sendCommand = (topic, data) => {
     console.log('MQTT trying to send mqtt command:', data);
     mqttClient.publish(topic, data, 0, false);
@@ -30,11 +31,8 @@ export const MqttProvider = ({ children }) => {
 
   const handleSaleTableStatusReport = (devId, reportData) => {
     let newDevice = {
-      name: null,
       id: devId,
       devType: DEV_TYPE_SALE_TABLE,
-      sceneId: null,
-      sceneName: null,
       isHeating: reportData.Is_Heating,
       isUpWater: reportData.Is_Up_water,
       netType: reportData.NET_type,
@@ -42,20 +40,7 @@ export const MqttProvider = ({ children }) => {
       waterLevelDetection: reportData.Water_level_detection,
       errorWaterLevel: reportData.error_water_level,
       errorTemperature: reportData.error_temperature,
-      maxWaterLevel: null,
-      maxTemperature: null,
-      firmwareVersion: null,
-      lowestWaterLevel: null,
-      waterStartOut: null,
-      waterStopOut: null,
-      tempRetDiff: null,
-      waterRetDiff: null,
-      tempOutDelay: null,
-      waterSensorType: null,
-      highTempAlarm: null,
-      lowTempAlarm: null,
-      lowWaterLevelAlarm: null, //To confirm
-      alarmDelay: null,
+      onlineStatus: true,
     };
     console.log('Now try to sync to slice...');
     dispatch(syncDevice(newDevice));
@@ -102,13 +87,7 @@ export const MqttProvider = ({ children }) => {
       devType: DEV_TYPE_SALE_TABLE,
       sceneId: inSceneId,
       sceneName: inSceneName,
-      isHeating: null,
-      isUpWater: null,
-      netType: null,
-      detectionTemperature: null,
-      waterLevelDetection: null,
-      errorWaterLevel: null,
-      errorTemperature: null,
+      onlineStatus: true,
       maxWaterLevel: propData.params.Water_level_Threshold_Max,
       maxTemperature: propData.params.Temp_Threshold_Max,
       firmwareVersion: propData.Firmware_information,
@@ -129,11 +108,9 @@ export const MqttProvider = ({ children }) => {
 
   const handleRefrgStatusReport = (devId, reportData) => {
     let newDevice = {
-      name: null,
       id: devId,
       devType: DEV_TYPE_REFRIGERATOR,
-      sceneId: null,
-      sceneName: null,
+      onlineStatus: true,
       netType: reportData.NET_type,
       cabinetTemp: reportData.Cabinet_tempe,
       evaporatorTempe: reportData.Evaporator_tempe,
@@ -178,20 +155,7 @@ export const MqttProvider = ({ children }) => {
       devType: DEV_TYPE_REFRIGERATOR,
       sceneId: inSceneId,
       sceneName: inSceneName,
-      netType: null,
-      cabinetTemp: null,
-      evaporatorTempe: null,
-      condenserTempe: null,
-      ntcTempe: null,
-      sht30OneTempe: null,
-      sht30OneHumi: null,
-      sht30TwoTempe: null,
-      sht30TwoHumi: null,
-      doorDetection1: null,
-      doorDetection2: null,
-      doorStatusOut: null,
-      relay1Status: null,
-      relay2Status: null,
+      onlineStatus: true,
     };
     dispatch(syncDevice(newDevice));
   };
@@ -267,7 +231,38 @@ export const MqttProvider = ({ children }) => {
             console.log(
               'Unknown message with topic:' + msg.topic + ', ignore it!',
             );
+            return;
           }
+
+          console.log(heartbeatTimers, dataJson.device_id);
+          let devTimerId = heartbeatTimers[dataJson.device_id];
+          if (devTimerId) {
+            clearTimeout(devTimerId);
+          }
+          devTimerId = setTimeout(
+            devId => {
+              console.log(
+                'Timeout for reciving device status or property report for',
+                devId,
+              );
+              let newDevice = {
+                id: devId,
+                onlineStatus: false,
+              };
+              dispatch(syncDevice(newDevice));
+            },
+            30000,
+            dataJson.device_id,
+          );
+
+          let newDevIdTimer = {};
+          newDevIdTimer[dataJson.device_id] = devTimerId;
+          console.log(newDevIdTimer);
+          setHeartbeatTimers(oldDevTimerIds => {
+            let mergedTimers = { ...oldDevTimerIds, ...newDevIdTimer };
+            console.log('Merged timers', mergedTimers);
+            return mergedTimers;
+          });
         });
 
         client.on('connect', function () {

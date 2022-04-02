@@ -29,131 +29,134 @@ const setDevSceneName = (devIdScene, devSceneMap) => {
 };
 
 const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
-  if (devData !== null) {
-    if (devData.name !== null) {
+  if (devData) {
+    if (devData.name) {
       scenes[sceneIndex].data[devIndex].name = devData.name;
     }
-    if (devData.sceneId !== null) {
+    if (devData.sceneId) {
       scenes[sceneIndex].data[devIndex].sceneId = devData.sceneId;
     }
-    if (devData.netType !== null) {
+    if (devData.netType) {
       scenes[sceneIndex].data[devIndex].netType = devData.netType;
+    }
+    if (devData.onlineStatus) {
+      scenes[sceneIndex].data[devIndex].onlineStatus = devData.onlineStatus;
     }
 
     if (devData.devType === DEV_TYPE_SALE_TABLE) {
-      if (devData.isHeating !== null) {
+      if (devData.isHeating) {
         scenes[sceneIndex].data[devIndex].isHeating = devData.isHeating;
       }
-      if (devData.isUpWater !== null) {
+      if (devData.isUpWater) {
         scenes[sceneIndex].data[devIndex].isUpWater = devData.isUpWater;
       }
-      if (devData.detectionTemperature !== null) {
+      if (devData.detectionTemperature) {
         scenes[sceneIndex].data[devIndex].detectionTemperature =
           devData.detectionTemperature;
       }
-      if (devData.waterLevelDetection !== null) {
+      if (devData.waterLevelDetection) {
         scenes[sceneIndex].data[devIndex].waterLevelDetection =
           devData.waterLevelDetection;
       }
-      if (devData.errorWaterLevel !== null) {
+      if (devData.errorWaterLevel) {
         scenes[sceneIndex].data[devIndex].errorWaterLevel =
           devData.errorWaterLevel;
       }
-      if (devData.errorTemperature !== null) {
+      if (devData.errorTemperature) {
         scenes[sceneIndex].data[devIndex].errorTemperature =
           devData.errorTemperature;
       }
-      if (devData.maxWaterLevel !== null) {
+      if (devData.maxWaterLevel) {
         scenes[sceneIndex].data[devIndex].maxWaterLevel = devData.maxWaterLevel;
       }
-      if (devData.maxTemperature !== null) {
+      if (devData.maxTemperature) {
         scenes[sceneIndex].data[devIndex].maxTemperature =
           devData.maxTemperature;
       }
-      if (devData.firmwareVersion !== null) {
+      if (devData.firmwareVersion) {
         scenes[sceneIndex].data[devIndex].firmwareVersion =
           devData.firmwareVersion;
       }
-      if (devData.lowestWaterLevel !== null) {
+      if (devData.lowestWaterLevel) {
         scenes[sceneIndex].data[devIndex].lowestWaterLevel =
           devData.lowestWaterLevel;
       }
-      if (devData.waterStartOut !== null) {
+      if (devData.waterStartOut) {
         scenes[sceneIndex].data[devIndex].waterStartOut = devData.waterStartOut;
       }
-      if (devData.waterStopOut !== null) {
+      if (devData.waterStopOut) {
         scenes[sceneIndex].data[devIndex].waterStopOut = devData.waterStopOut;
       }
-      if (devData.tempRetDiff !== null) {
+      if (devData.tempRetDiff) {
         scenes[sceneIndex].data[devIndex].tempRetDiff = devData.tempRetDiff;
       }
-      if (devData.waterRetDiff !== null) {
+      if (devData.waterRetDiff) {
         scenes[sceneIndex].data[devIndex].waterRetDiff = devData.waterRetDiff;
       }
-      if (devData.tempOutDelay !== null) {
+      if (devData.tempOutDelay) {
         scenes[sceneIndex].data[devIndex].tempOutDelay = devData.tempOutDelay;
       }
-      if (devData.waterSensorType !== null) {
+      if (devData.waterSensorType) {
         scenes[sceneIndex].data[devIndex].waterSensorType =
           devData.waterSensorType;
       }
-      if (devData.highTempAlarm !== null) {
+      if (devData.highTempAlarm) {
         scenes[sceneIndex].data[devIndex].highTempAlarm = devData.highTempAlarm;
       }
-      if (devData.lowTempAlarm !== null) {
+      if (devData.lowTempAlarm) {
         scenes[sceneIndex].data[devIndex].lowTempAlarm = devData.lowTempAlarm;
       }
-      if (devData.lowWaterLevelAlarm !== null) {
+      if (devData.lowWaterLevelAlarm) {
         scenes[sceneIndex].data[devIndex].lowWaterLevelAlarm =
           devData.lowWaterLevelAlarm;
       }
-      if (devData.alarmDelay !== null) {
+      if (devData.alarmDelay) {
         scenes[sceneIndex].data[devIndex].alarmDelay = devData.alarmDelay;
       }
     }
 
     if (devData.devType === DEV_TYPE_REFRIGERATOR) {
-      if (devData.cabinetTemp !== null) {
+      if (devData.cabinetTemp) {
         scenes[sceneIndex].data[devIndex].cabinetTemp = devData.cabinetTemp;
       }
-      if (devData.evaporatorTempe !== null) {
+      if (devData.evaporatorTempe) {
         scenes[sceneIndex].data[devIndex].evaporatorTempe =
           devData.evaporatorTempe;
       }
-      if (devData.condenserTempe !== null) {
+      if (devData.condenserTempe) {
         scenes[sceneIndex].data[devIndex].condenserTempe =
           devData.condenserTempe;
       }
-      if (devData.ntcTempe !== null) {
+      if (devData.ntcTempe) {
         scenes[sceneIndex].data[devIndex].ntcTempe = devData.ntcTempe;
       }
-      if (devData.sht30OneTempe !== null) {
+      if (devData.sht30OneTempe) {
         scenes[sceneIndex].data[devIndex].sht30OneTempe = devData.sht30OneTempe;
       }
-      if (devData.sht30OneHumi !== null) {
+      if (devData.sht30OneHumi) {
         scenes[sceneIndex].data[devIndex].sht30OneHumi = devData.sht30OneHumi;
       }
-      if (devData.sht30TwoTempe !== null) {
+      if (devData.sht30TwoTempe) {
         scenes[sceneIndex].data[devIndex].sht30TwoTempe = devData.sht30TwoTempe;
       }
-      if (devData.sht30TwoHumi !== null) {
+      if (devData.sht30TwoHumi) {
         scenes[sceneIndex].data[devIndex].sht30TwoHumi = devData.sht30TwoHumi;
       }
-      if (devData.doorDetection1 !== null) {
+      if (devData.doorDetection1) {
         scenes[sceneIndex].data[devIndex].doorDetection1 =
           devData.doorDetection1;
       }
-      if (devData.doorDetection2 !== null) {
+      if (devData.doorDetection2) {
         scenes[sceneIndex].data[devIndex].doorDetection2 =
           devData.doorDetection2;
       }
-      if (devData.doorStatusOut !== null) {
+      if (devData.doorStatusOut) {
         scenes[sceneIndex].data[devIndex].doorStatusOut = devData.doorStatusOut;
       }
-      if (devData.relay1Status !== null) {
+      if (devData.relay1Status) {
         scenes[sceneIndex].data[devIndex].relay1Status = devData.relay1Status;
       }
-      if (devData.relay2Status !== null) {
+      if (devData.relay2Status) {
         scenes[sceneIndex].data[devIndex].relay2Status = devData.relay2Status;
       }
     }
@@ -185,13 +188,13 @@ export const slice = createSlice({
       if (
         oldSceneName !== '' &&
         oldSceneName !== UNKNOWN_SCENE_NAME &&
-        device.sceneName === null
+        !device.sceneName
       ) {
         device.sceneName = oldSceneName;
       } else {
         if (
           oldSceneName === '' || //Scene not exist
-          device.sceneName === null || //From status report
+          !device.sceneName ||
           device.sceneName === '' || //From status report
           device.sceneName === 'NA' //From property, but not set
         ) {

@@ -37,7 +37,7 @@ const MyTabs = () => {
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
           headerTitle: '在线设备',
-          tabBarBadge: scenes.length,
+          tabBarBadge: scenes.length > 1 ? scenes.length - 1 : scenes.length,
         }}
       />
       <Tab.Screen
