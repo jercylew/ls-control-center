@@ -93,6 +93,8 @@ const SaleTableItem = ({ devPros }) => {
     React.useState(false);
   const [dlgSettingUltrasoundVisible, setDlgSettingUltrasoundVisible] =
     React.useState(false);
+  const [dlgFactoryResetWarning, setDlgFactoryResetWarning] =
+    React.useState(false);
 
   const [maxTemp, setMaxTemp] = React.useState(devPros.maxTemperature);
   const [maxWaterLevel, setMaxWaterLevel] = React.useState(
@@ -140,6 +142,8 @@ const SaleTableItem = ({ devPros }) => {
     setDlgSettingUltrasoundVisible(true);
   const hideDialogSettingUltrasoundDevInfo = () =>
     setDlgSettingUltrasoundVisible(false);
+  const showDialogFactoryResetWarning = () => setDlgFactoryResetWarning(true);
+  const hideDialogFactoryResetWarning = () => setDlgFactoryResetWarning(false);
 
   const refreshDevInfos = () => {
     setMaxTemp(devPros.maxTemperature);
@@ -286,6 +290,19 @@ const SaleTableItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
+  const onDialogFactoryResetOk = () => {
+    hideDialogFactoryResetWarning();
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Restore_factory: 1,
+      },
+    };
+
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  };
+
   const isWaterLeverError = () => {
     return devPros.errorWaterLevel && devPros.errorWaterLevel.length > 0;
   };
@@ -320,6 +337,14 @@ const SaleTableItem = ({ devPros }) => {
             {devPros.name}
           </Text>
           <Text style={styles.info}>{devPros.id}</Text>
+          <Button
+            icon="restore"
+            mode="text"
+            color="red"
+            compact={true}
+            onPress={showDialogFactoryResetWarning}>
+            重置
+          </Button>
         </View>
         <View style={styles.itemAlarmMessage}>
           <Text
@@ -718,6 +743,33 @@ const SaleTableItem = ({ devPros }) => {
               mode="contained"
               style={styles.dialogButton}
               onPress={onDialogSettingOk}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgFactoryResetWarning}
+          onDismiss={hideDialogFactoryResetWarning}>
+          <Dialog.Title>警告!</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogFactoryResetWarning}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogFactoryResetOk}>
               确定
             </Button>
           </Dialog.Actions>
