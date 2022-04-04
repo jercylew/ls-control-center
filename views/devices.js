@@ -129,7 +129,6 @@ const SaleTableItem = ({ devPros }) => {
   const [tempMessageShow, setTempMessageShow] = React.useState(false);
   const [waterMessageShow, setWaterMessageShow] = React.useState(false);
   const [alarmMessage, setAlarmMessage] = React.useState('');
-  const [devOnline, setDevOnline] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -378,7 +377,7 @@ const SaleTableItem = ({ devPros }) => {
                 <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
                 <Stop
                   offset="1"
-                  stopColor={devOnline ? '#00ff00' : '#789166'}
+                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
                   stopOpacity="1"
                 />
               </RadialGradient>

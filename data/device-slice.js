@@ -39,9 +39,7 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
     if (devData.netType) {
       scenes[sceneIndex].data[devIndex].netType = devData.netType;
     }
-    if (devData.onlineStatus) {
-      scenes[sceneIndex].data[devIndex].onlineStatus = devData.onlineStatus;
-    }
+    scenes[sceneIndex].data[devIndex].onlineStatus = devData.onlineStatus;
 
     if (devData.devType === DEV_TYPE_SALE_TABLE) {
       if (devData.isHeating) {
@@ -287,7 +285,7 @@ export const slice = createSlice({
   },
 });
 
-export const { syncDevice, saveDeviceInfo } = slice.actions;
+export const { syncDevice, syncDeviceReportTimer } = slice.actions;
 
 export const selectScenes = state => state.scene.scenes;
 export default slice.reducer;
