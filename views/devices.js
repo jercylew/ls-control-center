@@ -348,22 +348,6 @@ const SaleTableItem = ({ devPros }) => {
           </Button>
         </View>
         <View style={styles.itemAlarmMessage}>
-          <Text
-            style={
-              isWaterLeverError()
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            水位异常
-          </Text>
-          <Text
-            style={
-              isTempError()
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            温度异常
-          </Text>
           <Svg height="20" width="20" style={styles.itemStatusIcon}>
             <Defs>
               <RadialGradient
@@ -384,6 +368,22 @@ const SaleTableItem = ({ devPros }) => {
             </Defs>
             <Circle cx="10" cy="10" r="10" fill="url(#grad)" />
           </Svg>
+          <Text
+            style={
+              isWaterLeverError()
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            水位异常
+          </Text>
+          <Text
+            style={
+              isTempError()
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            温度异常
+          </Text>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
           <Text
@@ -804,6 +804,8 @@ const RefrgtorItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
   const [dlgRelay1Visible, setDlgRelay1Visible] = React.useState(false);
   const [dlgRelay2Visible, setDlgRelay2Visible] = React.useState(false);
+  const [dlgFactoryResetWarning, setDlgFactoryResetWarning] =
+    React.useState(false);
 
   const [relay1Status, setRelay1Status] = React.useState(
     devPros.relay1Status === 1,
@@ -825,6 +827,9 @@ const RefrgtorItem = ({ devPros }) => {
 
   const showDialogRelay2 = () => setDlgRelay2Visible(true);
   const hideDialogRelay2 = () => setDlgRelay2Visible(false);
+
+  const showDialogFactoryResetWarning = () => setDlgFactoryResetWarning(true);
+  const hideDialogFactoryResetWarning = () => setDlgFactoryResetWarning(false);
 
   const devCmdTopic = TOPIC_REFRGTOR_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
@@ -912,6 +917,19 @@ const RefrgtorItem = ({ devPros }) => {
     setRelay2Status(devPros.relay2Status === 1);
   };
 
+  const onDialogFactoryResetOk = () => {
+    hideDialogFactoryResetWarning();
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Restore_factory: 1,
+      },
+    };
+
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  };
+
   return (
     <>
       <View style={styles.item}>
@@ -934,10 +952,40 @@ const RefrgtorItem = ({ devPros }) => {
             {devPros.name}
           </Text>
           <Text style={styles.info}>{devPros.id}</Text>
+          <Button
+            icon="restore"
+            mode="text"
+            color="red"
+            compact={true}
+            onPress={showDialogFactoryResetWarning}>
+            重置
+          </Button>
+        </View>
+        <View style={styles.itemAlarmMessage}>
+          <Svg height="20" width="20" style={styles.itemStatusIcon}>
+            <Defs>
+              <RadialGradient
+                id="grad"
+                cx="50%"
+                cy="50%"
+                r="50%"
+                fx="50%"
+                fy="50%"
+                gradientUnits="userSpaceOnUse">
+                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
+                <Stop
+                  offset="1"
+                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
+                  stopOpacity="1"
+                />
+              </RadialGradient>
+            </Defs>
+            <Circle cx="10" cy="10" r="10" fill="url(#grad)" />
+          </Svg>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
           <Text
-            style={styles.itemSetTempWaterLevelText}
+            style={styles.itemSetRefrgRelayText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
               refreshDevInfos();
@@ -946,7 +994,7 @@ const RefrgtorItem = ({ devPros }) => {
             设置继电器1
           </Text>
           <Text
-            style={styles.itemSetTempWaterLevelText}
+            style={styles.itemSetRefrgRelayText}
             onPress={() => {
               console.log('Item Clicked, setting water level', devPros);
               refreshDevInfos();
@@ -1106,6 +1154,33 @@ const RefrgtorItem = ({ devPros }) => {
             </Button>
           </Dialog.Actions>
         </Dialog>
+        <Dialog
+          visible={dlgFactoryResetWarning}
+          onDismiss={hideDialogFactoryResetWarning}>
+          <Dialog.Title>警告!</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              icon="close"
+              mode="contained"
+              color="#e3e3e3"
+              style={styles.dialogButton}
+              onPress={hideDialogFactoryResetWarning}>
+              取消
+            </Button>
+            <Button
+              icon="send"
+              mode="contained"
+              style={styles.dialogButton}
+              onPress={onDialogFactoryResetOk}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
     </>
   );
@@ -1182,7 +1257,7 @@ const styles = StyleSheet.create({
   itemSetTempWaterLevel: {
     alignContent: 'flex-end',
     paddingVertical: 30,
-    flexDirection: 'row',
+    // flexDirection: 'row',
     marginHorizontal: 30,
   },
   itemAlarmMessage: {
@@ -1195,6 +1270,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#2805f2',
     paddingHorizontal: 5,
+  },
+  itemSetRefrgRelayText: {
+    fontSize: 17,
+    color: '#2805f2',
+    paddingHorizontal: 40,
+    marginVertical: 2,
   },
   itemAlarmMessageText: {
     fontSize: 12,
