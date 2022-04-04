@@ -190,6 +190,7 @@ export const MqttProvider = ({ children }) => {
       lowTempAlarm: propData.params.Low_Temp_Alarm,
       lowWaterLevelAlarm: propData.params.Low_Water_Level_Alarm, //To confirm
       alarmDelay: propData.params.Alarm_Delay,
+      tradiWaterMode: propData.params.Tradi_water_mode,
     };
     dispatch(syncDevice(newDevice));
   };

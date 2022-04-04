@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -121,6 +121,9 @@ const SaleTableItem = ({ devPros }) => {
     devPros.highTempAlarm,
   );
   const [highTempAlarmError, setHighTempAlarmError] = React.useState(false);
+  const [selectedTradiWaterMode, setSelectedTradiWaterMode] = React.useState(
+    devPros.tradiWaterMode,
+  );
 
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
@@ -147,6 +150,10 @@ const SaleTableItem = ({ devPros }) => {
   const hideDialogFactoryResetWarning = () => setDlgFactoryResetWarning(false);
 
   const refreshDevInfos = () => {
+    setDevName(devPros.name);
+    setSceneName(devPros.sceneName);
+    setSceneId(devPros.sceneId);
+
     setMaxTemp(devPros.maxTemperature);
     setMaxWaterLevel(devPros.maxWaterLevel);
     setLowestWaterLevel(devPros.lowestWaterLevel);
@@ -159,6 +166,7 @@ const SaleTableItem = ({ devPros }) => {
     setAlarmDelay(devPros.alarmDelay);
     setLowTempAlarm(devPros.lowTempAlarm);
     setHighTempAlarm(devPros.highTempAlarm);
+    setSelectedTradiWaterMode(devPros.tradiWaterMode);
   };
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
@@ -181,6 +189,7 @@ const SaleTableItem = ({ devPros }) => {
         Scene_Id: sceneId,
         Device_Name: deviceNameUnicode,
         Water_Sen_Type: selectedSensorType,
+        Tradi_water_mode: selectedTradiWaterMode,
         // Remote_address: '',
         // Remote_port: 1883,
         // Mqtt_User_Name: '',
@@ -331,6 +340,7 @@ const SaleTableItem = ({ devPros }) => {
               };
               sendCommand(TOPIC_SALE_TABLE_GET_STATUS, JSON.stringify(cmdJson));
 
+              refreshDevInfos();
               setTimeout(() => {
                 showDialogDevInfo();
               }, 200);
@@ -463,7 +473,7 @@ const SaleTableItem = ({ devPros }) => {
                 devPros.firmwareVersion}
             </Text>
             <View style={styles.input}>
-              <View style={styles.sensorTypePicker}>
+              <View style={styles.typePicker}>
                 <Text>传感器类型</Text>
                 <Picker
                   selectedValue={selectedSensorType}
@@ -480,6 +490,24 @@ const SaleTableItem = ({ devPros }) => {
                     label={waterSensorType(WATER_SENSOR_TYPE_ULTRASOUND)}
                     value={WATER_SENSOR_TYPE_ULTRASOUND}
                   />
+                </Picker>
+              </View>
+              <View
+                style={
+                  devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL
+                    ? styles.typePicker
+                    : styles.hide
+                }>
+                <Text>传统传感器模式</Text>
+                <Picker
+                  selectedValue={selectedTradiWaterMode}
+                  mode={'dropdown'}
+                  style={styles.inputPicker}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setSelectedTradiWaterMode(itemValue)
+                  }>
+                  <Picker.Item label={'模式0'} value={0} />
+                  <Picker.Item label={'模式1'} value={1} />
                 </Picker>
               </View>
               <TextInput
@@ -913,6 +941,10 @@ const RefrgtorItem = ({ devPros }) => {
   }
 
   const refreshDevInfos = () => {
+    setDevName(devPros.name);
+    setSceneName(devPros.sceneName);
+    setSceneId(devPros.sceneId);
+
     setRelay1Status(devPros.relay1Status === 1);
     setRelay2Status(devPros.relay2Status === 1);
   };
@@ -944,6 +976,7 @@ const RefrgtorItem = ({ devPros }) => {
                 method: 'get_status',
               };
               sendCommand(TOPIC_REFRGTOR_GET_STATUS, JSON.stringify(cmdJson));
+              refreshDevInfos();
 
               setTimeout(() => {
                 showDialogDevInfo();
@@ -1317,14 +1350,14 @@ const styles = StyleSheet.create({
     width: '50%',
     marginHorizontal: 2,
   },
-  sensorTypePicker: {
+  typePicker: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
   inputPicker: {
-    width: '70%',
-    marginHorizontal: 2,
+    width: '45%',
+    alignItems: 'flex-start',
   },
   dialogButton: {
     marginHorizontal: 10,

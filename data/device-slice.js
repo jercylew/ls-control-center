@@ -111,6 +111,10 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
       if (devData.alarmDelay) {
         scenes[sceneIndex].data[devIndex].alarmDelay = devData.alarmDelay;
       }
+      if (devData.tradiWaterMode) {
+        scenes[sceneIndex].data[devIndex].tradiWaterMode =
+          devData.tradiWaterMode;
+      }
     }
 
     if (devData.devType === DEV_TYPE_REFRIGERATOR) {
