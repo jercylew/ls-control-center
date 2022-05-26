@@ -19,6 +19,7 @@ import {
 } from '../data/device-slice';
 import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
+import { colors } from '../constants/colors';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
@@ -1262,10 +1263,10 @@ const styles = StyleSheet.create({
   },
   item: {
     flexDirection: 'row',
-    backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
     borderRadius: 5,
+    backgroundColor: colors.theme,
   },
   header: {
     fontSize: 32,

@@ -1,16 +1,19 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   View,
   NativeEventEmitter,
   NativeModules,
 } from 'react-native';
-import {RadioButton, Button, TextInput} from 'react-native-paper';
+import { RadioButton, Button } from 'react-native-paper';
 import ESPTouchModule from '../api/esptouch-wrapper';
+import { button } from '../constants/button';
+import { colors } from '../constants/colors';
 
-const {ReactNativeLoading} = NativeModules;
+const { ReactNativeLoading } = NativeModules;
 
 const NetworkConfig = () => {
   const [ssid, setSsid] = React.useState('');
@@ -93,44 +96,72 @@ const NetworkConfig = () => {
 
   return (
     <SafeAreaView style={styles.topView}>
-      <Text style={styles.headerText}>{`SSID: ${ssid}`}</Text>
-      <Text style={styles.headerText}>{`BSSID: ${bssid}`}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.textPrefix}>SSID:</Text>
+        <Text style={styles.text}>{ssid}</Text>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        label="密码"
-        onChangeText={onChangePassword}
-        secureTextEntry={securePass}
-        value={password}
-        right={
-          <TextInput.Icon
-            name="eye"
-            onPress={() => {
-              setSecurePass(!securePass);
-            }}
-          />
-        }
-      />
+      <View style={styles.textContainer}>
+        <Text style={styles.textPrefix}>BSSID:</Text>
+        <Text style={styles.text}>{bssid}</Text>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        onChangeText={onChangeNumDev}
-        value={numDev.toString()}
-        label="设备数量"
-        keyboardType="numeric"
-      />
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputPrefix}>密码:</Text>
+        <TextInput
+          secureTextEntry={true}
+          onChangeText={onChangePassword}
+          value={password}
+          keyboardType={'default'}
+          autoComplete={'password'}
+          style={styles.input}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputPrefix}>设备数量:</Text>
+        <TextInput
+          onChangeText={onChangeNumDev}
+          value={numDev.toString()}
+          keyboardType={'numeric'}
+          autoComplete={'password'}
+          style={styles.input}
+        />
+      </View>
 
       <RadioButton.Group
         onValueChange={newValue => onChangeBroadcast(newValue)}
         value={broadcast}>
         <View style={styles.radiosGroup}>
           <View style={styles.radioItem}>
-            <Text style={styles.labelText}>广播</Text>
-            <RadioButton style={styles.labelRadio} value="broadcast" />
+            <Text
+              style={
+                broadcast === 'broadcast'
+                  ? styles.labelTexChecked
+                  : styles.labelText
+              }>
+              广播
+            </Text>
+            <RadioButton
+              style={styles.labelRadio}
+              value="broadcast"
+              color="#009FFC"
+            />
           </View>
           <View style={styles.radioItem}>
-            <Text style={styles.labelText}>组播</Text>
-            <RadioButton style={styles.labelRadio} value="multicast" />
+            <Text
+              style={
+                broadcast === 'multicast'
+                  ? styles.labelTexChecked
+                  : styles.labelText
+              }>
+              组播
+            </Text>
+            <RadioButton
+              style={styles.labelRadio}
+              value="multicast"
+              color="#009FFC"
+            />
           </View>
         </View>
       </RadioButton.Group>
@@ -142,9 +173,11 @@ const NetworkConfig = () => {
 
       <Button
         mode="contained"
-        icon="set-center"
         disabled={!connBtnEnabled}
         onPress={onConfirmConnEspDev}
+        color={button.color}
+        contentStyle={button.contentStyle}
+        labelStyle={button.labelStyle}
         style={styles.confirmButton}>
         确认
       </Button>
@@ -154,8 +187,9 @@ const NetworkConfig = () => {
 
 const styles = StyleSheet.create({
   topView: {
+    flex: 1,
     fontSize: 20,
-    margin: 8,
+    backgroundColor: colors.pageBackground,
   },
   headerText: {
     margin: 8,
@@ -163,8 +197,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   input: {
-    margin: 5,
-    borderRadius: 10,
+    width: 1000,
+    fontSize: 20,
+  },
+  text: {
+    width: 1000,
+    fontSize: 20,
+    color: '#009FFC',
   },
   radioItem: {
     flexDirection: 'row',
@@ -177,14 +216,21 @@ const styles = StyleSheet.create({
   labelText: {
     margin: 5,
     fontSize: 20,
+    color: '#9AAAAA',
+  },
+  labelTexChecked: {
+    margin: 5,
+    fontSize: 20,
+    color: '#009FFC',
   },
   labelRadio: {
     margin: 5,
     fontSize: 20,
   },
   confirmButton: {
-    // height: 50,
-    margin: 5,
+    marginLeft: 35,
+    marginRight: 35,
+    marginTop: 50,
     borderRadius: 10,
   },
   statusOkText: {
@@ -202,6 +248,36 @@ const styles = StyleSheet.create({
     padding: 2,
     fontSize: 20,
     color: '#f01707',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    borderRadius: 10,
+    height: 60,
+    margin: 12,
+    padding: 10,
+    fontSize: 20,
+    backgroundColor: colors.inputBackground,
+  },
+  inputPrefix: {
+    paddingHorizontal: 5,
+    fontSize: 20,
+    color: '#9AAAAA',
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    borderRadius: 10,
+    height: 60,
+    fontSize: 20,
+    backgroundColor: colors.backgroundColor,
+  },
+  textPrefix: {
+    paddingHorizontal: 5,
+    fontSize: 20,
+    color: '#9AAAAA',
   },
 });
 

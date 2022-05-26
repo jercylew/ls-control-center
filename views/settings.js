@@ -1,6 +1,8 @@
-import React, {Component} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {TextInput, Button} from 'react-native-paper';
+import React, { Component } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
+
+import { button } from '../constants/button';
 
 class Settings extends Component {
   constructor(props) {
@@ -23,27 +25,27 @@ class Settings extends Component {
   }
 
   setMqttBroker(value) {
-    this.setState({mqtt_broker: value});
+    this.setState({ mqtt_broker: value });
   }
 
   setMqttUser(value) {
-    this.setState({mqtt_user: value});
+    this.setState({ mqtt_user: value });
   }
 
   setMqttPassword(value) {
-    this.setState({mqtt_password: value});
+    this.setState({ mqtt_password: value });
   }
 
   setMqttPort(value) {
-    this.setState({mqtt_port: value});
+    this.setState({ mqtt_port: value });
   }
 
   setMqttClientId(value) {
-    this.setState({mqtt_client_id: value});
+    this.setState({ mqtt_client_id: value });
   }
 
   setSecurePass(value) {
-    this.setState({securePass: value});
+    this.setState({ securePass: value });
   }
 
   render() {
@@ -100,8 +102,10 @@ class Settings extends Component {
         />
         <Button
           mode="contained"
-          icon="star"
+          color={button.color}
           onPress={() => console.log('Pressed')}
+          contentStyle={button.contentStyle}
+          labelStyle={button.labelStyle}
           style={styles.confirmButton}>
           确认
         </Button>
@@ -120,7 +124,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   confirmButton: {
-    margin: 5,
+    marginLeft: 35,
+    marginRight: 35,
+    marginTop: 50,
     borderRadius: 10,
   },
 });
