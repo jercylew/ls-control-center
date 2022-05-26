@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
-
+import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { Button } from 'react-native-paper';
 import { button } from '../constants/button';
+import { colors } from '../constants/colors';
 
 class Settings extends Component {
   constructor(props) {
@@ -49,57 +49,63 @@ class Settings extends Component {
   }
 
   render() {
-    const {
-      mqtt_broker,
-      mqtt_user,
-      mqtt_password,
-      mqtt_port,
-      mqtt_client_id,
-      securePass,
-    } = this.state;
-
     return (
       <View style={styles.topView}>
-        <TextInput
-          style={styles.input}
-          label="MQTT Server"
-          value={mqtt_broker}
-          onChangeText={this.setMqttBroker}
-        />
-        <TextInput
-          style={styles.input}
-          label="MQTT User Name"
-          value={mqtt_user}
-          onChangeText={this.setMqttUser}
-        />
-        <TextInput
-          style={styles.input}
-          label="MQTT User Password"
-          value={mqtt_password}
-          secureTextEntry={securePass}
-          right={
-            <TextInput.Icon
-              name="eye"
-              onPress={() => {
-                this.setSecurePass(!securePass);
-              }}
-            />
-          }
-          onChangeText={this.setMqttPassword}
-        />
-        <TextInput
-          style={styles.input}
-          label="MQTT Client Id"
-          value={mqtt_client_id}
-          onChangeText={this.setMqttClientId}
-        />
-        <TextInput
-          style={styles.input}
-          label="MQTT Port"
-          value={mqtt_port}
-          keyboardType="numeric"
-          onChangeText={this.setMqttPort}
-        />
+        <View style={styles.inputContainer}>
+          <Text style={styles.labelText}>MQTT Server:</Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.mqtt_broker}
+            onChangeText={this.setMqttBroker}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.labelText}>MQTT User Name:</Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.mqtt_user}
+            onChangeText={this.setMqttUser}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.labelText}>MQTT User Password:</Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.mqtt_password}
+            secureTextEntry={true}
+            onChangeText={this.setMqttPassword}
+            // right={
+            //   <TextInput.Icon
+            //     name="eye"
+            //     onPress={() => {
+            //       this.setSecurePass(!securePass);
+            //     }}
+            //   />
+            // }
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.labelText}>MQTT Client Id:</Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.mqtt_client_id}
+            onChangeText={this.setMqttClientId}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.labelText}>MQTT Port:</Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.mqtt_port}
+            keyboardType="numeric"
+            onChangeText={this.setMqttPort}
+          />
+        </View>
+
         <Button
           mode="contained"
           color={button.color}
@@ -120,14 +126,27 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   input: {
-    margin: 5,
+    fontSize: 20,
+    height: 60,
+    marginTop: 5,
     borderRadius: 10,
+    color: '#009FFC',
+    backgroundColor: colors.inputBackground,
   },
   confirmButton: {
-    marginLeft: 35,
-    marginRight: 35,
-    marginTop: 50,
+    marginLeft: 45,
+    marginRight: 45,
+    marginTop: 20,
     borderRadius: 10,
+  },
+  inputContainer: {
+    borderRadius: 10,
+    marginHorizontal: 5,
+    marginVertical: 8,
+    fontSize: 20,
+  },
+  labelText: {
+    color: '#9AAAAA',
   },
 });
 
