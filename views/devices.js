@@ -352,33 +352,13 @@ const SaleTableItem = ({ devPros }) => {
           <Button
             icon="restore"
             mode="text"
-            color="red"
+            color="#62D6FF"
             compact={true}
             onPress={showDialogFactoryResetWarning}>
             重置
           </Button>
         </View>
         <View style={styles.itemAlarmMessage}>
-          <Svg height="20" width="20" style={styles.itemStatusIcon}>
-            <Defs>
-              <RadialGradient
-                id="grad"
-                cx="50%"
-                cy="50%"
-                r="50%"
-                fx="50%"
-                fy="50%"
-                gradientUnits="userSpaceOnUse">
-                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
-                <Stop
-                  offset="1"
-                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
-                  stopOpacity="1"
-                />
-              </RadialGradient>
-            </Defs>
-            <Circle cx="10" cy="10" r="10" fill="url(#grad)" />
-          </Svg>
           <Text
             style={
               isWaterLeverError()
@@ -397,6 +377,26 @@ const SaleTableItem = ({ devPros }) => {
           </Text>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
+          <Svg height="40" width="40" style={styles.itemStatusIcon}>
+            <Defs>
+              <RadialGradient
+                id="grad"
+                cx="50%"
+                cy="50%"
+                r="50%"
+                fx="50%"
+                fy="50%"
+                gradientUnits="userSpaceOnUse">
+                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
+                <Stop
+                  offset="1"
+                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
+                  stopOpacity="1"
+                />
+              </RadialGradient>
+            </Defs>
+            <Circle cx="20" cy="20" r="15" fill="url(#grad)" />
+          </Svg>
           <Text
             style={styles.itemSetTempWaterLevelText}
             onPress={() => {
@@ -1263,18 +1263,22 @@ const styles = StyleSheet.create({
   },
   item: {
     flexDirection: 'row',
-    padding: 20,
+    // padding: 20,
     marginVertical: 8,
-    borderRadius: 5,
-    backgroundColor: colors.theme,
+    borderRadius: 10,
+    backgroundColor: '#00A2FF',
   },
   header: {
-    fontSize: 32,
-    backgroundColor: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#839795',
   },
   title: {
     fontSize: 24,
-    color: '#2805f2',
+    fontWeight: 'bold',
+    color: 'white',
+    paddingLeft: 30,
+    paddingTop: 10,
   },
   errorMessage: {
     fontSize: 18,
@@ -1283,6 +1287,8 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 15,
     marginTop: 5,
+    paddingLeft: 30,
+    color: '#62D6FF',
   },
   input: {
     fontSize: 18,
@@ -1302,12 +1308,12 @@ const styles = StyleSheet.create({
   },
   itemSetTempWaterLevelText: {
     fontSize: 17,
-    color: '#2805f2',
-    paddingHorizontal: 5,
+    color: '#72D6FE',
+    paddingHorizontal: 12,
   },
   itemSetRefrgRelayText: {
     fontSize: 17,
-    color: '#2805f2',
+    color: '#72D6FE',
     paddingHorizontal: 40,
     marginVertical: 2,
   },

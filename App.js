@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet } from 'react-native';
 import Devices from './views/devices';
 import NetworkConfig from './views/network-config';
 import Settings from './views/settings';
@@ -36,10 +37,11 @@ const MyTabs = () => {
         options={{
           tabBarLabel: '设备',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
+            <MaterialCommunityIcons name="home" color={color} size={30} />
           ),
           headerTitle: '在线设备',
           headerTitleAlign: 'center',
+          headerTitleStyle: styles.headerTitleStyle,
           tabBarBadge: scenes.length > 1 ? scenes.length - 1 : scenes.length,
         }}
       />
@@ -49,10 +51,11 @@ const MyTabs = () => {
         options={{
           tabBarLabel: '配网',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="wifi" color={color} size={26} />
+            <MaterialCommunityIcons name="wifi" color={color} size={30} />
           ),
           headerTitle: '网络配置',
           headerTitleAlign: 'center',
+          headerTitleStyle: styles.headerTitleStyle,
         }}
       />
       <Tab.Screen
@@ -88,6 +91,7 @@ c26 -32 -13 -81 -47 -59 -23 14 -28 41 -13 59 16 19 44 19 60 0z"
           ),
           headerTitle: '设置',
           headerTitleAlign: 'center',
+          headerTitleStyle: styles.headerTitleStyle,
         }}
       />
     </Tab.Navigator>
@@ -107,3 +111,10 @@ export default function App() {
     </StoreProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  headerTitleStyle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+});
