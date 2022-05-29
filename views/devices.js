@@ -6,9 +6,17 @@ import {
   SectionList,
   StatusBar,
   View,
+  Alert,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
-import { Button, Dialog, Portal, TextInput, Switch } from 'react-native-paper';
+import {
+  Button,
+  Dialog,
+  Portal,
+  TextInput,
+  Switch,
+  DataTable,
+} from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
 import {
@@ -19,7 +27,8 @@ import {
 } from '../data/device-slice';
 import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
-import { colors } from '../constants/colors';
+import { dialogButtonOk } from '../constants/button';
+import { dialogButtonCancel } from '../constants/button';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
@@ -349,14 +358,6 @@ const SaleTableItem = ({ devPros }) => {
             {devPros.name}
           </Text>
           <Text style={styles.info}>{devPros.id}</Text>
-          <Button
-            icon="restore"
-            mode="text"
-            color="#62D6FF"
-            compact={true}
-            onPress={showDialogFactoryResetWarning}>
-            重置
-          </Button>
         </View>
         <View style={styles.itemAlarmMessage}>
           <Text
@@ -377,7 +378,23 @@ const SaleTableItem = ({ devPros }) => {
           </Text>
         </View>
         <View style={styles.itemSetTempWaterLevel}>
-          <Svg height="40" width="40" style={styles.itemStatusIcon}>
+          <Svg
+            height="40"
+            width="40"
+            style={styles.itemStatusIcon}
+            onPress={() => {
+              console.log('Item Clicked, setting temperature', devPros);
+              refreshDevInfos();
+              if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
+                showDialogSettingTraditionalDevInfo();
+              } else if (
+                devPros.waterSensorType === WATER_SENSOR_TYPE_ULTRASOUND
+              ) {
+                showDialogSettingUltrasoundDevInfo();
+              } else {
+                Alert.alert('未知水位传感器类型！');
+              }
+            }}>
             <Defs>
               <RadialGradient
                 id="grad"
@@ -397,82 +414,156 @@ const SaleTableItem = ({ devPros }) => {
             </Defs>
             <Circle cx="20" cy="20" r="15" fill="url(#grad)" />
           </Svg>
-          <Text
-            style={styles.itemSetTempWaterLevelText}
-            onPress={() => {
-              console.log('Item Clicked, setting temperature', devPros);
-              refreshDevInfos();
-              if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
-                showDialogSettingTraditionalDevInfo();
-              } else if (
-                devPros.waterSensorType === WATER_SENSOR_TYPE_ULTRASOUND
-              ) {
-                showDialogSettingUltrasoundDevInfo();
-              } else {
-                console.error('Unknown water sensor type');
-              }
-            }}>
-            设置
-          </Text>
+          <Button
+            icon="restore"
+            mode="text"
+            color="#62D6FF"
+            compact={true}
+            labelStyle={{ fontWeight: 'bold', fontSize: 16 }}
+            onPress={showDialogFactoryResetWarning}>
+            重置
+          </Button>
         </View>
       </View>
       <Portal>
-        <Dialog visible={dlgDevInfoVisible} onDismiss={hideDialogDevInfo}>
-          <Dialog.Title>设备信息</Dialog.Title>
+        <Dialog
+          visible={dlgDevInfoVisible}
+          onDismiss={hideDialogDevInfo}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>设备信息</Dialog.Title>
           <Dialog.Content>
-            <Text>
-              {'加热中： ' +
-                boolToText(devPros.isHeating) +
-                ',\t\t\t上水中：' +
-                boolToText(devPros.isUpWater) +
-                ',\t设置温度： ' +
-                intToText(devPros.maxTemperature) +
-                '°C'}
-            </Text>
-            <Text>
-              {'当前温度：' +
-                intToText(devPros.detectionTemperature) +
-                '°C, 温度回差：' +
-                intToText(devPros.tempRetDiff)}
-            </Text>
-            <Text
-              style={devPros.waterSensorType === 1 ? styles.show : styles.hide}>
-              {'设置水位： ' +
-                intToText(devPros.maxWaterLevel) +
-                'mm' +
-                ',\t\t当前水位： ' +
-                intToText(devPros.waterLevelDetection) +
-                'mm' +
-                ',\t\t最低水位值： ' +
-                intToText(devPros.lowestWaterLevel) +
-                'mm,\t水位回差： ' +
-                intToText(devPros.waterRetDiff)}
-            </Text>
-            <Text>
-              {'加热输出延时：' +
-                intToText(devPros.tempOutDelay) +
-                '秒' +
-                ',\t上水输出延时： ' +
-                intToText(devPros.waterStartOut) +
-                '秒' +
-                ',\t停止上水延时： ' +
-                intToText(devPros.waterStopOut) +
-                '秒'}
-            </Text>
-            <Text>
-              {'高温报警：' +
-                intToText(devPros.highTempAlarm) +
-                ',\t低温报警：' +
-                intToText(devPros.lowTempAlarm) +
-                ',\t报警延时：' +
-                intToText(devPros.alarmDelay)}
-            </Text>
-            <Text>
-              {'网卡类型：' +
-                netTypeToText(devPros.netType) +
-                ',\t固件版本：' +
-                devPros.firmwareVersion}
-            </Text>
+            <DataTable>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'加热中: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {boolToText(devPros.isHeating)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 上水中: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {boolToText(devPros.isUpWater)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'设置温度:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.maxTemperature) + '°C'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 当前温度: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.detectionTemperature) + '°C'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'温度回差:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.tempRetDiff)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{' 设置水位: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.maxWaterLevel) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{'当前水位:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterLevelDetection) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{' 最低水位: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.lowestWaterLevel) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'水位回差: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterRetDiff)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 加热输出延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.tempOutDelay) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'上水输出延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterStartOut) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 停止上水延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterStopOut) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'高温报警:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.highTempAlarm)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 低温报警: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.lowTempAlarm)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'报警延时:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.alarmDelay)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 网卡类型: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {netTypeToText(devPros.netType)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'固件版本:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {devPros.firmwareVersion}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+            </DataTable>
+            {/*
             <View style={styles.input}>
               <View style={styles.typePicker}>
                 <Text>传感器类型</Text>
@@ -526,23 +617,26 @@ const SaleTableItem = ({ devPros }) => {
                 value={sceneId}
                 onChangeText={text => setSceneId(text)}
               />
-            </View>
+            </View> */}
           </Dialog.Content>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogDevInfo}>
-              关闭
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevInfo}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogDevInfoOk}>
-              设置
+              color={dialogButtonOk.color}
+              onPress={onDialogDevInfoOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -1278,7 +1372,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     paddingLeft: 30,
-    paddingTop: 10,
+    paddingTop: 25,
+  },
+  dialogTitle: {
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   errorMessage: {
     fontSize: 18,
@@ -1298,7 +1396,7 @@ const styles = StyleSheet.create({
     alignContent: 'flex-end',
     paddingVertical: 30,
     // flexDirection: 'row',
-    marginHorizontal: 30,
+    marginHorizontal: 20,
   },
   itemAlarmMessage: {
     alignContent: 'center',
@@ -1366,14 +1464,36 @@ const styles = StyleSheet.create({
     width: '45%',
     alignItems: 'flex-start',
   },
+  dialog: {
+    borderRadius: 15,
+  },
   dialogButton: {
-    marginHorizontal: 10,
+    borderRadius: 10,
+    width: 120,
+    marginHorizontal: 20,
+    shadowColor: 'white',
   },
   hide: {
     display: 'none',
   },
   show: {
     display: 'flex',
+  },
+  tableRow: {
+    borderWidth: 1,
+    borderTopColor: '#F1F1F1',
+    borderLeftColor: 'white',
+    borderRightColor: 'white',
+  },
+  tableCellKey: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#949D9F',
+  },
+  tableCellValue: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#04A4FF',
   },
 });
 
