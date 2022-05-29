@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
+  TextInput,
   SafeAreaView,
   SectionList,
   StatusBar,
@@ -9,14 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
-import {
-  Button,
-  Dialog,
-  Portal,
-  TextInput,
-  Switch,
-  DataTable,
-} from 'react-native-paper';
+import { Button, Dialog, Portal, Switch, DataTable } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
 import {
@@ -27,8 +21,8 @@ import {
 } from '../data/device-slice';
 import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
-import { dialogButtonOk } from '../constants/button';
-import { dialogButtonCancel } from '../constants/button';
+import { dialogButtonOk, dialogButtonCancel } from '../constants/button';
+import { colors } from '../constants/colors';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
@@ -100,6 +94,7 @@ const WATER_SENSOR_TYPE_ULTRASOUND = 1;
 
 const SaleTableItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
+  const [dlgDevConfVisible, setDlgDevConfVisible] = React.useState(false);
   const [dlgSettingTraditionalVisible, setDlgSettingTraditionalVisible] =
     React.useState(false);
   const [dlgSettingUltrasoundVisible, setDlgSettingUltrasoundVisible] =
@@ -147,7 +142,8 @@ const SaleTableItem = ({ devPros }) => {
 
   const showDialogDevInfo = () => setDlgDevInfoVisible(true);
   const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
-
+  const showDialogDevConfig = () => setDlgDevConfVisible(true);
+  const hideDialogDevConfig = () => setDlgDevConfVisible(false);
   const showDialogSettingTraditionalDevInfo = () =>
     setDlgSettingTraditionalVisible(true);
   const hideDialogSettingTraditionalDevInfo = () =>
@@ -182,7 +178,9 @@ const SaleTableItem = ({ devPros }) => {
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
 
-  function onDialogDevInfoOk() {
+  const dialogTextInputPadStr = '   ';
+
+  function onDialogDevConfOk() {
     if (sceneName !== devPros.sceneName) {
       console.log(
         'Device with id `' + devPros.id + '` changed to new scene ' + sceneName,
@@ -357,7 +355,9 @@ const SaleTableItem = ({ devPros }) => {
             }}>
             {devPros.name}
           </Text>
-          <Text style={styles.info}>{devPros.id}</Text>
+          <Text style={styles.info} onPress={showDialogDevConfig}>
+            {devPros.id}
+          </Text>
         </View>
         <View style={styles.itemAlarmMessage}>
           <Text
@@ -563,61 +563,6 @@ const SaleTableItem = ({ devPros }) => {
                 </DataTable.Cell>
               </DataTable.Row>
             </DataTable>
-            {/*
-            <View style={styles.input}>
-              <View style={styles.typePicker}>
-                <Text>传感器类型</Text>
-                <Picker
-                  selectedValue={selectedSensorType}
-                  mode={'dropdown'}
-                  style={styles.inputPicker}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setSelectedSensorType(itemValue)
-                  }>
-                  <Picker.Item
-                    label={waterSensorType(WATER_SENSOR_TYPE_TRADITIONAL)}
-                    value={WATER_SENSOR_TYPE_TRADITIONAL}
-                  />
-                  <Picker.Item
-                    label={waterSensorType(WATER_SENSOR_TYPE_ULTRASOUND)}
-                    value={WATER_SENSOR_TYPE_ULTRASOUND}
-                  />
-                </Picker>
-              </View>
-              <View
-                style={
-                  devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL
-                    ? styles.typePicker
-                    : styles.hide
-                }>
-                <Text>传统传感器模式</Text>
-                <Picker
-                  selectedValue={selectedTradiWaterMode}
-                  mode={'dropdown'}
-                  style={styles.inputPicker}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setSelectedTradiWaterMode(itemValue)
-                  }>
-                  <Picker.Item label={'模式0'} value={0} />
-                  <Picker.Item label={'模式1'} value={1} />
-                </Picker>
-              </View>
-              <TextInput
-                label="设备名称"
-                value={devName}
-                onChangeText={text => setDevName(text)}
-              />
-              <TextInput
-                label="场地名称"
-                value={sceneName}
-                onChangeText={text => setSceneName(text)}
-              />
-              <TextInput
-                label="场地ID"
-                value={sceneId}
-                onChangeText={text => setSceneId(text)}
-              />
-            </View> */}
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -632,7 +577,105 @@ const SaleTableItem = ({ devPros }) => {
             <Button
               mode="contained"
               color={dialogButtonOk.color}
-              onPress={onDialogDevInfoOk}
+              onPress={hideDialogDevInfo}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgDevConfVisible}
+          onDismiss={hideDialogDevConfig}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>设备配置</Dialog.Title>
+          <Dialog.Content>
+            <View style={styles.input}>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>传感器类型:</Text>
+                <View style={styles.pickerView}>
+                  <Picker
+                    selectedValue={selectedSensorType}
+                    mode={'dropdown'}
+                    style={styles.textValue}
+                    item
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedSensorType(itemValue)
+                    }>
+                    <Picker.Item
+                      label={waterSensorType(WATER_SENSOR_TYPE_TRADITIONAL)}
+                      value={WATER_SENSOR_TYPE_TRADITIONAL}
+                      color={'#009FFC'}
+                    />
+                    <Picker.Item
+                      label={waterSensorType(WATER_SENSOR_TYPE_ULTRASOUND)}
+                      value={WATER_SENSOR_TYPE_ULTRASOUND}
+                      color={'#009FFC'}
+                    />
+                  </Picker>
+                </View>
+              </View>
+              <View
+                style={
+                  devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL
+                    ? styles.textContainer
+                    : styles.hide
+                }>
+                <Text style={styles.textLabel}>传统传感器模式:</Text>
+                <View style={styles.pickerView}>
+                  <Picker
+                    selectedValue={selectedTradiWaterMode}
+                    mode={'dropdown'}
+                    style={styles.textValue}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setSelectedTradiWaterMode(itemValue)
+                    }>
+                    <Picker.Item label={'模式0'} value={0} />
+                    <Picker.Item label={'模式1'} value={1} />
+                  </Picker>
+                </View>
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>设备名称:</Text>
+                <TextInput
+                  value={dialogTextInputPadStr + devName}
+                  onChangeText={text => setDevName(text.substring(3))}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地名称:</Text>
+                <TextInput
+                  value={dialogTextInputPadStr + sceneName}
+                  onChangeText={text => setSceneName(text.substring(3))}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地ID:</Text>
+                <TextInput
+                  value={dialogTextInputPadStr + sceneId}
+                  onChangeText={text => setSceneId(text.substring(3))}
+                  style={styles.dialogInput}
+                />
+              </View>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevConfig}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogDevConfOk}
               contentStyle={dialogButtonOk.contentStyle}
               labelStyle={dialogButtonOk.labelStyle}
               style={styles.dialogButton}>
@@ -1357,7 +1400,6 @@ const styles = StyleSheet.create({
   },
   item: {
     flexDirection: 'row',
-    // padding: 20,
     marginVertical: 8,
     borderRadius: 10,
     backgroundColor: '#00A2FF',
@@ -1384,6 +1426,7 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 15,
+    fontWeight: 'bold',
     marginTop: 5,
     paddingLeft: 30,
     color: '#62D6FF',
@@ -1395,7 +1438,6 @@ const styles = StyleSheet.create({
   itemSetTempWaterLevel: {
     alignContent: 'flex-end',
     paddingVertical: 30,
-    // flexDirection: 'row',
     marginHorizontal: 20,
   },
   itemAlarmMessage: {
@@ -1460,12 +1502,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  inputPicker: {
-    width: '45%',
-    alignItems: 'flex-start',
-  },
   dialog: {
     borderRadius: 15,
+  },
+  dialogInput: {
+    marginTop: 5,
+    borderRadius: 10,
+    width: 150,
+    fontSize: 15,
+    color: '#009FFC',
+    backgroundColor: '#E8E8E8',
+    height: 45,
+    fontWeight: 'bold',
   },
   dialogButton: {
     borderRadius: 10,
@@ -1494,6 +1542,40 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#04A4FF',
+  },
+  pickerView: {
+    borderRadius: 10,
+    height: 50,
+    minHeight: 50,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+    borderRadius: 10,
+    height: 60,
+    fontSize: 20,
+    backgroundColor: colors.backgroundColor,
+  },
+  textLabel: {
+    paddingHorizontal: 5,
+    fontSize: 15,
+    color: '#9AAAAA',
+    fontWeight: 'bold',
+  },
+  textValue: {
+    width: 150,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#009FFC',
+    backgroundColor: '#E8E8E8',
+    borderRadius: 10,
+    height: 20,
   },
 });
 
