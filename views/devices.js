@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   SectionList,
   StatusBar,
+  FlatList,
   View,
   Alert,
 } from 'react-native';
@@ -13,6 +14,7 @@ import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
 import { Button, Dialog, Portal, Switch, DataTable } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   syncDevice,
   selectScenes,
@@ -328,6 +330,120 @@ const SaleTableItem = ({ devPros }) => {
   const isTempError = () => {
     return devPros.errorTemperature && devPros.errorTemperature.length > 0;
   };
+
+  const settingsTradSensor = [
+    {
+      key: 'maxTemp',
+      name: '设置温度',
+      value: intToText(maxTemp),
+      setter: text => {
+        setMaxTemp(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'tempRetDiff',
+      name: '温度回差(°C)',
+      value: intToText(tempRetDiff),
+      setter: text => {
+        setTempRetDiff(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'highTempAlarm',
+      name: '高温报警',
+      value: intToText(highTempAlarm),
+      setter: text => {
+        let temp = textToInt(text);
+        setHighTempAlarm(temp);
+        if (temp >= 0 && temp <= 120) {
+          setHighTempAlarmError(false);
+        } else {
+          setHighTempAlarmError(true);
+        }
+      },
+      error: highTempAlarmError,
+    },
+    {
+      key: 'lowTempAlarm',
+      name: '低温报警',
+      value: intToText(lowTempAlarm),
+      setter: text => {
+        let temp = textToInt(text);
+        setLowTempAlarm(temp);
+        if (temp >= 0 && temp <= 120) {
+          setLowTempAlarmError(false);
+        } else {
+          setLowTempAlarmError(true);
+        }
+      },
+      error: lowTempAlarmError,
+    },
+    {
+      key: 'tempOutDelay',
+      name: '加热输出延时',
+      value: intToText(tempOutDelay),
+      setter: text => {
+        setTempOutDelay(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'waterStartOut',
+      name: '上水输出延时',
+      value: intToText(waterStartOut),
+      setter: text => {
+        setWaterStartOut(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'waterStopOut',
+      name: '停止上水延时',
+      value: intToText(waterStopOut),
+      setter: text => {
+        setWaterStopOut(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'alarmDelay',
+      name: '报警延时',
+      value: intToText(alarmDelay),
+      setter: text => {
+        setAlarmDelay(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'maxWaterLevel',
+      name: '设置水位(mm)',
+      value: intToText(maxWaterLevel),
+      setter: text => {
+        setMaxWaterLevel(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'waterRetDiff',
+      name: '水位回差(mm)',
+      value: intToText(waterRetDiff),
+      setter: text => {
+        setWaterRetDiff(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'lowestWaterLevel',
+      name: '最低水位值(mm)',
+      value: intToText(lowestWaterLevel),
+      setter: text => {
+        setLowestWaterLevel(textToInt(text));
+      },
+      error: false,
+    },
+  ];
 
   return (
     <>
@@ -686,7 +802,9 @@ const SaleTableItem = ({ devPros }) => {
         <Dialog
           visible={dlgSettingTraditionalVisible}
           onDismiss={hideDialogSettingTraditionalDevInfo}>
-          <Dialog.Title>设置 - 传统水位传感器</Dialog.Title>
+          <Dialog.Title style={styles.dialogTitle}>
+            设置 - 传统水位传感器
+          </Dialog.Title>
           <Dialog.Content>
             <View style={styles.inputColumnTwo}>
               <TextInput
@@ -798,114 +916,26 @@ const SaleTableItem = ({ devPros }) => {
         </Dialog>
         <Dialog
           visible={dlgSettingUltrasoundVisible}
-          onDismiss={hideDialogSettingUltrasoundDevInfo}>
-          <Dialog.Title>设置 - 超声波水位传感器</Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="设置温度(°C)"
-                value={intToText(maxTemp)}
-                onChangeText={text => setMaxTemp(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="温度回差(°C)"
-                value={intToText(tempRetDiff)}
-                onChangeText={text => setTempRetDiff(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="高温报警"
-                value={intToText(highTempAlarm)}
-                onChangeText={text => {
-                  let temp = textToInt(text);
-                  setHighTempAlarm(temp);
-                  if (temp >= 0 && temp <= 120) {
-                    setHighTempAlarmError(false);
-                  } else {
-                    setHighTempAlarmError(true);
-                  }
-                }}
-                keyboardType="numeric"
-                error={highTempAlarmError}
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="低温报警"
-                value={intToText(lowTempAlarm)}
-                onChangeText={text => {
-                  let temp = textToInt(text);
-                  setLowTempAlarm(temp);
-                  if (temp >= 0 && temp <= 120) {
-                    setLowTempAlarmError(false);
-                  } else {
-                    setLowTempAlarmError(true);
-                  }
-                }}
-                keyboardType="numeric"
-                error={lowTempAlarmError}
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="加热输出延时"
-                value={intToText(tempOutDelay)}
-                onChangeText={text => setTempOutDelay(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="上水输出延时"
-                value={intToText(waterStartOut)}
-                onChangeText={text => setWaterStartOut(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="停止上水延时"
-                value={intToText(waterStopOut)}
-                onChangeText={text => setWaterStopOut(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="报警延时"
-                value={intToText(alarmDelay)}
-                onChangeText={text => setAlarmDelay(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="设置水位(mm)"
-                value={intToText(maxWaterLevel)}
-                onChangeText={text => setMaxWaterLevel(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="水位回差(mm)"
-                value={intToText(waterRetDiff)}
-                onChangeText={text => setWaterRetDiff(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="最低水位值(mm)"
-                value={intToText(lowestWaterLevel)}
-                onChangeText={text => setLowestWaterLevel(textToInt(text))}
-                keyboardType="numeric"
+          onDismiss={hideDialogSettingUltrasoundDevInfo}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>
+            设置 - 超声波水位传感器
+          </Dialog.Title>
+          <Dialog.ScrollArea>
+            <View style={styles.settingDialogContent}>
+              <FlatList
+                data={settingsTradSensor}
+                renderItem={({ item }) => (
+                  <View style={styles.textContainer}>
+                    <Text style={styles.textLabel}>{`${item.name}:`}</Text>
+                    <TextInput
+                      value={dialogTextInputPadStr + item.value}
+                      onChangeText={item.setter}
+                      style={styles.dialogInput}
+                      error={item.error}
+                    />
+                  </View>
+                )}
               />
             </View>
             <Text style={styles.errorMessage}>
@@ -915,48 +945,60 @@ const SaleTableItem = ({ devPros }) => {
               {waterMessageShow ? '水位设置值不得高于报警值！' : ''}
             </Text>
             <Text style={styles.errorMessage}>{alarmMessage}</Text>
-          </Dialog.Content>
+          </Dialog.ScrollArea>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogSettingUltrasoundDevInfo}>
+              color={dialogButtonCancel.color}
+              onPress={hideDialogSettingUltrasoundDevInfo}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
               取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogSettingOk}>
+              color={dialogButtonOk.color}
+              onPress={onDialogSettingOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
               确定
             </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog
           visible={dlgFactoryResetWarning}
-          onDismiss={hideDialogFactoryResetWarning}>
-          <Dialog.Title>警告!</Dialog.Title>
+          onDismiss={hideDialogFactoryResetWarning}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.warningTitle}>
+            <View style={styles.textContainer}>
+              <MaterialCommunityIcons name="alert" color="#ff0000" size={45} />
+              <Text style={styles.warningTitle}>温馨提示</Text>
+            </View>
+          </Dialog.Title>
           <Dialog.Content>
-            <Text>
+            <Text style={styles.warningText}>
               您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogFactoryResetWarning}>
+              color={dialogButtonCancel.color}
+              onPress={hideDialogFactoryResetWarning}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
               取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogFactoryResetOk}>
+              color={dialogButtonOk.color}
+              onPress={onDialogDevConfOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
               确定
             </Button>
           </Dialog.Actions>
@@ -1576,6 +1618,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     borderRadius: 10,
     height: 20,
+  },
+  warningText: {
+    color: 'red',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  warningTitle: {
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center',
+    fontSize: 22,
+    paddingTop: 3,
+  },
+  settingDialogContent: {
+    paddingTop: 20,
+    borderRadius: 15,
+    height: 300,
   },
 });
 
