@@ -331,7 +331,7 @@ const SaleTableItem = ({ devPros }) => {
     return devPros.errorTemperature && devPros.errorTemperature.length > 0;
   };
 
-  const settingsTradSensor = [
+  const settingsUltrSndSensor = [
     {
       key: 'maxTemp',
       name: '设置温度',
@@ -440,6 +440,93 @@ const SaleTableItem = ({ devPros }) => {
       value: intToText(lowestWaterLevel),
       setter: text => {
         setLowestWaterLevel(textToInt(text));
+      },
+      error: false,
+    },
+  ];
+
+  const settingsTradSensor = [
+    {
+      key: 'maxTemp',
+      name: '设置温度',
+      value: intToText(maxTemp),
+      setter: text => {
+        setMaxTemp(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'tempRetDiff',
+      name: '温度回差(°C)',
+      value: intToText(tempRetDiff),
+      setter: text => {
+        setTempRetDiff(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'highTempAlarm',
+      name: '高温报警',
+      value: intToText(highTempAlarm),
+      setter: text => {
+        let temp = textToInt(text);
+        setHighTempAlarm(temp);
+        if (temp >= 0 && temp <= 120) {
+          setHighTempAlarmError(false);
+        } else {
+          setHighTempAlarmError(true);
+        }
+      },
+      error: highTempAlarmError,
+    },
+    {
+      key: 'lowTempAlarm',
+      name: '低温报警',
+      value: intToText(lowTempAlarm),
+      setter: text => {
+        let temp = textToInt(text);
+        setLowTempAlarm(temp);
+        if (temp >= 0 && temp <= 120) {
+          setLowTempAlarmError(false);
+        } else {
+          setLowTempAlarmError(true);
+        }
+      },
+      error: lowTempAlarmError,
+    },
+    {
+      key: 'tempOutDelay',
+      name: '加热输出延时',
+      value: intToText(tempOutDelay),
+      setter: text => {
+        setTempOutDelay(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'waterStartOut',
+      name: '上水输出延时',
+      value: intToText(waterStartOut),
+      setter: text => {
+        setWaterStartOut(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'waterStopOut',
+      name: '停止上水延时',
+      value: intToText(waterStopOut),
+      setter: text => {
+        setWaterStopOut(textToInt(text));
+      },
+      error: false,
+    },
+    {
+      key: 'alarmDelay',
+      name: '报警延时',
+      value: intToText(alarmDelay),
+      setter: text => {
+        setAlarmDelay(textToInt(text));
       },
       error: false,
     },
@@ -805,87 +892,21 @@ const SaleTableItem = ({ devPros }) => {
           <Dialog.Title style={styles.dialogTitle}>
             设置 - 传统水位传感器
           </Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="设置温度(°C)"
-                value={intToText(maxTemp)}
-                onChangeText={text => setMaxTemp(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="温度回差(°C)"
-                value={intToText(tempRetDiff)}
-                onChangeText={text => setTempRetDiff(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="高温报警"
-                value={intToText(highTempAlarm)}
-                onChangeText={text => {
-                  let temp = textToInt(text);
-                  setHighTempAlarm(temp);
-                  if (temp >= 0 && temp <= 120) {
-                    setHighTempAlarmError(false);
-                  } else {
-                    setHighTempAlarmError(true);
-                  }
-                }}
-                keyboardType="numeric"
-                error={highTempAlarmError}
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="低温报警"
-                value={intToText(lowTempAlarm)}
-                onChangeText={text => {
-                  let temp = textToInt(text);
-                  setLowTempAlarm(temp);
-                  if (temp >= 0 && temp <= 120) {
-                    setLowTempAlarmError(false);
-                  } else {
-                    setLowTempAlarmError(true);
-                  }
-                }}
-                keyboardType="numeric"
-                error={lowTempAlarmError}
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="加热输出延时"
-                value={intToText(tempOutDelay)}
-                onChangeText={text => setTempOutDelay(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="上水输出延时"
-                value={intToText(waterStartOut)}
-                onChangeText={text => setWaterStartOut(textToInt(text))}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputColumnTwo}>
-              <TextInput
-                style={styles.inputColumnItem}
-                label="停止上水延时"
-                value={intToText(waterStopOut)}
-                onChangeText={text => setWaterStopOut(textToInt(text))}
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.inputColumnItem}
-                label="报警延时"
-                value={intToText(alarmDelay)}
-                onChangeText={text => setAlarmDelay(textToInt(text))}
-                keyboardType="numeric"
+          <Dialog.ScrollArea>
+            <View style={styles.settingDialogContent}>
+              <FlatList
+                data={settingsTradSensor}
+                renderItem={({ item }) => (
+                  <View style={styles.textContainer}>
+                    <Text style={styles.textLabel}>{`${item.name}:`}</Text>
+                    <TextInput
+                      value={dialogTextInputPadStr + item.value}
+                      onChangeText={item.setter}
+                      style={styles.dialogInput}
+                      error={item.error}
+                    />
+                  </View>
+                )}
               />
             </View>
             <Text style={styles.errorMessage}>
@@ -895,7 +916,7 @@ const SaleTableItem = ({ devPros }) => {
               {waterMessageShow ? '水位设置值不得高于报警值！' : ''}
             </Text>
             <Text style={styles.errorMessage}>{alarmMessage}</Text>
-          </Dialog.Content>
+          </Dialog.ScrollArea>
           <Dialog.Actions>
             <Button
               mode="contained"
@@ -927,7 +948,7 @@ const SaleTableItem = ({ devPros }) => {
           <Dialog.ScrollArea>
             <View style={styles.settingDialogContent}>
               <FlatList
-                data={settingsTradSensor}
+                data={settingsUltrSndSensor}
                 renderItem={({ item }) => (
                   <View style={styles.textContainer}>
                     <Text style={styles.textLabel}>{`${item.name}:`}</Text>
