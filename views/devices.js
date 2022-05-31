@@ -898,18 +898,21 @@ const SaleTableItem = ({ devPros }) => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogSettingTraditionalDevInfo}>
+              color={dialogButtonCancel.color}
+              onPress={hideDialogSettingTraditionalDevInfo}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
               取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogSettingOk}>
+              color={dialogButtonOk.color}
+              onPress={onDialogSettingOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
               确定
             </Button>
           </Dialog.Actions>
@@ -995,7 +998,7 @@ const SaleTableItem = ({ devPros }) => {
             <Button
               mode="contained"
               color={dialogButtonOk.color}
-              onPress={onDialogDevConfOk}
+              onPress={onDialogFactoryResetOk}
               contentStyle={dialogButtonOk.contentStyle}
               labelStyle={dialogButtonOk.labelStyle}
               style={styles.dialogButton}>
