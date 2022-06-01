@@ -180,7 +180,7 @@ const SaleTableItem = ({ devPros }) => {
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
 
-  const dialogTextInputPadStr = '   ';
+  const dialogTextInputPadStr = '';//'   ';
 
   function onDialogDevConfOk() {
     if (sceneName !== devPros.sceneName) {
@@ -335,25 +335,22 @@ const SaleTableItem = ({ devPros }) => {
     {
       key: 'maxTemp',
       name: '设置温度',
-      value: intToText(maxTemp),
       setter: text => {
         setMaxTemp(textToInt(text));
+        updateSettingsVarUltrSnd('maxTemp', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'tempRetDiff',
       name: '温度回差(°C)',
-      value: intToText(tempRetDiff),
       setter: text => {
         setTempRetDiff(textToInt(text));
+        updateSettingsVarUltrSnd('tempRetDiff', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'highTempAlarm',
       name: '高温报警',
-      value: intToText(highTempAlarm),
       setter: text => {
         let temp = textToInt(text);
         setHighTempAlarm(temp);
@@ -362,13 +359,12 @@ const SaleTableItem = ({ devPros }) => {
         } else {
           setHighTempAlarmError(true);
         }
+        updateSettingsVarUltrSnd('highTempAlarm', textToInt(text));
       },
-      error: highTempAlarmError,
     },
     {
       key: 'lowTempAlarm',
       name: '低温报警',
-      value: intToText(lowTempAlarm),
       setter: text => {
         let temp = textToInt(text);
         setLowTempAlarm(temp);
@@ -377,71 +373,64 @@ const SaleTableItem = ({ devPros }) => {
         } else {
           setLowTempAlarmError(true);
         }
+        updateSettingsVarUltrSnd('lowTempAlarm', textToInt(text));
       },
-      error: lowTempAlarmError,
     },
     {
       key: 'tempOutDelay',
       name: '加热输出延时',
-      value: intToText(tempOutDelay),
       setter: text => {
         setTempOutDelay(textToInt(text));
+        updateSettingsVarUltrSnd('tempOutDelay', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'waterStartOut',
       name: '上水输出延时',
-      value: intToText(waterStartOut),
       setter: text => {
         setWaterStartOut(textToInt(text));
+        updateSettingsVarUltrSnd('waterStartOut', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'waterStopOut',
       name: '停止上水延时',
-      value: intToText(waterStopOut),
       setter: text => {
         setWaterStopOut(textToInt(text));
+        updateSettingsVarUltrSnd('waterStopOut', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'alarmDelay',
       name: '报警延时',
-      value: intToText(alarmDelay),
       setter: text => {
         setAlarmDelay(textToInt(text));
+        updateSettingsVarUltrSnd('alarmDelay', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'maxWaterLevel',
       name: '设置水位(mm)',
-      value: intToText(maxWaterLevel),
       setter: text => {
         setMaxWaterLevel(textToInt(text));
+        updateSettingsVarUltrSnd('maxWaterLevel', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'waterRetDiff',
       name: '水位回差(mm)',
-      value: intToText(waterRetDiff),
       setter: text => {
         setWaterRetDiff(textToInt(text));
+        updateSettingsVarUltrSnd('waterRetDiff', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'lowestWaterLevel',
       name: '最低水位值(mm)',
-      value: intToText(lowestWaterLevel),
       setter: text => {
         setLowestWaterLevel(textToInt(text));
+        updateSettingsVarUltrSnd('lowestWaterLevel', textToInt(text));
       },
-      error: false,
     },
   ];
 
@@ -449,25 +438,22 @@ const SaleTableItem = ({ devPros }) => {
     {
       key: 'maxTemp',
       name: '设置温度',
-      value: intToText(maxTemp),
       setter: text => {
         setMaxTemp(textToInt(text));
+        updateSettingsVarTradi('maxTemp', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'tempRetDiff',
       name: '温度回差(°C)',
-      value: intToText(tempRetDiff),
       setter: text => {
         setTempRetDiff(textToInt(text));
+        updateSettingsVarTradi('tempRetDiff', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'highTempAlarm',
       name: '高温报警',
-      value: intToText(highTempAlarm),
       setter: text => {
         let temp = textToInt(text);
         setHighTempAlarm(temp);
@@ -476,13 +462,12 @@ const SaleTableItem = ({ devPros }) => {
         } else {
           setHighTempAlarmError(true);
         }
+        updateSettingsVarTradi('highTempAlarm', textToInt(text));
       },
-      error: highTempAlarmError,
     },
     {
       key: 'lowTempAlarm',
       name: '低温报警',
-      value: intToText(lowTempAlarm),
       setter: text => {
         let temp = textToInt(text);
         setLowTempAlarm(temp);
@@ -491,46 +476,91 @@ const SaleTableItem = ({ devPros }) => {
         } else {
           setLowTempAlarmError(true);
         }
+        updateSettingsVarTradi('lowTempAlarm', textToInt(text));
       },
-      error: lowTempAlarmError,
     },
     {
       key: 'tempOutDelay',
       name: '加热输出延时',
-      value: intToText(tempOutDelay),
       setter: text => {
         setTempOutDelay(textToInt(text));
+        updateSettingsVarTradi('tempOutDelay', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'waterStartOut',
       name: '上水输出延时',
-      value: intToText(waterStartOut),
       setter: text => {
         setWaterStartOut(textToInt(text));
+        updateSettingsVarTradi('waterStartOut', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'waterStopOut',
       name: '停止上水延时',
-      value: intToText(waterStopOut),
       setter: text => {
         setWaterStopOut(textToInt(text));
+        updateSettingsVarTradi('waterStopOut', textToInt(text));
       },
-      error: false,
     },
     {
       key: 'alarmDelay',
       name: '报警延时',
-      value: intToText(alarmDelay),
       setter: text => {
         setAlarmDelay(textToInt(text));
+        updateSettingsVarTradi('alarmDelay', textToInt(text));
       },
-      error: false,
     },
   ];
+
+  const [settingsVarUltrSndSensor, setSettingsVarUltrSndSensor] =
+    React.useState({
+      maxTemp: { value: intToText(maxTemp), error: false },
+      tempRetDiff: { value: intToText(tempRetDiff), error: false },
+      highTempAlarm: {
+        value: intToText(highTempAlarm),
+        error: highTempAlarmError,
+      },
+      lowTempAlarm: {
+        value: intToText(lowTempAlarm),
+        error: lowTempAlarmError,
+      },
+      tempOutDelay: { value: intToText(tempOutDelay), error: false },
+      waterStartOut: { value: intToText(waterStartOut), error: false },
+      waterStopOut: { value: intToText(waterStopOut), error: false },
+      alarmDelay: { value: intToText(alarmDelay), error: false },
+      maxWaterLevel: { value: intToText(maxWaterLevel), error: false },
+      waterRetDiff: { value: intToText(waterRetDiff), error: false },
+      lowestWaterLevel: { value: intToText(lowestWaterLevel), error: false },
+    });
+  const [settingsVarTradSensor, setSettingsVarTradSensor] = React.useState({
+    maxTemp: { value: intToText(maxTemp), error: false },
+    tempRetDiff: { value: intToText(tempRetDiff), error: false },
+    highTempAlarm: {
+      value: intToText(highTempAlarm),
+      error: highTempAlarmError,
+    },
+    lowTempAlarm: {
+      value: intToText(lowTempAlarm),
+      error: lowTempAlarmError,
+    },
+    tempOutDelay: { value: intToText(tempOutDelay), error: false },
+    waterStartOut: { value: intToText(waterStartOut), error: false },
+    waterStopOut: { value: intToText(waterStopOut), error: false },
+    alarmDelay: { value: intToText(alarmDelay), error: false },
+  });
+
+  const updateSettingsVarUltrSnd = (key, value) => {
+    const settings = settingsVarUltrSndSensor;
+    settings[key].value = value;
+    setSettingsVarUltrSndSensor(settings);
+  };
+
+  const updateSettingsVarTradi = (key, value) => {
+    const settings = settingsVarTradSensor;
+    settings[key].value = value;
+    setSettingsVarTradSensor(settings);
+  };
 
   return (
     <>
@@ -900,10 +930,14 @@ const SaleTableItem = ({ devPros }) => {
                   <View style={styles.textContainer}>
                     <Text style={styles.textLabel}>{`${item.name}:`}</Text>
                     <TextInput
-                      value={dialogTextInputPadStr + item.value}
+                      value={
+                        dialogTextInputPadStr +
+                        settingsVarTradSensor[item.key].value
+                      }
                       onChangeText={item.setter}
                       style={styles.dialogInput}
-                      error={item.error}
+                      error={settingsVarTradSensor[item.key].error}
+                      keyboardType="numeric"
                     />
                   </View>
                 )}
@@ -953,10 +987,14 @@ const SaleTableItem = ({ devPros }) => {
                   <View style={styles.textContainer}>
                     <Text style={styles.textLabel}>{`${item.name}:`}</Text>
                     <TextInput
-                      value={dialogTextInputPadStr + item.value}
+                      value={
+                        dialogTextInputPadStr +
+                        settingsVarUltrSndSensor[item.key].value
+                      }
                       onChangeText={item.setter}
                       style={styles.dialogInput}
-                      error={item.error}
+                      error={settingsVarUltrSndSensor[item.key].error}
+                      keyboardType="numeric"
                     />
                   </View>
                 )}
