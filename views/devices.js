@@ -9,6 +9,7 @@ import {
   FlatList,
   View,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
 import { Button, Dialog, Portal, Switch, DataTable } from 'react-native-paper';
@@ -93,6 +94,7 @@ const waterSensorType = value => {
 
 const WATER_SENSOR_TYPE_TRADITIONAL = 0;
 const WATER_SENSOR_TYPE_ULTRASOUND = 1;
+const dialogTextInputPadStr = '';
 
 const SaleTableItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
@@ -179,8 +181,6 @@ const SaleTableItem = ({ devPros }) => {
 
   const devCmdTopic = TOPIC_DEV_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
-
-  const dialogTextInputPadStr = '';//'   ';
 
   function onDialogDevConfOk() {
     if (sceneName !== devPros.sceneName) {
@@ -810,7 +810,7 @@ const SaleTableItem = ({ devPros }) => {
             <Button
               mode="contained"
               color={dialogButtonOk.color}
-              onPress={hideDialogDevInfo}
+              onPress={onDialogDevConfOk}
               contentStyle={dialogButtonOk.contentStyle}
               labelStyle={dialogButtonOk.labelStyle}
               style={styles.dialogButton}>
@@ -872,24 +872,24 @@ const SaleTableItem = ({ devPros }) => {
               <View style={styles.textContainer}>
                 <Text style={styles.textLabel}>设备名称:</Text>
                 <TextInput
-                  value={dialogTextInputPadStr + devName}
-                  onChangeText={text => setDevName(text.substring(3))}
+                  value={devName}
+                  onChangeText={text => setDevName(text)}
                   style={styles.dialogInput}
                 />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.textLabel}>场地名称:</Text>
                 <TextInput
-                  value={dialogTextInputPadStr + sceneName}
-                  onChangeText={text => setSceneName(text.substring(3))}
+                  value={sceneName}
+                  onChangeText={text => setSceneName(text)}
                   style={styles.dialogInput}
                 />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.textLabel}>场地ID:</Text>
                 <TextInput
-                  value={dialogTextInputPadStr + sceneId}
-                  onChangeText={text => setSceneId(text.substring(3))}
+                  value={sceneId}
+                  onChangeText={text => setSceneId(text)}
                   style={styles.dialogInput}
                 />
               </View>
@@ -1072,17 +1072,10 @@ const SaleTableItem = ({ devPros }) => {
 
 const RefrgtorItem = ({ devPros }) => {
   const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
-  const [dlgRelay1Visible, setDlgRelay1Visible] = React.useState(false);
-  const [dlgRelay2Visible, setDlgRelay2Visible] = React.useState(false);
+  const [dlgDevConfVisible, setDlgDevConfVisible] = React.useState(false);
   const [dlgFactoryResetWarning, setDlgFactoryResetWarning] =
     React.useState(false);
 
-  const [relay1Status, setRelay1Status] = React.useState(
-    devPros.relay1Status === 1,
-  );
-  const [relay2Status, setRelay2Status] = React.useState(
-    devPros.relay2Status === 1,
-  );
   const [devName, setDevName] = React.useState(devPros.name);
   const [sceneName, setSceneName] = React.useState(devPros.sceneName);
   const [sceneId, setSceneId] = React.useState(devPros.sceneId);
@@ -1092,14 +1085,11 @@ const RefrgtorItem = ({ devPros }) => {
   const showDialogDevInfo = () => setDlgDevInfoVisible(true);
   const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
 
-  const showDialogRelay1 = () => setDlgRelay1Visible(true);
-  const hideDialogRelay1 = () => setDlgRelay1Visible(false);
-
-  const showDialogRelay2 = () => setDlgRelay2Visible(true);
-  const hideDialogRelay2 = () => setDlgRelay2Visible(false);
-
   const showDialogFactoryResetWarning = () => setDlgFactoryResetWarning(true);
   const hideDialogFactoryResetWarning = () => setDlgFactoryResetWarning(false);
+
+  const showDialogDevConfig = () => setDlgDevConfVisible(true);
+  const hideDialogDevConfig = () => setDlgDevConfVisible(false);
 
   const devCmdTopic = TOPIC_REFRGTOR_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
@@ -1156,39 +1146,10 @@ const RefrgtorItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
-  function onDialogSetRelay1StatusOk() {
-    hideDialogRelay1();
-
-    let cmdJson = {
-      device_id: devPros.id,
-      method: 'control',
-      params: {
-        Relay1_Status: relay1Status ? 1 : 0,
-      },
-    };
-    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
-  }
-
-  function onDialogSetRelay2StatusOk() {
-    hideDialogRelay2();
-
-    let cmdJson = {
-      device_id: devPros.id,
-      method: 'control',
-      params: {
-        Relay2_Status: relay2Status ? 1 : 0,
-      },
-    };
-    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
-  }
-
   const refreshDevInfos = () => {
     setDevName(devPros.name);
     setSceneName(devPros.sceneName);
     setSceneId(devPros.sceneId);
-
-    setRelay1Status(devPros.relay1Status === 1);
-    setRelay2Status(devPros.relay2Status === 1);
   };
 
   const onDialogFactoryResetOk = () => {
@@ -1203,6 +1164,44 @@ const RefrgtorItem = ({ devPros }) => {
 
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   };
+
+  function onDialogDevConfOk() {
+    if (sceneName !== devPros.sceneName) {
+      console.log(
+        'Device with id `' + devPros.id + '` changed to new scene ' + sceneName,
+      );
+    }
+
+    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
+    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Scene_Name: sceneNameUnicode,
+        Scene_Id: sceneId,
+        Device_Name: deviceNameUnicode,
+        // Remote_address: '',
+        // Remote_port: 1883,
+        // Mqtt_User_Name: '',
+        // Mqtt_password: '',
+        // Mqtt_Client_id: '',
+        // Wifi_ssid: '',
+        // Wifi_password: '',
+      },
+    };
+
+    hideDialogDevInfo();
+    let newDevice = {
+      name: devName.slice(0, 16),
+      id: devPros.id,
+      devType: DEV_TYPE_SALE_TABLE,
+      sceneId: sceneId,
+      sceneName: sceneName.slice(0, 16),
+    };
+    dispatch(syncDevice(newDevice));
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
 
   return (
     <>
@@ -1226,18 +1225,38 @@ const RefrgtorItem = ({ devPros }) => {
             }}>
             {devPros.name}
           </Text>
-          <Text style={styles.info}>{devPros.id}</Text>
-          <Button
-            icon="restore"
-            mode="text"
-            color="red"
-            compact={true}
-            onPress={showDialogFactoryResetWarning}>
-            重置
-          </Button>
+          <Text style={styles.info} onPress={showDialogDevConfig}>
+            {devPros.id}
+          </Text>
         </View>
         <View style={styles.itemAlarmMessage}>
-          <Svg height="20" width="20" style={styles.itemStatusIcon}>
+          <Text
+            style={
+              devPros.highTempAlarmFlag
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            高温报警
+          </Text>
+          <Text
+            style={
+              devPros.highTempProtectionFlag
+                ? styles.itemAlarmMessageText
+                : styles.itemAlarmMessageTextHide
+            }>
+            高温保护
+          </Text>
+        </View>
+        <View style={styles.itemSetTempWaterLevel}>
+          <Svg
+            height="40"
+            width="40"
+            style={styles.itemStatusIcon}
+            onPress={() => {
+              console.log('Item Clicked, setting temperature', devPros);
+              refreshDevInfos();
+              //Setting
+            }}>
             <Defs>
               <RadialGradient
                 id="grad"
@@ -1255,11 +1274,18 @@ const RefrgtorItem = ({ devPros }) => {
                 />
               </RadialGradient>
             </Defs>
-            <Circle cx="10" cy="10" r="10" fill="url(#grad)" />
+            <Circle cx="20" cy="20" r="15" fill="url(#grad)" />
           </Svg>
-        </View>
-        <View style={styles.itemSetTempWaterLevel}>
-          <Text
+          <Button
+            icon="restore"
+            mode="text"
+            color="#62D6FF"
+            compact={true}
+            labelStyle={{ fontWeight: 'bold', fontSize: 16 }}
+            onPress={showDialogFactoryResetWarning}>
+            重置
+          </Button>
+          {/* <Text
             style={styles.itemSetRefrgRelayText}
             onPress={() => {
               console.log('Item Clicked, setting temperature', devPros);
@@ -1276,182 +1302,329 @@ const RefrgtorItem = ({ devPros }) => {
               showDialogRelay2();
             }}>
             设置继电器2
-          </Text>
+          </Text> */}
         </View>
       </View>
       <Portal>
-        <Dialog visible={dlgDevInfoVisible} onDismiss={hideDialogDevInfo}>
-          <Dialog.Title>设备信息</Dialog.Title>
-          <Dialog.Content>
-            <Text>
-              {'柜温： ' +
-                intToText(devPros.cabinetTemp) +
-                '°C' +
-                ',\t\t\t\t蒸发器温度： ' +
-                intToText(devPros.evaporatorTempe) +
-                '°C' +
-                ',\t\t\t冷凝器温度: ' +
-                intToText(devPros.condenserTempe) +
-                '°C'}
-            </Text>
-            <Text>
-              {'NTC温度：' +
-                intToText(devPros.ntcTempe) +
-                '°C' +
-                ',\t\t\t\t数字温度1： ' +
-                floatToText(devPros.sht30OneTempe) +
-                '°C' +
-                ',\t\t\t\t数字湿度1： ' +
-                floatToText(devPros.sht30OneHumi) +
-                '%'}
-            </Text>
-            <Text>
-              {'数字温度2： ' +
-                floatToText(devPros.sht30TwoTempe) +
-                '°C' +
-                ',\t\t\t\t数字湿度2: ' +
-                floatToText(devPros.sht30TwoHumi) +
-                '%' +
-                ',\t\t\t\t门检测1： ' +
-                binStateToText(devPros.doorDetection1)}
-            </Text>
-            <Text>
-              {'门检测2： ' +
-                binStateToText(devPros.doorDetection2) +
-                ',\t\t\t门输出: ' +
-                binStateToText(devPros.doorStatusOut) +
-                ',\t\t\t\t继电器1： ' +
-                binStateToText(devPros.relay1Status)}
-            </Text>
-            <Text>
-              {'继电器2： ' +
-                binStateToText(devPros.relay2Status) +
-                ',\t\t\t网卡类型: ' +
-                netTypeToText(devPros.netType)}
-            </Text>
-            <View style={styles.input}>
-              <TextInput
-                label="设备名称"
-                value={devName}
-                onChangeText={text => setDevName(text)}
-              />
-              <TextInput
-                label="场地名称"
-                value={sceneName}
-                onChangeText={text => setSceneName(text)}
-              />
-              <TextInput
-                label="场地ID"
-                value={sceneId}
-                onChangeText={text => setSceneId(text)}
-              />
-            </View>
-          </Dialog.Content>
+        <Dialog
+          visible={dlgDevInfoVisible}
+          onDismiss={hideDialogDevInfo}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>设备信息</Dialog.Title>
+          <Dialog.ScrollArea>
+            <ScrollView style={styles.settingDialogContent}>
+              <DataTable>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'柜温: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.comDetectiontemperature)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  压缩机开启: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.comStartRunFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'蒸发器温度:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.defDetectionTemperature) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  化霜开始: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.defrostingFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'滴水开始:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.drippingFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  风机运行: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.fanRunFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'冷凝器温度:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.conDetectionTemperature) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  高温报警: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.highTempAlarmFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'高温保护: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.highTempProtectionFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  固件版本:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {devPros.firmwareVersion}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+              </DataTable>
+            </ScrollView>
+            {/* <DataTable style={styles.settingDialogContent}>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'加热中: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {boolToText(devPros.isHeating)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 上水中: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {boolToText(devPros.isUpWater)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'设置温度:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.maxTemperature) + '°C'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 当前温度: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.detectionTemperature) + '°C'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'温度回差:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.tempRetDiff)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{' 设置水位: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.maxWaterLevel) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{'当前水位:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterLevelDetection) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell
+                  style={
+                    devPros.waterSensorType === 1 ? styles.show : styles.hide
+                  }>
+                  <Text style={styles.tableCellKey}>{' 最低水位: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.lowestWaterLevel) + 'mm'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'水位回差: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterRetDiff)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 加热输出延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.tempOutDelay) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'上水输出延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterStartOut) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 停止上水延时: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.waterStopOut) + '秒'}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'高温报警:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.highTempAlarm)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 低温报警: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.lowTempAlarm)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'报警延时:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {intToText(devPros.alarmDelay)}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{' 网卡类型: '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {netTypeToText(devPros.netType)}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+              <DataTable.Row style={styles.tableRow}>
+                <DataTable.Cell>
+                  <Text style={styles.tableCellKey}>{'固件版本:  '}</Text>
+                  <Text style={styles.tableCellValue}>
+                    {devPros.firmwareVersion}
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+            </DataTable> */}
+          </Dialog.ScrollArea>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogDevInfo}>
-              关闭
-            </Button>
-            <Button
-              icon="send"
-              mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogDevInfoOk}>
-              设置
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-        <Dialog visible={dlgRelay1Visible} onDismiss={hideDialogRelay1}>
-          <Dialog.Title>设置继电器1</Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.switchItem}>
-              <Text style={styles.labelSwitchText}>
-                {relay1Status ? '打开' : '关闭'}
-              </Text>
-              <Switch
-                value={relay1Status}
-                color="#e303fc"
-                onValueChange={() => setRelay1Status(!relay1Status)}
-              />
-            </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              icon="close"
-              mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogRelay1}>
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevInfo}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
               取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogSetRelay1StatusOk}>
-              确定
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-        <Dialog visible={dlgRelay2Visible} onDismiss={hideDialogRelay2}>
-          <Dialog.Title>设置继电器2</Dialog.Title>
-          <Dialog.Content>
-            <View style={styles.switchItem}>
-              <Text style={styles.labelSwitchText}>
-                {relay2Status ? '打开' : '关闭'}
-              </Text>
-              <Switch
-                value={relay2Status}
-                color="#e303fc"
-                onValueChange={() => setRelay2Status(!relay2Status)}
-              />
-            </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              icon="close"
-              mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogRelay2}>
-              取消
-            </Button>
-            <Button
-              icon="send"
-              mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogSetRelay2StatusOk}>
+              color={dialogButtonOk.color}
+              onPress={onDialogDevInfoOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
               确定
             </Button>
           </Dialog.Actions>
         </Dialog>
         <Dialog
           visible={dlgFactoryResetWarning}
-          onDismiss={hideDialogFactoryResetWarning}>
-          <Dialog.Title>警告!</Dialog.Title>
+          onDismiss={hideDialogFactoryResetWarning}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.warningTitle}>
+            <View style={styles.textContainer}>
+              <MaterialCommunityIcons name="alert" color="#ff0000" size={45} />
+              <Text style={styles.warningTitle}>温馨提示</Text>
+            </View>
+          </Dialog.Title>
           <Dialog.Content>
-            <Text>
+            <Text style={styles.warningText}>
               您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
-              icon="close"
               mode="contained"
-              color="#e3e3e3"
-              style={styles.dialogButton}
-              onPress={hideDialogFactoryResetWarning}>
+              color={dialogButtonCancel.color}
+              onPress={hideDialogFactoryResetWarning}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
               取消
             </Button>
             <Button
-              icon="send"
               mode="contained"
-              style={styles.dialogButton}
-              onPress={onDialogFactoryResetOk}>
+              color={dialogButtonOk.color}
+              onPress={onDialogFactoryResetOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgDevConfVisible}
+          onDismiss={hideDialogDevConfig}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>设备配置</Dialog.Title>
+          <Dialog.Content>
+            <View style={styles.input}>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>设备名称:</Text>
+                <TextInput
+                  value={devName}
+                  onChangeText={text => setDevName(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地名称:</Text>
+                <TextInput
+                  value={sceneName}
+                  onChangeText={text => setSceneName(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地ID:</Text>
+                <TextInput
+                  value={sceneId}
+                  onChangeText={text => setSceneId(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevConfig}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogDevConfOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
               确定
             </Button>
           </Dialog.Actions>
