@@ -763,13 +763,13 @@ const SaleTableItem = ({ devPros }) => {
                 <DataTable.Cell>
                   <Text style={styles.tableCellKey}>{'高温报警:  '}</Text>
                   <Text style={styles.tableCellValue}>
-                    {intToText(devPros.highTempAlarm)}
+                    {intToText(devPros.highTempAlarm) + '°C'}
                   </Text>
                 </DataTable.Cell>
                 <DataTable.Cell>
                   <Text style={styles.tableCellKey}>{' 低温报警: '}</Text>
                   <Text style={styles.tableCellValue}>
-                    {intToText(devPros.lowTempAlarm)}
+                    {intToText(devPros.lowTempAlarm) + '°C'}
                   </Text>
                 </DataTable.Cell>
               </DataTable.Row>
@@ -777,7 +777,7 @@ const SaleTableItem = ({ devPros }) => {
                 <DataTable.Cell>
                   <Text style={styles.tableCellKey}>{'报警延时:  '}</Text>
                   <Text style={styles.tableCellValue}>
-                    {intToText(devPros.alarmDelay)}
+                    {intToText(devPros.alarmDelay) + '秒'}
                   </Text>
                 </DataTable.Cell>
                 <DataTable.Cell>
@@ -1318,7 +1318,7 @@ const RefrgtorItem = ({ devPros }) => {
                   <DataTable.Cell>
                     <Text style={styles.tableCellKey}>{'柜温: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.comDetectiontemperature)}
+                      {intToText(devPros.comDetectiontemperature) + '°C'}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
@@ -1812,12 +1812,12 @@ const styles = StyleSheet.create({
   },
   tableCellKey: {
     fontSize: 15,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: '#949D9F',
   },
   tableCellValue: {
     fontSize: 15,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: '#04A4FF',
   },
   pickerView: {
@@ -1843,12 +1843,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     fontSize: 15,
     color: '#9AAAAA',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   textValue: {
     width: 150,
     fontSize: 15,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     color: '#009FFC',
     backgroundColor: '#E8E8E8',
     borderRadius: 10,
