@@ -929,10 +929,7 @@ const SaleTableItem = ({ devPros }) => {
                   <View style={styles.textContainer}>
                     <Text style={styles.textLabel}>{`${item.name}:`}</Text>
                     <TextInput
-                      value={
-                        dialogTextInputPadStr +
-                        settingsVarTradSensor[item.key].value
-                      }
+                      value={settingsVarTradSensor[item.key].value}
                       onChangeText={item.setter}
                       style={styles.dialogInput}
                       error={settingsVarTradSensor[item.key].error}
@@ -986,10 +983,7 @@ const SaleTableItem = ({ devPros }) => {
                   <View style={styles.textContainer}>
                     <Text style={styles.textLabel}>{`${item.name}:`}</Text>
                     <TextInput
-                      value={
-                        dialogTextInputPadStr +
-                        settingsVarUltrSndSensor[item.key].value
-                      }
+                      value={settingsVarUltrSndSensor[item.key].value}
                       onChangeText={item.setter}
                       style={styles.dialogInput}
                       error={settingsVarUltrSndSensor[item.key].error}
