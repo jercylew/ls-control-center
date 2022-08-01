@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import Devices from './views/devices';
 import NetworkConfig from './views/network-config';
 import Settings from './views/settings';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
+import Entypo from 'react-native-vector-icons/Entypo';
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper';
 import store from './data/store';
@@ -16,8 +19,12 @@ import { colors } from './constants/colors';
 
 const Tab = createBottomTabNavigator();
 
+const DEVICE_VIEW_GRID = 0;
+const DEVICE_VIEW_LIST = 1;
+
 const MyTabs = () => {
   const scenes = useSelector(selectScenes);
+  const [deviceViewType, setDeviceViewType] = useState(DEVICE_VIEW_GRID);
 
   return (
     <Tab.Navigator
@@ -42,6 +49,29 @@ const MyTabs = () => {
           headerTitle: '在线设备',
           headerTitleAlign: 'center',
           headerTitleStyle: styles.headerTitleStyle,
+          headerRight: props => {
+            return deviceViewType === DEVICE_VIEW_LIST ? (
+              <Feather
+                name="grid"
+                color="black"
+                size={25}
+                onPress={() => {
+                  console.log('Device list view mode changing to Grid');
+                  setDeviceViewType(DEVICE_VIEW_GRID);
+                }}
+              />
+            ) : (
+              <Entypo
+                name="dots-three-horizontal"
+                color={'black'}
+                size={25}
+                onPress={() => {
+                  console.log('Device list view mode changing to List');
+                  setDeviceViewType(DEVICE_VIEW_LIST);
+                }}
+              />
+            );
+          },
           tabBarBadge: scenes.length > 1 ? scenes.length - 1 : scenes.length,
         }}
       />

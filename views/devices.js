@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
-import { Button, Dialog, Portal, Switch, DataTable } from 'react-native-paper';
+import { Button, Dialog, Portal, DataTable } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,6 +26,7 @@ import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
 import { dialogButtonOk, dialogButtonCancel } from '../constants/button';
 import { colors } from '../constants/colors';
+import { SectionGrid } from 'react-native-super-grid';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
@@ -2390,6 +2391,11 @@ const Item = ({ devPros }) => {
     return RefrgtorItem({ devPros });
   } else {
     console.log('@@@@@@ERROR   Unknown device type');
+    return (
+      <>
+        <Text>NA</Text>
+      </>
+    );
   }
 };
 
@@ -2406,12 +2412,20 @@ const Devices = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SectionList
+      {/* <SectionList
         sections={renderScenes}
         keyExtractor={(item, index) => item.id + index}
         renderItem={({ item }) => <Item devPros={item} />}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.header}>{title}</Text>
+        )}
+      /> */}
+      <SectionGrid
+        itemDimension={130}
+        sections={renderScenes}
+        renderItem={({ item }) => <Item devPros={item} />}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.header}>{section.title}</Text>
         )}
       />
     </SafeAreaView>
@@ -2428,7 +2442,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 8,
     borderRadius: 10,
-    backgroundColor: '#00A2FF',
+    backgroundColor: 'white',
   },
   header: {
     fontSize: 20,
@@ -2438,7 +2452,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
     paddingLeft: 30,
     paddingTop: 25,
   },
