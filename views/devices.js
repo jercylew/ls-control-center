@@ -9,6 +9,7 @@ import {
   FlatList,
   View,
   Alert,
+  Image,
   ScrollView,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
@@ -565,7 +566,57 @@ const SaleTableItem = ({ devPros }) => {
   return (
     <>
       <View style={styles.item}>
-        <View>
+        <View style={styles.itemTop}>
+          <View>
+            <Image
+              source={require('../res/icon-sale-table.png')}
+              style={{ width: 40, height: 40, resizeMode: 'stretch' }}
+            />
+          </View>
+          <View>
+            <Text
+              style={styles.title}
+              onPress={() => {
+                console.log(
+                  'Item Clicked, setting device info',
+                  devPros,
+                  'selectedSensorType=',
+                  selectedSensorType,
+                );
+                let cmdJson = {
+                  device_id: devPros.id,
+                  method: 'get_status',
+                };
+                sendCommand(
+                  TOPIC_SALE_TABLE_GET_STATUS,
+                  JSON.stringify(cmdJson),
+                );
+
+                refreshDevInfos();
+                setTimeout(() => {
+                  showDialogDevInfo();
+                }, 200);
+              }}>
+              {devPros.name}
+            </Text>
+            <Text style={styles.info} onPress={showDialogDevConfig}>
+              {devPros.id}
+            </Text>
+          </View>
+          <Button
+            icon="restore"
+            mode="text"
+            color="#839795"
+            compact={true}
+            labelStyle={{ fontSize: 13 }}
+            onPress={showDialogFactoryResetWarning}>
+            重置
+          </Button>
+        </View>
+        <View style={styles.itemBottom}>
+          <Text style={styles.info}>{`加热中 | 当前温度 58°C`}</Text>
+        </View>
+        {/* <View>
           <Text
             style={styles.title}
             onPress={() => {
@@ -656,7 +707,7 @@ const SaleTableItem = ({ devPros }) => {
             onPress={showDialogFactoryResetWarning}>
             重置
           </Button>
-        </View>
+        </View> */}
       </View>
       <Portal>
         <Dialog
@@ -2436,13 +2487,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: StatusBar.currentHeight,
-    marginHorizontal: 16,
+    marginHorizontal: 5,
   },
   item: {
-    flexDirection: 'row',
     marginVertical: 8,
-    borderRadius: 10,
+    borderRadius: 8,
     backgroundColor: 'white',
+    shadowColor: 'black',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 10,
+  },
+  itemTop: {
+    flexDirection: 'row',
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+  },
+  itemMiddle: {},
+  itemBottom: {
+    flexDirection: 'row',
+    paddingHorizontal: 5,
+    paddingVertical: 10,
   },
   header: {
     fontSize: 20,
@@ -2450,11 +2516,11 @@ const styles = StyleSheet.create({
     color: '#839795',
   },
   title: {
-    fontSize: 24,
+    fontSize: 15,
     fontWeight: 'bold',
     color: 'black',
-    paddingLeft: 30,
-    paddingTop: 25,
+    paddingLeft: 5,
+    // paddingTop: 25,
   },
   dialogTitle: {
     textAlign: 'center',
@@ -2465,11 +2531,11 @@ const styles = StyleSheet.create({
     color: '#ff0000',
   },
   info: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginTop: 5,
-    paddingLeft: 30,
-    color: '#62D6FF',
+    fontSize: 12,
+    // fontWeight: 'bold',
+    marginTop: 10,
+    paddingLeft: 5,
+    color: '#839795',
   },
   input: {
     fontSize: 18,
