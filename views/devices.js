@@ -616,98 +616,6 @@ const SaleTableItem = ({ devPros }) => {
         <View style={styles.itemBottom}>
           <Text style={styles.info}>{`加热中 | 当前温度 58°C`}</Text>
         </View>
-        {/* <View>
-          <Text
-            style={styles.title}
-            onPress={() => {
-              console.log(
-                'Item Clicked, setting device info',
-                devPros,
-                'selectedSensorType=',
-                selectedSensorType,
-              );
-              let cmdJson = {
-                device_id: devPros.id,
-                method: 'get_status',
-              };
-              sendCommand(TOPIC_SALE_TABLE_GET_STATUS, JSON.stringify(cmdJson));
-
-              refreshDevInfos();
-              setTimeout(() => {
-                showDialogDevInfo();
-              }, 200);
-            }}>
-            {devPros.name}
-          </Text>
-          <Text style={styles.info} onPress={showDialogDevConfig}>
-            {devPros.id}
-          </Text>
-        </View>
-        <View style={styles.itemAlarmMessage}>
-          <Text
-            style={
-              isWaterLeverError()
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            水位异常
-          </Text>
-          <Text
-            style={
-              isTempError()
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            温度异常
-          </Text>
-        </View>
-        <View style={styles.itemSetTempWaterLevel}>
-          <Svg
-            height="40"
-            width="40"
-            style={styles.itemStatusIcon}
-            onPress={() => {
-              console.log('Item Clicked, setting temperature', devPros);
-              refreshDevInfos();
-              if (devPros.waterSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
-                showDialogSettingTraditionalDevInfo();
-              } else if (
-                devPros.waterSensorType === WATER_SENSOR_TYPE_ULTRASOUND
-              ) {
-                showDialogSettingUltrasoundDevInfo();
-              } else {
-                Alert.alert('未知水位传感器类型！');
-              }
-            }}>
-            <Defs>
-              <RadialGradient
-                id="grad"
-                cx="50%"
-                cy="50%"
-                r="50%"
-                fx="50%"
-                fy="50%"
-                gradientUnits="userSpaceOnUse">
-                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
-                <Stop
-                  offset="1"
-                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
-                  stopOpacity="1"
-                />
-              </RadialGradient>
-            </Defs>
-            <Circle cx="20" cy="20" r="15" fill="url(#grad)" />
-          </Svg>
-          <Button
-            icon="restore"
-            mode="text"
-            color="#62D6FF"
-            compact={true}
-            labelStyle={{ fontWeight: 'bold', fontSize: 16 }}
-            onPress={showDialogFactoryResetWarning}>
-            重置
-          </Button>
-        </View> */}
       </View>
       <Portal>
         <Dialog
@@ -2061,106 +1969,50 @@ const RefrgtorItem = ({ devPros }) => {
   return (
     <>
       <View style={styles.item}>
-        <View>
-          <Text
-            style={styles.title}
-            onPress={() => {
-              console.log('Item Clicked, setting device info', devPros);
+        <View style={styles.itemTop}>
+          <View>
+            <Image
+              source={require('../res/icon-refreg.png')}
+              style={{ width: 40, height: 40, resizeMode: 'stretch' }}
+            />
+          </View>
+          <View>
+            <Text
+              style={styles.title}
+              onPress={() => {
+                console.log('Item Clicked, setting device info', devPros);
+                let cmdJson = {
+                  device_id: devPros.id,
+                  method: 'get_status',
+                };
+                sendCommand(
+                  TOPIC_SALE_TABLE_GET_STATUS,
+                  JSON.stringify(cmdJson),
+                );
 
-              let cmdJson = {
-                device_id: devPros.id,
-                method: 'get_status',
-              };
-              sendCommand(TOPIC_REFRGTOR_GET_STATUS, JSON.stringify(cmdJson));
-              refreshDevInfos();
-
-              setTimeout(() => {
-                showDialogDevInfo();
-              }, 200);
-            }}>
-            {devPros.name}
-          </Text>
-          <Text style={styles.info} onPress={showDialogDevConfig}>
-            {devPros.id}
-          </Text>
-        </View>
-        <View style={styles.itemAlarmMessage}>
-          <Text
-            style={
-              devPros.highTempAlarmFlag
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            高温报警
-          </Text>
-          <Text
-            style={
-              devPros.highTempProtectionFlag
-                ? styles.itemAlarmMessageText
-                : styles.itemAlarmMessageTextHide
-            }>
-            高温保护
-          </Text>
-        </View>
-        <View style={styles.itemSetTempWaterLevel}>
-          <Svg
-            height="40"
-            width="40"
-            style={styles.itemStatusIcon}
-            onPress={() => {
-              console.log(
-                'Item Clicked, *********** setting refrigetor properties',
-                devPros,
-              );
-              refreshDevInfos();
-              setTimeout(showDialogDevSetting, 500);
-            }}>
-            <Defs>
-              <RadialGradient
-                id="grad"
-                cx="50%"
-                cy="50%"
-                r="50%"
-                fx="50%"
-                fy="50%"
-                gradientUnits="userSpaceOnUse">
-                <Stop offset="0" stopColor="#ffffff" stopOpacity="1" />
-                <Stop
-                  offset="1"
-                  stopColor={devPros.onlineStatus ? '#00ff00' : '#789166'}
-                  stopOpacity="1"
-                />
-              </RadialGradient>
-            </Defs>
-            <Circle cx="20" cy="20" r="15" fill="url(#grad)" />
-          </Svg>
+                refreshDevInfos();
+                setTimeout(() => {
+                  showDialogDevInfo();
+                }, 200);
+              }}>
+              {devPros.name}
+            </Text>
+            <Text style={styles.info} onPress={showDialogDevConfig}>
+              {devPros.id}
+            </Text>
+          </View>
           <Button
             icon="restore"
             mode="text"
-            color="#62D6FF"
+            color="#839795"
             compact={true}
-            labelStyle={{ fontWeight: 'bold', fontSize: 16 }}
+            labelStyle={{ fontSize: 13 }}
             onPress={showDialogFactoryResetWarning}>
             重置
           </Button>
-          {/* <Text
-            style={styles.itemSetRefrgRelayText}
-            onPress={() => {
-              console.log('Item Clicked, setting temperature', devPros);
-              refreshDevInfos();
-              showDialogRelay1();
-            }}>
-            设置继电器1
-          </Text>
-          <Text
-            style={styles.itemSetRefrgRelayText}
-            onPress={() => {
-              console.log('Item Clicked, setting water level', devPros);
-              refreshDevInfos();
-              showDialogRelay2();
-            }}>
-            设置继电器2
-          </Text> */}
+        </View>
+        <View style={styles.itemBottom}>
+          <Text style={styles.info}>{`加热中 | 当前温度 58°C`}</Text>
         </View>
       </View>
       <Portal>
@@ -2472,7 +2324,7 @@ const Devices = () => {
         )}
       /> */}
       <SectionGrid
-        itemDimension={130}
+        itemDimension={160}
         sections={renderScenes}
         renderItem={({ item }) => <Item devPros={item} />}
         renderSectionHeader={({ section }) => (
