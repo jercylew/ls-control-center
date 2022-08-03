@@ -8,6 +8,7 @@ import {
   NativeEventEmitter,
   NativeModules,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RadioButton, Button } from 'react-native-paper';
 import ESPTouchModule from '../api/esptouch-wrapper';
 import { button } from '../constants/button';
@@ -25,6 +26,7 @@ const NetworkConfig = () => {
   const [connStatus, setConnStatus] = React.useState('');
   const [connSucc, setConnSucc] = React.useState(false);
   const [connBtnEnabled, setConnBtnEnabled] = React.useState(true);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const onConfirmConnEspDev = () => {
     setConnStatus('');
@@ -97,24 +99,33 @@ const NetworkConfig = () => {
   return (
     <SafeAreaView style={styles.topView}>
       <View style={styles.textContainer}>
-        <Text style={styles.textPrefix}>SSID:</Text>
+        <Text style={styles.textPrefix}>{`SSID:  `}</Text>
         <Text style={styles.text}>{ssid}</Text>
       </View>
 
       <View style={styles.textContainer}>
-        <Text style={styles.textPrefix}>BSSID:</Text>
+        <Text style={styles.textPrefix}>{`BSSID: `}</Text>
         <Text style={styles.text}>{bssid}</Text>
       </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.inputPrefix}>密码:</Text>
         <TextInput
-          secureTextEntry={true}
+          secureTextEntry={showPassword}
           onChangeText={onChangePassword}
           value={password}
           keyboardType={'default'}
           autoComplete={'password'}
           style={styles.input}
+        />
+        <MaterialCommunityIcons
+          name="eye"
+          color={showPassword ? '#779190' : '#00A2FF'}
+          size={30}
+          onPress={() => {
+            setShowPassword(!showPassword);
+            console.log('Password display mode: ', showPassword);
+          }}
         />
       </View>
 
@@ -134,34 +145,28 @@ const NetworkConfig = () => {
         value={broadcast}>
         <View style={styles.radiosGroup}>
           <View style={styles.radioItem}>
-            <Text
-              style={
-                broadcast === 'broadcast'
-                  ? styles.labelTexChecked
-                  : styles.labelText
-              }>
-              广播
-            </Text>
+            <View>
+              <Text style={styles.labelText}>广播</Text>
+              <Text style={styles.tip}>一个数据同时发往所有主机</Text>
+            </View>
             <RadioButton
               style={styles.labelRadio}
               value="broadcast"
               color="#009FFC"
             />
           </View>
-          <View style={styles.radioItem}>
-            <Text
-              style={
-                broadcast === 'multicast'
-                  ? styles.labelTexChecked
-                  : styles.labelText
-              }>
-              组播
-            </Text>
-            <RadioButton
-              style={styles.labelRadio}
-              value="multicast"
-              color="#009FFC"
-            />
+          <View
+            style={[
+              styles.radioItem,
+              { marginTop: 20, borderTopColor: 'black', borderTopWidth: 1 },
+            ]}>
+            <View style={{ marginTop: 20 }}>
+              <Text style={styles.labelText}>组播</Text>
+              <Text style={styles.tip}>只发给某一范围的主机</Text>
+            </View>
+            <View style={{ marginTop: 20, fontSize: 20 }}>
+              <RadioButton value="multicast" color="#009FFC" />
+            </View>
           </View>
         </View>
       </RadioButton.Group>
@@ -197,31 +202,33 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   input: {
-    width: 1000,
+    width: '75%',
     fontSize: 20,
+    backgroundColor: 'white',
   },
   text: {
     width: 1000,
     fontSize: 20,
     color: '#009FFC',
   },
+  tip: {
+    fontSize: 15,
+    color: '#7B9493',
+  },
   radioItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     margin: 8,
     padding: 2,
   },
   radiosGroup: {
-    flexDirection: 'row',
+    // flexDirection: 'row',
   },
   labelText: {
     margin: 5,
     fontSize: 20,
-    color: '#9AAAAA',
-  },
-  labelTexChecked: {
-    margin: 5,
-    fontSize: 20,
-    color: '#009FFC',
+    fontWeight: 'bold',
+    color: 'black',
   },
   labelRadio: {
     margin: 5,
@@ -230,7 +237,7 @@ const styles = StyleSheet.create({
   confirmButton: {
     marginLeft: 35,
     marginRight: 35,
-    marginTop: 50,
+    marginTop: 5,
     borderRadius: 10,
   },
   statusOkText: {
@@ -259,6 +266,11 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 20,
     backgroundColor: colors.inputBackground,
+    shadowColor: 'black',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 10,
   },
   inputPrefix: {
     paddingHorizontal: 5,
@@ -277,7 +289,7 @@ const styles = StyleSheet.create({
   textPrefix: {
     paddingHorizontal: 5,
     fontSize: 20,
-    color: '#9AAAAA',
+    color: 'black',
   },
 });
 
