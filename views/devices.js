@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {
   StyleSheet,
@@ -563,6 +564,14 @@ const SaleTableItem = ({ devPros }) => {
     setSettingsVarTradSensor(settings);
   };
 
+  const mainStatusText = () => {
+    const heatingInfo = devPros.isHeating ? '加热中 | ' : '';
+    const tempInfo = `当前温度${intToText(devPros.detectionTemperature)}°C `;
+    const upWaterInfo = devPros.isUpWater ? ' | 上水中' : '';
+
+    return `${heatingInfo}${tempInfo}${upWaterInfo}`;
+  };
+
   return (
     <>
       <View style={styles.item}>
@@ -614,7 +623,7 @@ const SaleTableItem = ({ devPros }) => {
           </Button>
         </View>
         <View style={styles.itemBottom}>
-          <Text style={styles.info}>{`加热中 | 当前温度 58°C`}</Text>
+          <Text style={styles.info}>{mainStatusText()}</Text>
         </View>
       </View>
       <Portal>
@@ -1966,6 +1975,15 @@ const RefrgtorItem = ({ devPros }) => {
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
   }
 
+  const mainStatusText = () => {
+    const compressInfo = devPros.comStartRunFlag ? '压缩机开启 | ' : '';
+    const tempInfo = `柜温${intToText(devPros.comDetectiontemperature)}°C `;
+    const defrostInfo = devPros.defrostingFlag ? ' | 化霜中' : '';
+    const drippingFlag = devPros.drippingFlag ? ' | 滴水中' : '';
+
+    return `${compressInfo}${tempInfo}${defrostInfo}${drippingFlag}`;
+  };
+
   return (
     <>
       <View style={styles.item}>
@@ -2006,13 +2024,13 @@ const RefrgtorItem = ({ devPros }) => {
             mode="text"
             color="#839795"
             compact={true}
-            labelStyle={{ fontSize: 13 }}
+            labelStyle={{ fontSize: 13, fontWeight: 'bold' }}
             onPress={showDialogFactoryResetWarning}>
             重置
           </Button>
         </View>
         <View style={styles.itemBottom}>
-          <Text style={styles.info}>{`加热中 | 当前温度 58°C`}</Text>
+          <Text style={styles.info}>{mainStatusText()}</Text>
         </View>
       </View>
       <Portal>
