@@ -78,7 +78,7 @@ export const MqttProvider = ({ children }) => {
       }
 
       let strMergedDevTimerIds = JSON.stringify(existingDeviceTimerIds);
-      console.log('setDeviceTimerId to save: ', strMergedDevTimerIds);
+      // console.log('setDeviceTimerId to save: ', strMergedDevTimerIds);
       await AsyncStorage.setItem(DEVICE_TIMER_ID_KEY, strMergedDevTimerIds);
     } catch (e) {
       console.log('Failed to set device timer id for', devId, ': ', e);
@@ -130,7 +130,6 @@ export const MqttProvider = ({ children }) => {
       errorTemperature: reportData.error_temperature,
       onlineStatus: true,
     };
-    console.log('Now try to sync to slice...');
     dispatch(syncDevice(newDevice));
   };
 
@@ -215,7 +214,7 @@ export const MqttProvider = ({ children }) => {
       highTempAlarm: reportData.High_Temp_Alarm,
       lowTempAlarm: reportData.Low_Temp_Alarm,
     };
-    console.log('Now try to sync refrigerator data to slice: ');
+    // console.log('Now try to sync refrigerator data to slice: ');
     dispatch(syncDevice(newDevice));
   };
 
@@ -303,10 +302,10 @@ export const MqttProvider = ({ children }) => {
   };
 
   const handleMqttMessageReceived = async msg => {
-    console.log('handleMqttMessageReceived: ', msg);
+    // console.log('handleMqttMessageReceived: ', msg);
     let dataJson = JSON.parse(msg.data);
     if (msg.topic === TOPIC_SALE_TABLE_STATUS) {
-      console.log('Sale table status');
+      // console.log('Sale table status');
 
       if ('method' in dataJson) {
         if (dataJson.method === 'report') {
@@ -323,10 +322,10 @@ export const MqttProvider = ({ children }) => {
         }
       }
     } else if (msg.topic === TOPIC_SALE_TABLE_PROPERTY) {
-      console.log('Sale table property');
+      // console.log('Sale table property');
       handleSaleTablePropertyReport(dataJson);
     } else if (msg.topic === TOPIC_REFRG_STATUS) {
-      console.log('Refrigerator status report');
+      // console.log('Refrigerator status report');
 
       if ('method' in dataJson) {
         if (dataJson.method === 'report') {
@@ -342,7 +341,7 @@ export const MqttProvider = ({ children }) => {
         }
       }
     } else if (msg.topic === TOPIC_REFRG_PROPERTY) {
-      console.log('Refrigerator property report');
+      // console.log('Refrigerator property report');
       handleRefrgPropertyReport(dataJson); //Reuse sale table??
     } else {
       console.log('Unknown message with topic:' + msg.topic + ', ignore it!');
@@ -353,10 +352,10 @@ export const MqttProvider = ({ children }) => {
 
     let devTimerId = setTimeout(
       devId => {
-        console.log(
-          'Timeout for reciving device status or property report for',
-          devId,
-        );
+        // console.log(
+        //   'Timeout for reciving device status or property report for',
+        //   devId,
+        // );
         let newDevice = {
           id: devId,
           onlineStatus: false,
@@ -372,7 +371,7 @@ export const MqttProvider = ({ children }) => {
 
   useEffect(() => {
     if (mqttClient === null) {
-      console.log('Mqttclient is null, create a new one and save it ...');
+      // console.log('Mqttclient is null, create a new one and save it ...');
       MQTT.createClient({
         host: '118.24.201.167',
         port: 1883,
@@ -397,7 +396,7 @@ export const MqttProvider = ({ children }) => {
 
     console.log('Mqtt client check timer not created, creat a new one ...');
     let timerId = setInterval(() => {
-      console.log('Time to check mqtt client status, mqttClient:', mqttClient);
+      // console.log('Time to check mqtt client status, mqttClient:', mqttClient);
       if (mqttClient) {
         mqttClient
           .isConnected()
