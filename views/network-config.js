@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     backgroundColor: colors.pageBackground,
+    margin: 8,
   },
   headerText: {
     margin: 8,
@@ -235,8 +236,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   confirmButton: {
-    marginLeft: 35,
-    marginRight: 35,
+    marginLeft: 45,
+    marginRight: 45,
     marginTop: 5,
     borderRadius: 10,
   },
