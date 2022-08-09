@@ -151,6 +151,7 @@ export const slice = createSlice({
 
         let newScene = {
           title: newSceneName,
+          id: device.sceneId,
           data: [],
         };
         newScene.data.push(device);

@@ -12,12 +12,14 @@ import {
   Alert,
   Image,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import { RadialGradient, Svg, Defs, Stop, Circle } from 'react-native-svg';
 import { Button, Dialog, Portal, DataTable } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   syncDevice,
   selectScenes,
@@ -28,12 +30,14 @@ import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
 import { dialogButtonOk, dialogButtonCancel } from '../constants/button';
 import { colors } from '../constants/colors';
-import { SectionGrid } from 'react-native-super-grid';
+import { FlatGrid } from 'react-native-super-grid';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
 const TOPIC_SALE_TABLE_GET_STATUS = '$thing/up/status/sale_table';
 const TOPIC_REFRGTOR_GET_STATUS = '$thing/up/status/refrigerator';
+
+const DeviceStack = createStackNavigator();
 
 const boolToText = value => {
   return value ? '是' : '否';
@@ -566,7 +570,7 @@ const SaleTableItem = ({ devPros }) => {
 
   const mainStatusText = () => {
     const heatingInfo = devPros.isHeating ? '加热中 | ' : '';
-    const tempInfo = `当前温度${intToText(devPros.detectionTemperature)}°C `;
+    const tempInfo = `温度${intToText(devPros.detectionTemperature)}°C `;
     const upWaterInfo = devPros.isUpWater ? ' | 上水中' : '';
 
     return `${heatingInfo}${tempInfo}${upWaterInfo}`;
@@ -2320,7 +2324,7 @@ const Item = ({ devPros }) => {
   }
 };
 
-const Devices = () => {
+const DeviceHome = ({ route, navigation }) => {
   const scenes = useSelector(selectScenes);
 
   let renderScenes = [];
@@ -2332,7 +2336,12 @@ const Devices = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: 5,
+        marginHorizontal: 10,
+      }}>
       {/* <SectionList
         sections={renderScenes}
         keyExtractor={(item, index) => item.id + index}
@@ -2341,15 +2350,102 @@ const Devices = () => {
           <Text style={styles.header}>{title}</Text>
         )}
       /> */}
-      <SectionGrid
+      {/* <SectionGrid
         itemDimension={160}
         sections={renderScenes}
         renderItem={({ item }) => <Item devPros={item} />}
         renderSectionHeader={({ section }) => (
           <Text style={styles.header}>{section.title}</Text>
         )}
+      /> */}
+      <View style={{ marginHorizontal: 0 }}>
+        <FlatList
+          data={renderScenes}
+          renderItem={({ item }) => (
+            <Pressable
+              style={{
+                marginVertical: 18,
+                marginHorizontal: 18,
+                borderRadius: 8,
+                backgroundColor: 'white',
+                shadowColor: 'black',
+                shadowOffset: { width: 2, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 3,
+                elevation: 10,
+              }}
+              onPress={() => {
+                navigation.navigate('DeviceItems', {
+                  sceneId: item.id,
+                  sceneName: item.title,
+                  devices: item.data,
+                });
+              }}>
+              <View>
+                <View style={styles.itemTop}>
+                  <View>
+                    <Image
+                      source={require('../res/icon-scene.png')}
+                      style={{ width: 60, height: 60, resizeMode: 'stretch' }}
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.title}>{item.title}</Text>
+                  </View>
+                </View>
+                <View style={styles.itemBottom}>
+                  <Text
+                    style={
+                      styles.info
+                    }>{`总设备数: ${item.data.length}, 在线： ${item.data.length}`}</Text>
+                </View>
+              </View>
+            </Pressable>
+          )}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const DeviceItems = ({ route, navigation }) => {
+  const { sceneId, sceneName, devices } = route.params;
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: 5,
+        marginHorizontal: 5,
+      }}>
+      <FlatGrid
+        itemDimension={130}
+        data={devices}
+        renderItem={({ item }) => <Item devPros={item} />}
       />
     </SafeAreaView>
+  );
+};
+
+const Devices = () => {
+  return (
+    <DeviceStack.Navigator initialRouteName="DeviceHome">
+      <DeviceStack.Screen
+        name="DeviceHome"
+        component={DeviceHome}
+        options={{ headerShown: false }}
+      />
+      <DeviceStack.Screen
+        name="DeviceItems"
+        component={DeviceItems}
+        initialParams={{ id: undefined }}
+        options={({ route }) => ({
+          title: route.params.sceneName,
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerTitle: route.params.sceneName,
+        })}
+      />
+    </DeviceStack.Navigator>
   );
 };
 
@@ -2360,7 +2456,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   item: {
-    marginVertical: 8,
+    marginVertical: 5,
     borderRadius: 8,
     backgroundColor: 'white',
     shadowColor: 'black',
@@ -2372,7 +2468,8 @@ const styles = StyleSheet.create({
   itemTop: {
     flexDirection: 'row',
     paddingHorizontal: 5,
-    paddingVertical: 10,
+    paddingVertical: 0,
+    alignItems: 'center',
   },
   itemMiddle: {},
   itemBottom: {
@@ -2389,7 +2486,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: 'black',
-    paddingLeft: 5,
+    paddingLeft: 10,
     // paddingTop: 25,
   },
   dialogTitle: {
