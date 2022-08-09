@@ -586,7 +586,7 @@ const SaleTableItem = ({ devPros }) => {
               style={{ width: 40, height: 40, resizeMode: 'stretch' }}
             />
           </View>
-          <View>
+          <View style={{ marginLeft: 20 }}>
             <Text
               style={styles.title}
               onPress={() => {
@@ -616,15 +616,6 @@ const SaleTableItem = ({ devPros }) => {
               {devPros.id}
             </Text>
           </View>
-          <Button
-            icon="restore"
-            mode="text"
-            color="#839795"
-            compact={true}
-            labelStyle={{ fontSize: 13 }}
-            onPress={showDialogFactoryResetWarning}>
-            重置
-          </Button>
         </View>
         <View style={styles.itemBottom}>
           <Text style={styles.info}>{mainStatusText()}</Text>
@@ -866,6 +857,16 @@ const SaleTableItem = ({ devPros }) => {
                 />
               </View>
             </View>
+            <Button
+              icon="restore"
+              mode="contained"
+              color="#FF0000"
+              compact={true}
+              labelStyle={{ fontSize: 15, color: 'white', fontWeight: 'bold' }}
+              style={{ marginHorizontal: 40, marginVertical: 35 }}
+              onPress={showDialogFactoryResetWarning}>
+              重置
+            </Button>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -998,10 +999,10 @@ const SaleTableItem = ({ devPros }) => {
         <Dialog
           visible={dlgFactoryResetWarning}
           onDismiss={hideDialogFactoryResetWarning}
-          style={styles.dialog}>
+          style={[styles.dialog, { marginHorizontal: 50 }]}>
           <Dialog.Title style={styles.warningTitle}>
-            <View style={styles.textContainer}>
-              <MaterialCommunityIcons name="alert" color="#ff0000" size={45} />
+            <View style={[styles.textContainer, { marginTop: 40 }]}>
+              <MaterialCommunityIcons name="alert" color="#ff0000" size={35} />
               <Text style={styles.warningTitle}>温馨提示</Text>
             </View>
           </Dialog.Title>
@@ -2023,15 +2024,6 @@ const RefrgtorItem = ({ devPros }) => {
               {devPros.id}
             </Text>
           </View>
-          <Button
-            icon="restore"
-            mode="text"
-            color="#839795"
-            compact={true}
-            labelStyle={{ fontSize: 13, fontWeight: 'bold' }}
-            onPress={showDialogFactoryResetWarning}>
-            重置
-          </Button>
         </View>
         <View style={styles.itemBottom}>
           <Text style={styles.info}>{mainStatusText()}</Text>
@@ -2167,42 +2159,6 @@ const RefrgtorItem = ({ devPros }) => {
           </Dialog.Actions>
         </Dialog>
         <Dialog
-          visible={dlgFactoryResetWarning}
-          onDismiss={hideDialogFactoryResetWarning}
-          style={styles.dialog}>
-          <Dialog.Title style={styles.warningTitle}>
-            <View style={styles.textContainer}>
-              <MaterialCommunityIcons name="alert" color="#ff0000" size={45} />
-              <Text style={styles.warningTitle}>温馨提示</Text>
-            </View>
-          </Dialog.Title>
-          <Dialog.Content>
-            <Text style={styles.warningText}>
-              您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              mode="contained"
-              color={dialogButtonCancel.color}
-              onPress={hideDialogFactoryResetWarning}
-              contentStyle={dialogButtonCancel.contentStyle}
-              labelStyle={dialogButtonCancel.labelStyle}
-              style={styles.dialogButton}>
-              取消
-            </Button>
-            <Button
-              mode="contained"
-              color={dialogButtonOk.color}
-              onPress={onDialogFactoryResetOk}
-              contentStyle={dialogButtonOk.contentStyle}
-              labelStyle={dialogButtonOk.labelStyle}
-              style={styles.dialogButton}>
-              确定
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-        <Dialog
           visible={dlgDevConfVisible}
           onDismiss={hideDialogDevConfig}
           style={styles.dialog}>
@@ -2234,6 +2190,16 @@ const RefrgtorItem = ({ devPros }) => {
                 />
               </View>
             </View>
+            <Button
+              icon="restore"
+              mode="contained"
+              color="#FF0000"
+              compact={true}
+              labelStyle={{ fontSize: 15, color: 'white', fontWeight: 'bold' }}
+              style={{ marginHorizontal: 40, marginVertical: 35 }}
+              onPress={showDialogFactoryResetWarning}>
+              重置
+            </Button>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -2304,6 +2270,42 @@ const RefrgtorItem = ({ devPros }) => {
             </Button>
           </Dialog.Actions>
         </Dialog>
+        <Dialog
+          visible={dlgFactoryResetWarning}
+          onDismiss={hideDialogFactoryResetWarning}
+          style={[styles.dialog, { marginHorizontal: 50 }]}>
+          <Dialog.Title style={styles.warningTitle}>
+            <View style={[styles.textContainer, { marginTop: 40 }]}>
+              <MaterialCommunityIcons name="alert" color="#ff0000" size={35} />
+              <Text style={styles.warningTitle}>温馨提示</Text>
+            </View>
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.warningText}>
+              您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogFactoryResetWarning}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogFactoryResetOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
     </>
   );
@@ -2361,8 +2363,10 @@ const DeviceHome = ({ route, navigation }) => {
       <View style={{ marginHorizontal: 0 }}>
         <FlatList
           data={renderScenes}
+          keyExtractor={item => `DeviceHome-scene-${item.id}-${item.title}`}
           renderItem={({ item }) => (
             <Pressable
+              // key={`DeviceHome-scene-${item.id}-${item.title}`}
               style={{
                 marginVertical: 18,
                 marginHorizontal: 18,
@@ -2375,6 +2379,7 @@ const DeviceHome = ({ route, navigation }) => {
                 elevation: 10,
               }}
               onPress={() => {
+                console.log(`scene-${item.id}-${item.title}`);
                 navigation.navigate('DeviceItems', {
                   sceneId: item.id,
                   sceneName: item.title,
@@ -2419,8 +2424,11 @@ const DeviceItems = ({ route, navigation }) => {
       }}>
       <FlatGrid
         itemDimension={130}
+        keyExtractor={item => `DeviceItems-${item.id}`}
         data={devices}
-        renderItem={({ item }) => <Item devPros={item} />}
+        renderItem={({ item }) => (
+          <Item key={`DeviceItems-${item.id}`} devPros={item} />
+        )}
       />
     </SafeAreaView>
   );
@@ -2468,7 +2476,7 @@ const styles = StyleSheet.create({
   itemTop: {
     flexDirection: 'row',
     paddingHorizontal: 5,
-    paddingVertical: 0,
+    marginVertical: 10,
     alignItems: 'center',
   },
   itemMiddle: {},
@@ -2486,7 +2494,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: 'black',
-    paddingLeft: 10,
+    paddingLeft: 20,
     // paddingTop: 25,
   },
   dialogTitle: {
@@ -2501,7 +2509,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     // fontWeight: 'bold',
     marginTop: 10,
-    paddingLeft: 5,
+    paddingLeft: 10,
     color: '#839795',
   },
   input: {
@@ -2591,7 +2599,7 @@ const styles = StyleSheet.create({
   },
   dialogButton: {
     borderRadius: 10,
-    width: 120,
+    width: 100,
     marginHorizontal: 20,
     shadowColor: 'white',
   },
