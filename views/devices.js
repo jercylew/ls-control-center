@@ -578,55 +578,71 @@ const SaleTableItem = ({ devPros }) => {
 
   return (
     <>
-      <View style={styles.item}>
-        <View style={styles.itemTop}>
-          <View>
-            <Image
-              source={require('../res/icon-sale-table.png')}
-              style={{ width: 40, height: 40, resizeMode: 'stretch' }}
-            />
-          </View>
-          <View style={{ marginLeft: 20 }}>
-            <Text
-              style={styles.title}
-              onPress={() => {
-                console.log(
-                  'Item Clicked, setting device info',
-                  devPros,
-                  'selectedSensorType=',
-                  selectedSensorType,
-                );
-                let cmdJson = {
-                  device_id: devPros.id,
-                  method: 'get_status',
-                };
-                sendCommand(
-                  TOPIC_SALE_TABLE_GET_STATUS,
-                  JSON.stringify(cmdJson),
-                );
+      <View
+        style={devPros.onlineStatus ? styles.itemOnline : styles.itemOffline}>
+        <Pressable
+          delayLongPress={1000}
+          onLongPress={() => {
+            console.log('Sale table item long clicked!');
+            if (selectedSensorType === WATER_SENSOR_TYPE_TRADITIONAL) {
+              showDialogSettingTraditionalDevInfo();
+            } else if (selectedSensorType === WATER_SENSOR_TYPE_ULTRASOUND) {
+              showDialogSettingUltrasoundDevInfo();
+            } else {
+              console.log('Unknown water sensor type!');
+              Alert.alert('错误', '未知水位传感器类型！');
+            }
+          }}>
+          <View style={styles.itemTop}>
+            <View>
+              <Image
+                source={require('../res/icon-sale-table.png')}
+                style={{ width: 40, height: 40, resizeMode: 'stretch' }}
+              />
+            </View>
+            <View style={{ marginLeft: 20 }}>
+              <Text
+                style={styles.title}
+                onPress={() => {
+                  console.log(
+                    'Item Clicked, setting device info',
+                    devPros,
+                    'selectedSensorType=',
+                    selectedSensorType,
+                  );
+                  let cmdJson = {
+                    device_id: devPros.id,
+                    method: 'get_status',
+                  };
+                  sendCommand(
+                    TOPIC_SALE_TABLE_GET_STATUS,
+                    JSON.stringify(cmdJson),
+                  );
 
-                refreshDevInfos();
-                setTimeout(() => {
-                  showDialogDevInfo();
-                }, 200);
-              }}>
-              {devPros.name}
-            </Text>
-            <Text style={styles.info} onPress={showDialogDevConfig}>
-              {devPros.id}
-            </Text>
+                  refreshDevInfos();
+                  setTimeout(() => {
+                    showDialogDevInfo();
+                  }, 200);
+                }}>
+                {devPros.name}
+              </Text>
+              <Text style={styles.info} onPress={showDialogDevConfig}>
+                {devPros.id}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.itemBottom}>
-          <Text style={styles.info}>{mainStatusText()}</Text>
-        </View>
+          <View style={styles.itemBottom}>
+            <Text style={styles.info}>{mainStatusText()}</Text>
+          </View>
+        </Pressable>
       </View>
       <Portal>
         <Dialog
           visible={dlgDevInfoVisible}
           onDismiss={hideDialogDevInfo}
           style={styles.dialog}>
-          <Dialog.Title style={styles.dialogTitle}>设备信息</Dialog.Title>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备信息`}</Dialog.Title>
           <Dialog.Content>
             <DataTable>
               <DataTable.Row style={styles.tableRow}>
@@ -785,7 +801,8 @@ const SaleTableItem = ({ devPros }) => {
           visible={dlgDevConfVisible}
           onDismiss={hideDialogDevConfig}
           style={styles.dialog}>
-          <Dialog.Title style={styles.dialogTitle}>设备配置</Dialog.Title>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备配置`}</Dialog.Title>
           <Dialog.Content>
             <View style={styles.input}>
               <View style={styles.textContainer}>
@@ -891,7 +908,8 @@ const SaleTableItem = ({ devPros }) => {
         </Dialog>
         <Dialog
           visible={dlgSettingTraditionalVisible}
-          onDismiss={hideDialogSettingTraditionalDevInfo}>
+          onDismiss={hideDialogSettingTraditionalDevInfo}
+          style={styles.dialog}>
           <Dialog.Title style={styles.dialogTitle}>
             设置 - 传统水位传感器
           </Dialog.Title>
@@ -1991,50 +2009,59 @@ const RefrgtorItem = ({ devPros }) => {
 
   return (
     <>
-      <View style={styles.item}>
-        <View style={styles.itemTop}>
-          <View>
-            <Image
-              source={require('../res/icon-refreg.png')}
-              style={{ width: 40, height: 40, resizeMode: 'stretch' }}
-            />
-          </View>
-          <View>
-            <Text
-              style={styles.title}
-              onPress={() => {
-                console.log('Item Clicked, setting device info', devPros);
-                let cmdJson = {
-                  device_id: devPros.id,
-                  method: 'get_status',
-                };
-                sendCommand(
-                  TOPIC_SALE_TABLE_GET_STATUS,
-                  JSON.stringify(cmdJson),
-                );
+      <View
+        style={devPros.onlineStatus ? styles.itemOnline : styles.itemOffline}>
+        <Pressable
+          delayLongPress={1000}
+          onLongPress={() => {
+            console.log('Sale table item long clicked!');
+            showDialogDevSetting();
+          }}>
+          <View style={styles.itemTop}>
+            <View>
+              <Image
+                source={require('../res/icon-refreg.png')}
+                style={{ width: 40, height: 40, resizeMode: 'stretch' }}
+              />
+            </View>
+            <View>
+              <Text
+                style={styles.title}
+                onPress={() => {
+                  console.log('Item Clicked, setting device info', devPros);
+                  let cmdJson = {
+                    device_id: devPros.id,
+                    method: 'get_status',
+                  };
+                  sendCommand(
+                    TOPIC_SALE_TABLE_GET_STATUS,
+                    JSON.stringify(cmdJson),
+                  );
 
-                refreshDevInfos();
-                setTimeout(() => {
-                  showDialogDevInfo();
-                }, 200);
-              }}>
-              {devPros.name}
-            </Text>
-            <Text style={styles.info} onPress={showDialogDevConfig}>
-              {devPros.id}
-            </Text>
+                  refreshDevInfos();
+                  setTimeout(() => {
+                    showDialogDevInfo();
+                  }, 200);
+                }}>
+                {devPros.name}
+              </Text>
+              <Text style={styles.info} onPress={showDialogDevConfig}>
+                {devPros.id}
+              </Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.itemBottom}>
-          <Text style={styles.info}>{mainStatusText()}</Text>
-        </View>
+          <View style={styles.itemBottom}>
+            <Text style={styles.info}>{mainStatusText()}</Text>
+          </View>
+        </Pressable>
       </View>
       <Portal>
         <Dialog
           visible={dlgDevInfoVisible}
           onDismiss={hideDialogDevInfo}
           style={styles.dialog}>
-          <Dialog.Title style={styles.dialogTitle}>设备信息</Dialog.Title>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备信息`}</Dialog.Title>
           <Dialog.ScrollArea>
             <ScrollView style={styles.settingDialogContent}>
               <DataTable>
@@ -2162,7 +2189,8 @@ const RefrgtorItem = ({ devPros }) => {
           visible={dlgDevConfVisible}
           onDismiss={hideDialogDevConfig}
           style={styles.dialog}>
-          <Dialog.Title style={styles.dialogTitle}>设备配置</Dialog.Title>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备配置`}</Dialog.Title>
           <Dialog.Content>
             <View style={styles.input}>
               <View style={styles.textContainer}>
@@ -2383,7 +2411,7 @@ const DeviceHome = ({ route, navigation }) => {
                 navigation.navigate('DeviceItems', {
                   sceneId: item.id,
                   sceneName: item.title,
-                  devices: item.data,
+                  // devices: item.data,
                 });
               }}>
               <View>
@@ -2414,7 +2442,11 @@ const DeviceHome = ({ route, navigation }) => {
 };
 
 const DeviceItems = ({ route, navigation }) => {
-  const { sceneId, sceneName, devices } = route.params;
+  const { sceneId, sceneName } = route.params;
+  const scenes = useSelector(selectScenes);
+  const scene = scenes.find(element => element.id === sceneId);
+
+  // devices from slice
   return (
     <SafeAreaView
       style={{
@@ -2425,7 +2457,7 @@ const DeviceItems = ({ route, navigation }) => {
       <FlatGrid
         itemDimension={130}
         keyExtractor={item => `DeviceItems-${item.id}`}
-        data={devices}
+        data={scene.data}
         renderItem={({ item }) => (
           <Item key={`DeviceItems-${item.id}`} devPros={item} />
         )}
@@ -2463,15 +2495,29 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
     marginHorizontal: 5,
   },
-  item: {
+  itemOffline: {
     marginVertical: 5,
     borderRadius: 8,
     backgroundColor: 'white',
-    shadowColor: 'black',
+    shadowColor: '#000000',
     shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.5,
     shadowRadius: 3,
-    elevation: 10,
+    borderWidth: 1,
+    borderColor: '#000000',
+    elevation: 15,
+  },
+  itemOnline: {
+    marginVertical: 5,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    shadowColor: '#0000FF',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    borderWidth: 1,
+    borderColor: '#0000FF',
+    elevation: 15,
   },
   itemTop: {
     flexDirection: 'row',
