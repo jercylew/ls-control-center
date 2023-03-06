@@ -198,8 +198,8 @@ dependencies {
     implementation project(':sp-react-native-mqtt')
 
     // implementation 'ESPTouch'
-    implementation 'com.github.EspressifApp:lib-esptouch-android:1.0.0'
-    implementation 'com.github.EspressifApp:lib-esptouch-v2-android:2.1.0'
+    implementation 'com.github.EspressifApp:lib-esptouch-android:1.1.1'
+    implementation 'com.github.EspressifApp:lib-esptouch-v2-android:2.2.1'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
