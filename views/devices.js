@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   SafeAreaView,
-  SectionList,
   StatusBar,
   FlatList,
   View,
@@ -1069,52 +1068,59 @@ const RefrgtorItem = ({ devPros }) => {
   const [comFirstStartTimer, setComFirstStartTimer] = React.useState(
     devPros.comFirstStartTimer,
   );
-  const [setTemperature, setSetTemperature] = React.useState(
-    devPros.setTemperature,
+  const [comSetTemp, setComSetTemp] = React.useState(devPros.comSetTemp);
+  const [comTempBacklash, setComTempBacklash] = React.useState(
+    devPros.comTempBacklash,
   );
-  const [maxTempSetting, setMaxTempSetting] = React.useState(60);
-  const [minTempSetting, setMinTempSetting] = React.useState(0);
-  const [tempReturnDifference, setTempReturnDifference] = React.useState(
-    devPros.tempReturnDifference,
+  const [comDelayRunTime, setComDelayRunTime] = React.useState(
+    devPros.comDelayRunTime,
   );
-  const [delayRunTime, setDelayRunTime] = React.useState(devPros.delayRunTime);
-  const [faultStartTime, setFaultStartTime] = React.useState(
-    devPros.faultStartTime,
+  const [comFaultStartTime, setComFaultStartTime] = React.useState(
+    devPros.comFaultStartTime,
   );
-  const [faultStopTime, setFaultStopTime] = React.useState(
-    devPros.faultStopTime,
+  const [comFaultStopTime, setComFaultStopTime] = React.useState(
+    devPros.comFaultStopTime,
   );
-  const [alarmTempUpOffset, setAlarmTempUpOffset] = React.useState(
-    devPros.alarmTempUpOffset,
+  const [comHighTempAlarm, setComHighTempAlarm] = React.useState(
+    devPros.comHighTempAlarm,
   );
-  const [alarmTempDownOffset, setAlarmTempDownOffset] = React.useState(
-    devPros.alarmTempDownOffset,
+  const [comLowTempAlarm, setComLowTempAlarm] = React.useState(
+    devPros.comLowTempAlarm,
   );
-  const [alarmTempUpOffsetDelay, setAlarmTempUpOffsetDelay] = React.useState(
-    devPros.alarmTempUpOffsetDelay,
+  const [comAlarmTempUpOffset, setComAlarmTempUpOffset] = React.useState(
+    devPros.comAlarmTempUpOffset,
   );
-  const [alarmTempDownOffsetDelay, setAlarmTempDownOffsetDelay] =
-    React.useState(devPros.alarmTempDownOffsetDelay);
-  const [frostingTemperature, setFrostingTemperature] = React.useState(
-    devPros.frostingTemperature,
+  const [comAlarmTempDownOffset, setComAlarmTempDownOffset] = React.useState(
+    devPros.comAlarmTempDownOffset,
   );
-  const [stopDefrostingTemperature, setStopDefrostingTemperature] =
-    React.useState(devPros.stopDefrostingTemperature);
-  const [maxDefrostingTimer, setMaxDefrostingTimer] = React.useState(
-    devPros.maxDefrostingTimer,
+  const [comAlarmTempUpOffsetDelay, setComAlarmTempUpOffsetDelay] =
+    React.useState(devPros.comAlarmTempUpOffsetDelay);
+  const [comAlarmTempDownOffsetDelay, setComAlarmTempDownOffsetDelay] =
+    React.useState(devPros.comAlarmTempDownOffsetDelay);
+  const [comMaxTempSetting, setComMaxTempSetting] = React.useState(
+    devPros.comMaxTempSetting,
   );
-  const [lowTempAccumulatedTime, setLowTempAccumulatedTime] = React.useState(
-    devPros.lowTempAccumulatedTime,
+  const [comMinTempSetting, setComMinTempSetting] = React.useState(
+    devPros.comMinTempSetting,
   );
-  const [defrostingDisplayDelay, setDefrostingDisplayDelay] = React.useState(
-    devPros.defrostingDisplayDelay,
+  const [defFrostingTemp, setDefFrostingTemp] = React.useState(
+    devPros.defFrostingTemp,
   );
-  const [defrostingCycle, setDefrostingCycle] = React.useState(
-    devPros.defrostingCycle,
+  const [defStopDefrostingTemp, setDefStopDefrostingTemp] = React.useState(
+    devPros.defStopDefrostingTemp,
   );
-  const [drippingTime, setDrippingTime] = React.useState(devPros.drippingTime);
-  const [defrostingMode, setDefrostingMode] = React.useState(
-    devPros.defrostingMode,
+  const [defMaxDefrostingTimer, setDefMaxDefrostingTimer] = React.useState(
+    devPros.defMaxDefrostingTimer,
+  );
+  const [defLowTempAccumulatedTime, setDefLowTempAccumulatedTime] =
+    React.useState(devPros.defLowTempAccumulatedTime);
+  const [defDefrostingMode, setDefDefrostingMode] = React.useState(
+    devPros.defDefrostingMode,
+  );
+  const [defDefrostingDisplayDelay, setDefDefrostingDisplayDelay] =
+    React.useState(devPros.defDefrostingDisplayDelay);
+  const [defDrippingTime, setDefDrippingTime] = React.useState(
+    devPros.defDrippingTime,
   );
   const [fanFirstStartTimer, setFanFirstStartTimer] = React.useState(
     devPros.fanFirstStartTimer,
@@ -1122,14 +1128,15 @@ const RefrgtorItem = ({ devPros }) => {
   const [fanOperatingMode, setFanOperatingMode] = React.useState(
     devPros.fanOperatingMode,
   );
-  const [highTempAlarmValue, setHighTempAlarmValue] = React.useState(
-    devPros.highTempAlarmValue,
+  const [conHighTempAlarmValue, setConHighTempAlarmValue] = React.useState(
+    devPros.conHighTempAlarmValue,
   );
-  const [highTempProtectionValue, setHighTempProtectionValue] = React.useState(
-    devPros.highTempProtectionValue,
+  const [conHighTempProtectionValue, setConHighTempProtectionValue] =
+    React.useState(devPros.conHighTempProtectionValue);
+  const [conHighTempBacklash, setConHighTempBacklash] = React.useState(
+    devPros.conHighTempBacklash,
   );
-  const [highTempReturnDifference, setHighTempReturnDifference] =
-    React.useState(devPros.highTempReturnDifference);
+
   const [alarmMessage, setAlarmMessage] = React.useState('');
 
   const dispatch = useDispatch();
@@ -1173,194 +1180,145 @@ const RefrgtorItem = ({ devPros }) => {
       },
     },
     {
-      key: 'setTemperature',
-      name: '设置柜温(°C)',
+      key: 'comSetTemp',
+      name: '柜温设置',
       setter: text => {
         let value = textToInt(text);
-        setSetTemperature(value);
-        if (value < minTempSetting || value > maxTempSetting) {
-          showDialogErrorInfo('设置柜温介于最大与最小值之间');
-          updateSettingsVarRefrgSensor('setTemperature', value, true);
+        setComSetTemp(value);
+        if (value < comMinTempSetting || value > comMaxTempSetting) {
+          showDialogErrorInfo('柜温设置值应介于预定最大值与最小值之间');
+          updateSettingsVarRefrgSensor('comSetTemp', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('setTemperature', value, false);
+          updateSettingsVarRefrgSensor('comSetTemp', value, false);
         }
       },
     },
     {
-      key: 'maxTempSetting',
-      name: '最大柜温',
-      setter: text => {
-        let value = textToInt(text);
-        setMaxTempSetting(value);
-        updateSettingsVarRefrgSensor('maxTempSetting', textToInt(text));
-      },
-    },
-    {
-      key: 'minTempSetting',
-      name: '最小柜温',
-      setter: text => {
-        let value = textToInt(text);
-        setMinTempSetting(value);
-        updateSettingsVarRefrgSensor('minTempSetting', textToInt(text));
-      },
-    },
-    {
-      key: 'tempReturnDifference',
+      key: 'comTempBacklash',
       name: '温控回差',
       setter: text => {
         let value = textToInt(text);
-        setTempReturnDifference(value);
+        setComTempBacklash(value);
         if (value < 1 || value > 15) {
-          showDialogErrorInfo('温控回差应介于1与15之间');
-          updateSettingsVarRefrgSensor('tempReturnDifference', value, true);
+          showDialogErrorInfo('温度控制回差应介于1~15之间');
+          updateSettingsVarRefrgSensor('comTempBacklash', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('tempReturnDifference', value, false);
+          updateSettingsVarRefrgSensor('comTempBacklash', value, false);
         }
       },
     },
     {
-      key: 'delayRunTime',
+      key: 'comDelayRunTime',
       name: '压缩机启动延时',
       setter: text => {
         let value = textToInt(text);
-        setDelayRunTime(value);
+        setComDelayRunTime(value);
         if (value < 1 || value > 60) {
-          showDialogErrorInfo('压缩机启动延时应介于1与60之间');
-          updateSettingsVarRefrgSensor('delayRunTime', value, true);
+          showDialogErrorInfo('压缩机启动延时应介于1~60之间');
+          updateSettingsVarRefrgSensor('comDelayRunTime', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('delayRunTime', value, false);
+          updateSettingsVarRefrgSensor('comDelayRunTime', value, false);
         }
       },
     },
     {
-      key: 'faultStartTime',
-      name: '故障开机时间',
+      key: 'comFaultStartTime',
+      name: '柜温故障开机时间',
       setter: text => {
         let value = textToInt(text);
-        setFaultStartTime(value);
+        setComFaultStartTime(value);
         if (value < 1 || value > 120) {
-          showDialogErrorInfo('故障开机时间应介于1与120之间');
-          updateSettingsVarRefrgSensor('faultStartTime', value, true);
+          showDialogErrorInfo('柜温故障开机时间应介于1~120之间');
+          updateSettingsVarRefrgSensor('comFaultStartTime', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('faultStartTime', value, false);
+          updateSettingsVarRefrgSensor('comFaultStartTime', value, false);
         }
       },
     },
     {
-      key: 'faultStopTime',
-      name: '故障停机时间',
+      key: 'comFaultStopTime',
+      name: '柜温故障停机时间',
       setter: text => {
         let value = textToInt(text);
-        setFaultStopTime(value);
+        setComFaultStopTime(value);
         if (value < 1 || value > 120) {
-          showDialogErrorInfo('故障停机时间应介于1与120之间');
-          updateSettingsVarRefrgSensor('faultStopTime', value, true);
+          showDialogErrorInfo('柜温故障停机时间应介于1~120之间');
+          updateSettingsVarRefrgSensor('comFaultStopTime', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('faultStopTime', value, false);
+          updateSettingsVarRefrgSensor('comFaultStopTime', value, false);
         }
       },
     },
     {
-      key: 'alarmTempUpOffset',
-      name: '报警上限偏移',
+      key: 'comHighTempAlarm',
+      name: '高温报警温度',
       setter: text => {
         let value = textToInt(text);
-        setAlarmTempUpOffset(value);
+        setComHighTempAlarm(value);
+        updateSettingsVarRefrgSensor('comHighTempAlarm', value);
+      },
+    },
+    {
+      key: 'comLowTempAlarm',
+      name: '低温报警温度',
+      setter: text => {
+        let value = textToInt(text);
+        setComLowTempAlarm(value);
+        updateSettingsVarRefrgSensor('comLowTempAlarm', value);
+      },
+    },
+    {
+      key: 'comAlarmTempUpOffset',
+      name: '柜温上限报警偏移',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempUpOffset(value);
         if (value < 0 || value > 25) {
-          showDialogErrorInfo('报警上限偏移应介于0与25之间');
-          updateSettingsVarRefrgSensor('alarmTempUpOffset', value, true);
+          showDialogErrorInfo('柜温上限报警偏移应介于0~25之间');
+          updateSettingsVarRefrgSensor('comAlarmTempUpOffset', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('alarmTempUpOffset', value, false);
+          updateSettingsVarRefrgSensor('comAlarmTempUpOffset', value, false);
         }
       },
     },
     {
-      key: 'alarmTempDownOffset',
-      name: '报警下限偏移',
+      key: 'comAlarmTempDownOffset',
+      name: '柜温下限报警偏移',
       setter: text => {
         let value = textToInt(text);
-        setAlarmTempDownOffset(value);
+        setComAlarmTempDownOffset(value);
         if (value < 0 || value > 25) {
-          showDialogErrorInfo('报警下限偏移应介于0与25之间');
-          updateSettingsVarRefrgSensor('alarmTempDownOffset', value, true);
+          showDialogErrorInfo('柜温下限报警偏移应介于0~25之间');
+          updateSettingsVarRefrgSensor('comAlarmTempDownOffset', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('alarmTempDownOffset', value, false);
+          updateSettingsVarRefrgSensor('comAlarmTempDownOffset', value, false);
         }
       },
     },
     {
-      key: 'alarmTempUpOffsetDelay',
-      name: '报警上限延时',
+      key: 'comAlarmTempUpOffsetDelay',
+      name: '柜温超上限报警延时',
       setter: text => {
         let value = textToInt(text);
-        setAlarmTempUpOffsetDelay(value);
+        setComAlarmTempUpOffsetDelay(value);
         if (value < 0 || value > 125) {
-          showDialogErrorInfo('报警上限延时应介于0与125之间');
-          updateSettingsVarRefrgSensor('alarmTempUpOffsetDelay', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('alarmTempUpOffsetDelay', value, false);
-        }
-      },
-    },
-    {
-      key: 'alarmTempDownOffsetDelay',
-      name: '报警下限延时',
-      setter: text => {
-        let value = textToInt(text);
-        setAlarmTempDownOffsetDelay(value);
-        if (value < 0 || value > 125) {
-          showDialogErrorInfo('报警下限延时应介于0与125之间');
-          updateSettingsVarRefrgSensor('alarmTempDownOffsetDelay', value, true);
-        } else {
-          showDialogErrorInfo('');
+          showDialogErrorInfo('柜温超上限报警延时应介于0~125之间');
           updateSettingsVarRefrgSensor(
-            'alarmTempDownOffsetDelay',
-            value,
-            false,
-          );
-        }
-      },
-    },
-    {
-      key: 'frostingTemperature',
-      name: '结霜温度',
-      setter: text => {
-        let value = textToInt(text);
-        setFrostingTemperature(value);
-        if (value < -40 || value > 0) {
-          showDialogErrorInfo('结霜温度应介于-40与0之间');
-          updateSettingsVarRefrgSensor('frostingTemperature', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('frostingTemperature', value, false);
-        }
-      },
-    },
-    {
-      key: 'stopDefrostingTemperature',
-      name: '结霜终止温度',
-      setter: text => {
-        let value = textToInt(text);
-        setStopDefrostingTemperature(value);
-        if (value < -40 || value > 50) {
-          showDialogErrorInfo('结霜终止温度应介于-40与50之间');
-          updateSettingsVarRefrgSensor(
-            'stopDefrostingTemperature',
+            'comAlarmTempUpOffsetDelay',
             value,
             true,
           );
         } else {
           showDialogErrorInfo('');
           updateSettingsVarRefrgSensor(
-            'stopDefrostingTemperature',
+            'comAlarmTempUpOffsetDelay',
             value,
             false,
           );
@@ -1368,92 +1326,217 @@ const RefrgtorItem = ({ devPros }) => {
       },
     },
     {
-      key: 'maxDefrostingTimer',
+      key: 'comAlarmTempDownOffsetDelay',
+      name: '柜温超下限报警延时',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempDownOffsetDelay(value);
+        if (value < 0 || value > 125) {
+          showDialogErrorInfo('柜温超下限报警延时应介于0~125之间');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempDownOffsetDelay',
+            value,
+            true,
+          );
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempDownOffsetDelay',
+            value,
+            false,
+          );
+        }
+      },
+    },
+    {
+      key: 'comMaxTempSetting',
+      name: '柜温最大设置温度',
+      setter: text => {
+        let value = textToInt(text);
+        setComMaxTempSetting(value);
+        updateSettingsVarRefrgSensor('comMaxTempSetting', textToInt(text));
+      },
+    },
+    {
+      key: 'comMinTempSetting',
+      name: '柜温最小设置温度',
+      setter: text => {
+        let value = textToInt(text);
+        setComMinTempSetting(value);
+        updateSettingsVarRefrgSensor('comMinTempSetting', textToInt(text));
+      },
+    },
+    {
+      key: 'defFrostingTemp',
+      name: '结霜温度',
+      setter: text => {
+        let value = textToInt(text);
+        setDefFrostingTemp(value);
+        if (value < -40 || value > 0) {
+          showDialogErrorInfo('结霜温度应介于-40与0之间');
+          updateSettingsVarRefrgSensor('defFrostingTemp', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('defFrostingTemp', value, false);
+        }
+      },
+    },
+    {
+      key: 'defStopDefrostingTemp',
+      name: '化霜终止温度',
+      setter: text => {
+        let value = textToInt(text);
+        setDefStopDefrostingTemp(value);
+        if (value < -40 || value > 50) {
+          showDialogErrorInfo('化霜终止温度应介于-40与50之间');
+          updateSettingsVarRefrgSensor('defStopDefrostingTemp', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('defStopDefrostingTemp', value, false);
+        }
+      },
+    },
+    {
+      key: 'defMaxDefrostingTimer',
       name: '最长化霜时间',
       setter: text => {
         let value = textToInt(text);
-        setMaxDefrostingTimer(value);
+        setDefMaxDefrostingTimer(value);
         if (value < 1 || value > 60) {
           showDialogErrorInfo('最长化霜时间应介于1与60之间');
-          updateSettingsVarRefrgSensor('maxDefrostingTimer', value, true);
+          updateSettingsVarRefrgSensor('defMaxDefrostingTimer', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('maxDefrostingTimer', value, false);
+          updateSettingsVarRefrgSensor('defMaxDefrostingTimer', value, false);
         }
       },
     },
     {
-      key: 'lowTempAccumulatedTime',
-      name: '蒸发器低温累积',
+      key: 'defLowTempAccumulatedTime',
+      name: '蒸发器累计低温时间',
       setter: text => {
         let value = textToInt(text);
-        setLowTempAccumulatedTime(value);
+        setDefLowTempAccumulatedTime(value);
         if (value < 20 || value > 360) {
-          showDialogErrorInfo('蒸发器低温累积应介于20与360之间');
-          updateSettingsVarRefrgSensor('lowTempAccumulatedTime', value, true);
+          showDialogErrorInfo('蒸发器累计低温时间应介于1与60之间');
+          updateSettingsVarRefrgSensor(
+            'defLowTempAccumulatedTime',
+            value,
+            true,
+          );
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('lowTempAccumulatedTime', value, false);
+          updateSettingsVarRefrgSensor(
+            'defLowTempAccumulatedTime',
+            value,
+            false,
+          );
         }
       },
     },
     {
-      key: 'defrostingDisplayDelay',
-      name: '化霜显示延时',
-      setter: text => {
-        let value = textToInt(text);
-        setDefrostingDisplayDelay(value);
-        if (value < 0 || value > 60) {
-          showDialogErrorInfo('化霜显示延时应介于0与60之间');
-          updateSettingsVarRefrgSensor('defrostingDisplayDelay', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('defrostingDisplayDelay', value, false);
-        }
-      },
-    },
-    {
-      key: 'defrostingCycle',
-      name: '化霜周期',
-      setter: text => {
-        let value = textToInt(text);
-        setDefrostingCycle(value);
-        if (value < 20 || value > 360) {
-          showDialogErrorInfo('化霜周期应介于20与360之间');
-          updateSettingsVarRefrgSensor('defrostingCycle', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('defrostingCycle', value, false);
-        }
-      },
-    },
-    {
-      key: 'drippingTime',
-      name: '化霜滴水',
-      setter: text => {
-        let value = textToInt(text);
-        setDrippingTime(value);
-        if (value < 0 || value > 60) {
-          showDialogErrorInfo('化霜滴水应介于0与60之间');
-          updateSettingsVarRefrgSensor('drippingTime', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('drippingTime', value, false);
-        }
-      },
-    },
-    {
-      key: 'defrostingMode',
+      key: 'defDefrostingMode',
       name: '化霜模式',
       setter: text => {
         let value = textToInt(text);
-        setDefrostingMode(value);
+        setDefDefrostingMode(value);
         if (value !== 0 && value !== 1) {
-          showDialogErrorInfo('化霜模式必须为0或者1');
-          updateSettingsVarRefrgSensor('defrostingMode', value, true);
+          showDialogErrorInfo('化霜模式只能为1或者0');
+          updateSettingsVarRefrgSensor('defDefrostingMode', value, true);
         } else {
           showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('defrostingMode', value, false);
+          updateSettingsVarRefrgSensor('defDefrostingMode', value, false);
+        }
+      },
+    },
+    {
+      key: 'defDefrostingDisplayDelay',
+      name: '化霜后显示延时',
+      setter: text => {
+        let value = textToInt(text);
+        setDefDefrostingDisplayDelay(value);
+        if (value < 0 || value > 60) {
+          showDialogErrorInfo('化霜后显示延时应介于0与60之间');
+          updateSettingsVarRefrgSensor(
+            'defDefrostingDisplayDelay',
+            value,
+            true,
+          );
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor(
+            'defDefrostingDisplayDelay',
+            value,
+            false,
+          );
+        }
+      },
+    },
+    {
+      key: 'defDrippingTime',
+      name: '化霜滴水时间',
+      setter: text => {
+        let value = textToInt(text);
+        setDefDrippingTime(value);
+        if (value < 0 || value > 60) {
+          showDialogErrorInfo('化霜滴水时间应介于0与60之间');
+          updateSettingsVarRefrgSensor('defDrippingTime', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('defDrippingTime', value, false);
+        }
+      },
+    },
+    {
+      key: 'conHighTempAlarmValue',
+      name: '冷凝器高温报警值',
+      setter: text => {
+        let value = textToInt(text);
+        setConHighTempAlarmValue(value);
+        if (value < 50 || value > 110) {
+          showDialogErrorInfo('冷凝器高温报警值应介于50与110之间');
+          updateSettingsVarRefrgSensor('conHighTempAlarmValue', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('conHighTempAlarmValue', value, false);
+        }
+      },
+    },
+    {
+      key: 'conHighTempProtectionValue',
+      name: '冷凝器高温保护值',
+      setter: text => {
+        let value = textToInt(text);
+        setConHighTempProtectionValue(value);
+        if (value < conHighTempAlarmValue || value > 115) {
+          showDialogErrorInfo('冷凝器高温保护值应介于报警值与115之间');
+          updateSettingsVarRefrgSensor(
+            'conHighTempProtectionValue',
+            value,
+            true,
+          );
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor(
+            'conHighTempProtectionValue',
+            value,
+            false,
+          );
+        }
+      },
+    },
+    {
+      key: 'conHighTempBacklash',
+      name: '冷凝器高温恢复回差',
+      setter: text => {
+        let value = textToInt(text);
+        setConHighTempBacklash(value);
+        if (value < 0 || value > 45) {
+          showDialogErrorInfo('冷凝器高温恢复回差应介于0与45之间');
+          updateSettingsVarRefrgSensor('conHighTempBacklash', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('conHighTempBacklash', value, false);
         }
       },
     },
@@ -1487,55 +1570,6 @@ const RefrgtorItem = ({ devPros }) => {
         }
       },
     },
-    {
-      key: 'highTempAlarmValue',
-      name: '冷凝高温报警',
-      setter: text => {
-        let value = textToInt(text);
-        setHighTempAlarmValue(value);
-        if (value < 50 || value > 110) {
-          showDialogErrorInfo('冷凝高温报警应介于50与110之间');
-          updateSettingsVarRefrgSensor('highTempAlarmValue', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('highTempAlarmValue', value, false);
-        }
-      },
-    },
-    {
-      key: 'highTempProtectionValue',
-      name: '冷凝高温保护',
-      setter: text => {
-        let value = textToInt(text);
-        setHighTempProtectionValue(value);
-        if (value < highTempAlarmValue || value > 115) {
-          showDialogErrorInfo('冷凝高温保护应介于高温报警值与115之间');
-          updateSettingsVarRefrgSensor('highTempProtectionValue', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor('highTempProtectionValue', value, false);
-        }
-      },
-    },
-    {
-      key: 'highTempReturnDifference',
-      name: '冷凝高温回差',
-      setter: text => {
-        let value = textToInt(text);
-        setHighTempReturnDifference(value);
-        if (value < 0 || value > 45) {
-          showDialogErrorInfo('冷凝高温回差应介于0与45之间');
-          updateSettingsVarRefrgSensor('highTempReturnDifference', value, true);
-        } else {
-          showDialogErrorInfo('');
-          updateSettingsVarRefrgSensor(
-            'highTempReturnDifference',
-            value,
-            false,
-          );
-        }
-      },
-    },
   ];
 
   const updateSettingsVarRefrgSensor = (key, value, error) => {
@@ -1547,65 +1581,61 @@ const RefrgtorItem = ({ devPros }) => {
 
   const [settingsVarRefrgSensor, setSettingsVarRefrgSensor] = React.useState({
     comFirstStartTimer: { value: intToText(comFirstStartTimer), error: false },
-    setTemperature: { value: intToText(setTemperature), error: false },
-    maxTempSetting: {
-      value: intToText(maxTempSetting),
+    comSetTemp: { value: intToText(comSetTemp), error: false },
+    comTempBacklash: { value: intToText(comTempBacklash), error: false },
+
+    comDelayRunTime: { value: intToText(comDelayRunTime), error: false },
+    comFaultStartTime: { value: intToText(comFaultStartTime), error: false },
+    comFaultStopTime: { value: intToText(comFaultStopTime), error: false },
+    comHighTempAlarm: { value: intToText(comHighTempAlarm), error: false },
+    comLowTempAlarm: { value: intToText(comLowTempAlarm), error: false },
+    comAlarmTempUpOffset: {
+      value: intToText(comAlarmTempUpOffset),
       error: false,
     },
-    minTempSetting: {
-      value: intToText(minTempSetting),
+    comAlarmTempDownOffset: {
+      value: intToText(comAlarmTempDownOffset),
       error: false,
     },
-    tempReturnDifference: {
-      value: intToText(tempReturnDifference),
+    comAlarmTempUpOffsetDelay: {
+      value: intToText(comAlarmTempUpOffsetDelay),
       error: false,
     },
-    delayRunTime: { value: intToText(delayRunTime), error: false },
-    faultStartTime: { value: intToText(faultStartTime), error: false },
-    faultStopTime: { value: intToText(faultStopTime), error: false },
-    alarmTempUpOffset: { value: intToText(alarmTempUpOffset), error: false },
-    alarmTempDownOffset: {
-      value: intToText(alarmTempDownOffset),
+    comAlarmTempDownOffsetDelay: {
+      value: intToText(comAlarmTempDownOffsetDelay),
       error: false,
     },
-    alarmTempUpOffsetDelay: {
-      value: intToText(alarmTempUpOffsetDelay),
+    comMaxTempSetting: { value: intToText(comMaxTempSetting), error: false },
+    comMinTempSetting: { value: intToText(comMinTempSetting), error: false },
+    defFrostingTemp: { value: intToText(defFrostingTemp), error: false },
+    defStopDefrostingTemp: {
+      value: intToText(defStopDefrostingTemp),
       error: false,
     },
-    alarmTempDownOffsetDelay: {
-      value: intToText(alarmTempDownOffsetDelay),
+    defMaxDefrostingTimer: {
+      value: intToText(defMaxDefrostingTimer),
       error: false,
     },
-    frostingTemperature: {
-      value: intToText(frostingTemperature),
+    defLowTempAccumulatedTime: {
+      value: intToText(defLowTempAccumulatedTime),
       error: false,
     },
-    stopDefrostingTemperature: {
-      value: intToText(stopDefrostingTemperature),
+    defDefrostingMode: { value: intToText(defDefrostingMode), error: false },
+    defDefrostingDisplayDelay: {
+      value: intToText(defDefrostingDisplayDelay),
       error: false,
     },
-    maxDefrostingTimer: {
-      value: intToText(maxDefrostingTimer),
+    defDrippingTime: { value: intToText(defDrippingTime), error: false },
+    conHighTempAlarmValue: {
+      value: intToText(conHighTempAlarmValue),
       error: false,
     },
-    lowTempAccumulatedTime: {
-      value: intToText(lowTempAccumulatedTime),
+    conHighTempProtectionValue: {
+      value: intToText(conHighTempProtectionValue),
       error: false,
     },
-    defrostingDisplayDelay: {
-      value: intToText(defrostingDisplayDelay),
-      error: false,
-    },
-    defrostingCycle: {
-      value: intToText(defrostingCycle),
-      error: false,
-    },
-    drippingTime: {
-      value: intToText(drippingTime),
-      error: false,
-    },
-    defrostingMode: {
-      value: intToText(defrostingMode),
+    conHighTempBacklash: {
+      value: intToText(conHighTempBacklash),
       error: false,
     },
     fanFirstStartTimer: {
@@ -1614,18 +1644,6 @@ const RefrgtorItem = ({ devPros }) => {
     },
     fanOperatingMode: {
       value: intToText(fanOperatingMode),
-      error: false,
-    },
-    highTempAlarmValue: {
-      value: intToText(highTempAlarmValue),
-      error: false,
-    },
-    highTempProtectionValue: {
-      value: intToText(highTempProtectionValue),
-      error: false,
-    },
-    highTempReturnDifference: {
-      value: intToText(highTempReturnDifference),
       error: false,
     },
   });
@@ -1663,20 +1681,6 @@ const RefrgtorItem = ({ devPros }) => {
       devType: DEV_TYPE_REFRIGERATOR,
       sceneId: sceneId,
       sceneName: sceneName.slice(0, 16),
-      netType: null,
-      cabinetTemp: null,
-      evaporatorTempe: null,
-      condenserTempe: null,
-      ntcTempe: null,
-      sht30OneTempe: null,
-      sht30OneHumi: null,
-      sht30TwoTempe: null,
-      sht30TwoHumi: null,
-      doorDetection1: null,
-      doorDetection2: null,
-      doorStatusOut: null,
-      relay1Status: null,
-      relay2Status: null,
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -1686,96 +1690,95 @@ const RefrgtorItem = ({ devPros }) => {
     setDevName(devPros.name);
     setSceneName(devPros.sceneName);
     setSceneId(devPros.sceneId);
+
     setComFirstStartTimer(devPros.comFirstStartTimer);
-    setSetTemperature(devPros.setTemperature);
-    setMaxTempSetting(devPros.maxTempSetting);
-    setMinTempSetting(devPros.minTempSetting);
-    setTempReturnDifference(devPros.tempReturnDifference);
-    setDelayRunTime(devPros.delayRunTime);
-    setFaultStartTime(devPros.faultStartTime);
-    setFaultStopTime(devPros.faultStopTime);
-    setAlarmTempUpOffset(devPros.alarmTempUpOffset);
-    setAlarmTempDownOffset(devPros.alarmTempDownOffset);
-    setAlarmTempUpOffsetDelay(devPros.alarmTempUpOffsetDelay);
-    setAlarmTempDownOffsetDelay(devPros.alarmTempDownOffsetDelay);
-    setFrostingTemperature(devPros.frostingTemperature);
-    setStopDefrostingTemperature(devPros.stopDefrostingTemperature);
-    setMaxDefrostingTimer(devPros.maxDefrostingTimer);
-    setLowTempAccumulatedTime(devPros.lowTempAccumulatedTime);
-    setDefrostingDisplayDelay(devPros.defrostingDisplayDelay);
-    setDefrostingCycle(devPros.defrostingCycle);
-    setDrippingTime(devPros.drippingTime);
-    setDefrostingMode(devPros.defrostingMode);
+    setComSetTemp(devPros.comSetTemp);
+    setComTempBacklash(devPros.comTempBacklash);
+    setComDelayRunTime(devPros.comDelayRunTime);
+    setComFaultStartTime(devPros.comFaultStartTime);
+    setComFaultStopTime(devPros.comFaultStopTime);
+    setComHighTempAlarm(devPros.comHighTempAlarm);
+    setComLowTempAlarm(devPros.comLowTempAlarm);
+    setComAlarmTempUpOffset(devPros.comAlarmTempUpOffset);
+    setComAlarmTempDownOffset(devPros.comAlarmTempDownOffset);
+    setComAlarmTempUpOffsetDelay(devPros.comAlarmTempUpOffsetDelay);
+    setComAlarmTempDownOffsetDelay(devPros.comAlarmTempDownOffsetDelay);
+    setComMaxTempSetting(devPros.comMaxTempSetting);
+    setComMinTempSetting(devPros.comMinTempSetting);
+    setDefFrostingTemp(devPros.defFrostingTemp);
+    setDefStopDefrostingTemp(devPros.defStopDefrostingTemp);
+    setDefMaxDefrostingTimer(devPros.defMaxDefrostingTimer);
+    setDefLowTempAccumulatedTime(devPros.defLowTempAccumulatedTime);
+    setDefDefrostingMode(devPros.defDefrostingMode);
+    setDefDefrostingDisplayDelay(devPros.defDefrostingDisplayDelay);
+    setDefDrippingTime(devPros.defDrippingTime);
+    setFanFirstStartTimer(devPros.fanFirstStartTimer);
     setFanFirstStartTimer(devPros.fanFirstStartTimer);
     setFanOperatingMode(devPros.fanOperatingMode);
-    setHighTempAlarmValue(devPros.highTempAlarmValue);
-    setHighTempProtectionValue(devPros.highTempProtectionValue);
-    setHighTempReturnDifference(devPros.highTempReturnDifference);
+    setConHighTempAlarmValue(devPros.conHighTempAlarmValue);
+    setConHighTempProtectionValue(devPros.conHighTempProtectionValue);
+    setConHighTempBacklash(devPros.conHighTempBacklash);
 
     setSettingsVarRefrgSensor({
       comFirstStartTimer: {
         value: intToText(comFirstStartTimer),
         error: false,
       },
-      setTemperature: { value: intToText(setTemperature), error: false },
-      maxTempSetting: {
-        value: intToText(maxTempSetting),
+      comSetTemp: { value: intToText(comSetTemp), error: false },
+      comTempBacklash: { value: intToText(comTempBacklash), error: false },
+
+      comDelayRunTime: { value: intToText(comDelayRunTime), error: false },
+      comFaultStartTime: { value: intToText(comFaultStartTime), error: false },
+      comFaultStopTime: { value: intToText(comFaultStopTime), error: false },
+      comHighTempAlarm: { value: intToText(comHighTempAlarm), error: false },
+      comLowTempAlarm: { value: intToText(comLowTempAlarm), error: false },
+      comAlarmTempUpOffset: {
+        value: intToText(comAlarmTempUpOffset),
         error: false,
       },
-      minTempSetting: {
-        value: intToText(minTempSetting),
+      comAlarmTempDownOffset: {
+        value: intToText(comAlarmTempDownOffset),
         error: false,
       },
-      tempReturnDifference: {
-        value: intToText(tempReturnDifference),
+      comAlarmTempUpOffsetDelay: {
+        value: intToText(comAlarmTempUpOffsetDelay),
         error: false,
       },
-      delayRunTime: { value: intToText(delayRunTime), error: false },
-      faultStartTime: { value: intToText(faultStartTime), error: false },
-      faultStopTime: { value: intToText(faultStopTime), error: false },
-      alarmTempUpOffset: { value: intToText(alarmTempUpOffset), error: false },
-      alarmTempDownOffset: {
-        value: intToText(alarmTempDownOffset),
+      comAlarmTempDownOffsetDelay: {
+        value: intToText(comAlarmTempDownOffsetDelay),
         error: false,
       },
-      alarmTempUpOffsetDelay: {
-        value: intToText(alarmTempUpOffsetDelay),
+      comMaxTempSetting: { value: intToText(comMaxTempSetting), error: false },
+      comMinTempSetting: { value: intToText(comMinTempSetting), error: false },
+      defFrostingTemp: { value: intToText(defFrostingTemp), error: false },
+      defStopDefrostingTemp: {
+        value: intToText(defStopDefrostingTemp),
         error: false,
       },
-      alarmTempDownOffsetDelay: {
-        value: intToText(alarmTempDownOffsetDelay),
+      defMaxDefrostingTimer: {
+        value: intToText(defMaxDefrostingTimer),
         error: false,
       },
-      frostingTemperature: {
-        value: intToText(frostingTemperature),
+      defLowTempAccumulatedTime: {
+        value: intToText(defLowTempAccumulatedTime),
         error: false,
       },
-      stopDefrostingTemperature: {
-        value: intToText(stopDefrostingTemperature),
+      defDefrostingMode: { value: intToText(defDefrostingMode), error: false },
+      defDefrostingDisplayDelay: {
+        value: intToText(defDefrostingDisplayDelay),
         error: false,
       },
-      maxDefrostingTimer: {
-        value: intToText(maxDefrostingTimer),
+      defDrippingTime: { value: intToText(defDrippingTime), error: false },
+      conHighTempAlarmValue: {
+        value: intToText(conHighTempAlarmValue),
         error: false,
       },
-      lowTempAccumulatedTime: {
-        value: intToText(lowTempAccumulatedTime),
+      conHighTempProtectionValue: {
+        value: intToText(conHighTempProtectionValue),
         error: false,
       },
-      defrostingDisplayDelay: {
-        value: intToText(defrostingDisplayDelay),
-        error: false,
-      },
-      defrostingCycle: {
-        value: intToText(defrostingCycle),
-        error: false,
-      },
-      drippingTime: {
-        value: intToText(drippingTime),
-        error: false,
-      },
-      defrostingMode: {
-        value: intToText(defrostingMode),
+      conHighTempBacklash: {
+        value: intToText(conHighTempBacklash),
         error: false,
       },
       fanFirstStartTimer: {
@@ -1784,18 +1787,6 @@ const RefrgtorItem = ({ devPros }) => {
       },
       fanOperatingMode: {
         value: intToText(fanOperatingMode),
-        error: false,
-      },
-      highTempAlarmValue: {
-        value: intToText(highTempAlarmValue),
-        error: false,
-      },
-      highTempProtectionValue: {
-        value: intToText(highTempProtectionValue),
-        error: false,
-      },
-      highTempReturnDifference: {
-        value: intToText(highTempReturnDifference),
         error: false,
       },
     });
@@ -1857,72 +1848,83 @@ const RefrgtorItem = ({ devPros }) => {
       showDialogErrorInfo('压缩机首启延时应介于1~60之间');
       return false;
     }
-    if (setTemperature < minTempSetting || setTemperature > maxTempSetting) {
-      showDialogErrorInfo('设置柜温介于最大与最小值之间');
+    if (comSetTemp < comMinTempSetting || comSetTemp > comMaxTempSetting) {
+      showDialogErrorInfo('柜温设置值应介于预定最大值与最小值之间');
       return false;
     }
-    if (tempReturnDifference < 1 || tempReturnDifference > 15) {
-      showDialogErrorInfo('温控回差应介于1与15之间');
+    if (comTempBacklash < 1 || comTempBacklash > 15) {
+      showDialogErrorInfo('温度控制回差应介于1~15之间');
       return false;
     }
-    if (delayRunTime < 1 || delayRunTime > 60) {
-      showDialogErrorInfo('压缩机启动延时应介于1与60之间');
+    if (comDelayRunTime < 1 || comDelayRunTime > 60) {
+      showDialogErrorInfo('压缩机启动延时应介于1~60之间');
       return false;
     }
-    if (faultStartTime < 1 || faultStartTime > 120) {
-      showDialogErrorInfo('故障开机时间应介于1与120之间');
+    if (comFaultStartTime < 1 || comFaultStartTime > 120) {
+      showDialogErrorInfo('柜温故障开机时间应介于1~120之间');
       return false;
     }
-    if (faultStopTime < 1 || faultStopTime > 120) {
-      showDialogErrorInfo('故障停机时间应介于1与120之间');
+    if (comFaultStopTime < 1 || comFaultStopTime > 120) {
+      showDialogErrorInfo('柜温故障停机时间应介于1~120之间');
       return false;
     }
-    if (alarmTempUpOffset < 0 || alarmTempUpOffset > 25) {
-      showDialogErrorInfo('报警上限偏移应介于0与25之间');
+    if (comAlarmTempUpOffset < 0 || comAlarmTempUpOffset > 25) {
+      showDialogErrorInfo('柜温上限报警偏移应介于0~25之间');
       return false;
     }
-    if (alarmTempDownOffset < 0 || alarmTempDownOffset > 25) {
-      showDialogErrorInfo('报警下限偏移应介于0与25之间');
+    if (comAlarmTempDownOffset < 0 || comAlarmTempDownOffset > 25) {
+      showDialogErrorInfo('柜温下限报警偏移应介于0~25之间');
       return false;
     }
-    if (alarmTempUpOffsetDelay < 0 || alarmTempUpOffsetDelay > 125) {
-      showDialogErrorInfo('报警上限延时应介于0与125之间');
+    if (comAlarmTempUpOffsetDelay < 0 || comAlarmTempUpOffsetDelay > 125) {
+      showDialogErrorInfo('柜温超上限报警延时应介于0~125之间');
       return false;
     }
-    if (alarmTempDownOffsetDelay < 0 || alarmTempDownOffsetDelay > 125) {
-      showDialogErrorInfo('报警下限延时应介于0与125之间');
+    if (comAlarmTempDownOffsetDelay < 0 || comAlarmTempDownOffsetDelay > 125) {
+      showDialogErrorInfo('柜温超下限报警延时应介于0~125之间');
       return false;
     }
-    if (frostingTemperature < -40 || frostingTemperature > 0) {
+    if (defFrostingTemp < -40 || defFrostingTemp > 0) {
       showDialogErrorInfo('结霜温度应介于-40与0之间');
       return false;
     }
-    if (stopDefrostingTemperature < -40 || stopDefrostingTemperature > 50) {
-      showDialogErrorInfo('结霜终止温度应介于-40与50之间');
+    if (defStopDefrostingTemp < -40 || defStopDefrostingTemp > 50) {
+      showDialogErrorInfo('化霜终止温度应介于-40与50之间');
       return false;
     }
-    if (maxDefrostingTimer < 1 || maxDefrostingTimer > 60) {
+    if (defMaxDefrostingTimer < 1 || defMaxDefrostingTimer > 60) {
       showDialogErrorInfo('最长化霜时间应介于1与60之间');
       return false;
     }
-    if (lowTempAccumulatedTime < 20 || lowTempAccumulatedTime > 360) {
-      showDialogErrorInfo('蒸发器低温累积应介于20与360之间');
+    if (defLowTempAccumulatedTime < 20 || defLowTempAccumulatedTime > 360) {
+      showDialogErrorInfo('蒸发器累计低温时间应介于1与60之间');
       return false;
     }
-    if (defrostingDisplayDelay < 0 || defrostingDisplayDelay > 60) {
-      showDialogErrorInfo('化霜显示延时应介于0与60之间');
+    if (defDefrostingMode !== 0 && defDefrostingMode !== 1) {
+      showDialogErrorInfo('化霜模式只能为1或者0');
       return false;
     }
-    if (defrostingCycle < 20 || defrostingCycle > 360) {
-      showDialogErrorInfo('化霜周期应介于20与360之间');
+    if (defDefrostingDisplayDelay < 0 || defDefrostingDisplayDelay > 60) {
+      showDialogErrorInfo('化霜后显示延时应介于0与60之间');
       return false;
     }
-    if (drippingTime < 0 || drippingTime > 60) {
-      showDialogErrorInfo('化霜滴水应介于0与60之间');
+    if (defDrippingTime < 0 || defDrippingTime > 60) {
+      showDialogErrorInfo('化霜滴水时间应介于0与60之间');
       return false;
     }
-    if (defrostingMode !== 0 && defrostingMode !== 1) {
-      showDialogErrorInfo('化霜模式必须为0或者1');
+    if (conHighTempAlarmValue < 50 || conHighTempAlarmValue > 110) {
+      showDialogErrorInfo('冷凝器高温报警值应介于50与110之间');
+      return false;
+    }
+    if (
+      conHighTempProtectionValue < conHighTempAlarmValue ||
+      conHighTempProtectionValue > 115
+    ) {
+      showDialogErrorInfo('冷凝器高温保护值应介于报警值与115之间');
+      return false;
+    }
+    if (conHighTempBacklash < 0 || conHighTempBacklash > 45) {
+      showDialogErrorInfo('冷凝器高温恢复回差应介于0与45之间');
       return false;
     }
     if (fanFirstStartTimer < 1 || fanFirstStartTimer > 60) {
@@ -1935,21 +1937,6 @@ const RefrgtorItem = ({ devPros }) => {
       fanOperatingMode !== 2
     ) {
       showDialogErrorInfo('风机运行模式必须为0, 1或者2');
-      return false;
-    }
-    if (highTempAlarmValue < 50 || highTempAlarmValue > 110) {
-      showDialogErrorInfo('冷凝高温报警应介于50与110之间');
-      return false;
-    }
-    if (
-      highTempProtectionValue < highTempAlarmValue ||
-      highTempProtectionValue > 115
-    ) {
-      showDialogErrorInfo('冷凝高温保护应介于高温报警值与115之间');
-      return false;
-    }
-    if (highTempReturnDifference < 0 || highTempReturnDifference > 45) {
-      showDialogErrorInfo('冷凝高温回差应介于0与45之间');
       return false;
     }
     return true;

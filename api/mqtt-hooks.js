@@ -199,22 +199,22 @@ export const MqttProvider = ({ children }) => {
       id: devId,
       devType: DEV_TYPE_REFRIGERATOR,
       onlineStatus: true,
-      netType: reportData.NET_type,
 
-      comDetectiontemperature: reportData.Com_Detection_temperature,
+      comFirstStartFlag: reportData.Com_First_Start_Flag,
+      comDetectiontemperature: reportData.Com_Detection_temp,
       comStartRunFlag: reportData.Com_Start_Run_Flag,
-      defDetectionTemperature: reportData.Def_Detection_temperature,
-      defrostingFlag: reportData.Defrosting_flag,
-      drippingFlag: reportData.Dripping_Flag,
+      comCabinetTempeError: reportData.Com_Cabinet_Tempe_Error,
+      comHighTempAlarmFlag: reportData.Com_High_Temp_Alarm_Flag,
+      comLowTempAlarmFlag: reportData.Com_Low_Temp_Alarm_Flag,
+      defDetectionTemperature: reportData.Def_Detection_temp,
+      defDefrostingflag: reportData.Def_Defrosting_flag,
+      defDrippingFlag: reportData.Def_Dripping_Flag,
+      fanFirstStartFlag: reportData.FAN_First_Start_Flag,
       fanRunFlag: reportData.FAN_Run_flag,
-      conDetectionTemperature: reportData.Con_Detection_temperature,
-      highTempAlarmFlag: reportData.High_Temp_Alarm_Flag,
-      highTempProtectionFlag: reportData.High_Temp_Protection_Flag,
-      cabinetTempeError: reportData.Cabinet_Tempe_Error,
-      highTempAlarm: reportData.High_Temp_Alarm,
-      lowTempAlarm: reportData.Low_Temp_Alarm,
+      conDetectiontemp: reportData.Con_Detection_temp,
+      conHighTempAlarmFlag: reportData.Con_High_Temp_Alarm_Flag,
+      conHighTempProtection_Flag: reportData.Con_High_Temp_Protection_Flag
     };
-    // console.log('Now try to sync refrigerator data to slice: ');
     dispatch(syncDevice(newDevice));
   };
 
@@ -244,32 +244,59 @@ export const MqttProvider = ({ children }) => {
       sceneId: inSceneId,
       sceneName: inSceneName,
       onlineStatus: true,
-      firmwareVersion: propData.params.Firmware_information,
+      firmwareVersion: propData.Firmware_information,
+
+      // setTemperature: propData.params.Set_temperature,
+      // tempReturnDifference: propData.params.Temp_return_difference,
+      // delayRunTime: propData.params.Delay_Run_Time,
+      // faultStartTime: propData.params.Fault_Start_Time,
+      // faultStopTime: propData.params.Fault_Stop_Time,
+      // highTemperatureAlarm: propData.params.High_Temperature_Alarm,
+      // lowTemperatureAlarm: propData.params.Low_Temperature_Alarm,
+      // alarmTempUpOffset: propData.params.Alarm_Temp_UpOffset,
+      // alarmTempDownOffset: propData.params.Alarm_Temp_DownOffset,
+      // alarmTempUpOffsetDelay: propData.params.Alarm_Temp_UpOffset_Delay,
+      // alarmTempDownOffsetDelay: propData.params.Alarm_Temp_DownOffset_Delay,
+      // frostingTemperature: propData.params.Frosting_temperature,
+      // stopDefrostingTemperature: propData.params.Stop_defrosting_temperature,
+      // maxDefrostingTimer: propData.params.Max_Defrosting_Timer,
+      // lowTempAccumulatedTime: propData.params.Low_Temp_Accumulated_Time,
+      // defrostingMode: propData.params.Defrosting_Mode,
+      // defrostingDisplayDelay: propData.params.Defrosting_Display_delay,
+      // defrostingCycle: propData.params.Defrosting_Cycle,
+      // drippingTime: propData.params.Dripping_Time,
+      // highTempAlarmValue: propData.params.High_Temp_Alarm_Value,
+      // highTempProtectionValue: propData.params.High_Temp_Protection_Value,
+      // highTempReturnDifference: propData.params.High_Temp_Return_Difference,
+
       comFirstStartTimer: propData.params.Com_First_Start_Timer,
-      setTemperature: propData.params.Set_temperature,
-      tempReturnDifference: propData.params.Temp_return_difference,
-      delayRunTime: propData.params.Delay_Run_Time,
-      faultStartTime: propData.params.Fault_Start_Time,
-      faultStopTime: propData.params.Fault_Stop_Time,
-      highTemperatureAlarm: propData.params.High_Temperature_Alarm,
-      lowTemperatureAlarm: propData.params.Low_Temperature_Alarm,
-      alarmTempUpOffset: propData.params.Alarm_Temp_UpOffset,
-      alarmTempDownOffset: propData.params.Alarm_Temp_DownOffset,
-      alarmTempUpOffsetDelay: propData.params.Alarm_Temp_UpOffset_Delay,
-      alarmTempDownOffsetDelay: propData.params.Alarm_Temp_DownOffset_Delay,
-      frostingTemperature: propData.params.Frosting_temperature,
-      stopDefrostingTemperature: propData.params.Stop_defrosting_temperature,
-      maxDefrostingTimer: propData.params.Max_Defrosting_Timer,
-      lowTempAccumulatedTime: propData.params.Low_Temp_Accumulated_Time,
-      defrostingMode: propData.params.Defrosting_Mode,
-      defrostingDisplayDelay: propData.params.Defrosting_Display_delay,
-      defrostingCycle: propData.params.Defrosting_Cycle,
-      drippingTime: propData.params.Dripping_Time,
+      comSetTemp: propData.params.Com_Set_temp,
+      comTempBacklash: propData.params.Com_Temp_Backlash,
+      comDelayRunTime: propData.params.Com_Delay_Run_Time,
+      comFaultStartTime: propData.params.Com_Fault_Start_Time,
+      comFaultStopTime: propData.params.Com_Fault_Stop_Time,
+      comHighTempAlarm: propData.params.Com_High_Temp_Alarm,
+      comLowTempAlarm: propData.params.Com_Low_Temp_Alarm,
+      comAlarmTempUpOffset: propData.params.Com_Alarm_Temp_UpOffset,
+      comAlarmTempDownOffset: propData.params.Com_Alarm_Temp_DownOffset,
+      comAlarmTempUpOffsetDelay: propData.params.Com_Alarm_Temp_UpOffset_Delay,
+      comAlarmTempDownOffsetDelay:
+        propData.params.Com_Alarm_Temp_DownOffset_Delay,
+      comMaxTempSetting: propData.params.Com_Max_temp_setting,
+      comMinTempSetting: propData.params.Com_Min_temp_setting,
+      defFrostingTemp: propData.params.Def_Frosting_temp,
+      defStopDefrostingTemp: propData.params.Def_Stop_defrosting_temp,
+      defMaxDefrostingTimer: propData.params.Def_Max_Defrosting_Timer,
+      defLowTempAccumulatedTime: propData.params.Def_Low_Temp_Accumulated_Time,
+      defDefrostingMode: propData.params.Def_Defrosting_Mode,
+      defDefrostingDisplayDelay: propData.params.Def_Defrosting_Display_delay,
+      defDrippingTime: propData.params.Def_Dripping_Time,
       fanFirstStartTimer: propData.params.Fan_First_Start_Timer,
       fanOperatingMode: propData.params.Fan_Operating_Mode,
-      highTempAlarmValue: propData.params.High_Temp_Alarm_Value,
-      highTempProtectionValue: propData.params.High_Temp_Protection_Value,
-      highTempReturnDifference: propData.params.High_Temp_Return_Difference,
+      conHighTempAlarmValue: propData.params.Con_High_Temp_Alarm_Value,
+      conHighTempProtectionValue:
+        propData.params.Con_High_Temp_Protection_Value,
+      conHighTempBacklash: propData.params.Con_High_Temp_Backlash,
     };
     dispatch(syncDevice(newDevice));
   };
@@ -302,7 +329,7 @@ export const MqttProvider = ({ children }) => {
   };
 
   const handleMqttMessageReceived = async msg => {
-    // console.log('handleMqttMessageReceived: ', msg);
+    console.log('handleMqttMessageReceived: ', msg);
     let dataJson = JSON.parse(msg.data);
     if (msg.topic === TOPIC_SALE_TABLE_STATUS) {
       // console.log('Sale table status');
