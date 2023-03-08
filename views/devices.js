@@ -2116,7 +2116,7 @@ const RefrgtorItem = ({ devPros }) => {
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  固件版本:  '}</Text>
+                    <Text style={styles.tableCellKey}>{'固件版本:'}</Text>
                     <Text style={styles.tableCellValue}>
                       {devPros.firmwareVersion}
                     </Text>
