@@ -2001,7 +2001,7 @@ const RefrgtorItem = ({ devPros }) => {
         <Pressable
           delayLongPress={1000}
           onLongPress={() => {
-            console.log('Sale table item long clicked!');
+            console.log('Refrigetor item long clicked!');
             showDialogDevSetting();
           }}>
           <View style={styles.itemTop}>
