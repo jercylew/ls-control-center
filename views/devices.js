@@ -24,6 +24,7 @@ import {
   selectScenes,
   DEV_TYPE_SALE_TABLE,
   DEV_TYPE_REFRIGERATOR,
+  DEV_TYPE_DC_REFRIGERATOR,
 } from '../data/device-slice';
 import { useMqttClient } from '../api/mqtt-hooks';
 import { strToUnicode } from '../api/unicode';
@@ -66,22 +67,6 @@ const intToText = value => {
   }
 
   return value.toString();
-};
-
-const floatToText = value => {
-  if (value === null || value === undefined) {
-    return '0';
-  }
-
-  return value.toFixed(2).toString();
-};
-
-const binStateToText = value => {
-  if (value === 1) {
-    return '打开';
-  }
-
-  return '关闭';
 };
 
 const waterSensorType = value => {
@@ -1955,30 +1940,931 @@ const RefrgtorItem = ({ devPros }) => {
       method: 'control',
       params: {
         Com_First_Start_Timer: comFirstStartTimer,
-        Set_temperature: setTemperature,
-        Max_temp_setting: maxTempSetting,
-        Min_temp_setting: minTempSetting,
-        Temp_return_difference: tempReturnDifference,
-        Delay_Run_Time: delayRunTime,
-        Fault_Start_Time: faultStartTime,
-        Fault_Stop_Time: faultStopTime,
-        Alarm_Temp_UpOffset: alarmTempUpOffset,
-        Alarm_Temp_DownOffset: alarmTempDownOffset,
-        Alarm_Temp_UpOffset_Delay: alarmTempUpOffsetDelay,
-        Alarm_Temp_DownOffset_Delay: alarmTempDownOffsetDelay,
-        Frosting_temperature: frostingTemperature,
-        Stop_defrosting_temperature: stopDefrostingTemperature,
-        Max_Defrosting_Timer: maxDefrostingTimer,
-        Low_Temp_Accumulated_Time: lowTempAccumulatedTime,
-        Defrosting_Display_delay: defrostingDisplayDelay,
-        Defrosting_Cycle: defrostingCycle,
-        Dripping_Time: drippingTime,
-        Defrosting_Mode: defrostingMode,
+        Com_Set_temp: comSetTemp,
+        Com_Max_temp_setting: comMaxTempSetting,
+        Com_Min_temp_setting: comMinTempSetting,
+        Com_Temp_Backlash: comTempBacklash,
+        Com_Delay_Run_Time: comDelayRunTime,
+        Com_Fault_Start_Time: comFaultStartTime,
+        Com_Fault_Stop_Time: comFaultStopTime,
+        Com_Alarm_Temp_UpOffset: comAlarmTempUpOffset,
+        Com_Alarm_Temp_DownOffset: comAlarmTempDownOffset,
+        Com_Alarm_Temp_UpOffset_Delay: comAlarmTempUpOffsetDelay,
+        Com_Alarm_Temp_DownOffset_Delay: comAlarmTempDownOffsetDelay,
+        Def_Frosting_temp: defFrostingTemp,
+        Def_Stop_defrosting_temp: defStopDefrostingTemp,
+        Def_Max_Defrosting_Timer: defMaxDefrostingTimer,
+        Def_Low_Temp_Accumulated_Time: defLowTempAccumulatedTime,
+        Def_Defrosting_Display_delay: defDefrostingDisplayDelay,
+        Def_Dripping_Time: defDrippingTime,
+        Def_Defrosting_Mode: defDefrostingMode,
         Fan_First_Start_Timer: fanFirstStartTimer,
         Fan_Operating_Mode: fanOperatingMode,
-        High_Temp_Alarm_Value: highTempAlarmValue,
-        High_Temp_Protection_Value: highTempProtectionValue,
-        High_Temp_Return_Difference: highTempReturnDifference,
+        Con_High_Temp_Alarm_Value: conHighTempAlarmValue,
+        Con_High_Temp_Protection_Value: conHighTempProtectionValue,
+        Con_High_Temp_Backlash: conHighTempBacklash,
+      },
+    };
+
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
+
+  const mainStatusText = () => {
+    const compressInfo = devPros.comStartRunFlag ? '压缩机开启 | ' : '';
+    const tempInfo = `柜温${intToText(devPros.comDetectiontemperature)}°C `;
+    const defrostInfo = devPros.defrostingFlag ? ' | 化霜中' : '';
+    const drippingFlag = devPros.drippingFlag ? ' | 滴水中' : '';
+
+    return `${compressInfo}${tempInfo}${defrostInfo}${drippingFlag}`;
+  };
+
+  return (
+    <>
+      <View
+        style={devPros.onlineStatus ? styles.itemOnline : styles.itemOffline}>
+        <Pressable
+          delayLongPress={1000}
+          onLongPress={() => {
+            console.log('Refrigetor item long clicked!');
+            showDialogDevSetting();
+          }}>
+          <View style={styles.itemTop}>
+            <View>
+              <Image
+                source={require('../res/icon-refreg.png')}
+                style={{ width: 40, height: 40, resizeMode: 'stretch' }}
+              />
+            </View>
+            <View>
+              <Text
+                style={styles.title}
+                onPress={() => {
+                  console.log('Item Clicked, setting device info', devPros);
+                  let cmdJson = {
+                    device_id: devPros.id,
+                    method: 'get_status',
+                  };
+                  sendCommand(
+                    TOPIC_SALE_TABLE_GET_STATUS,
+                    JSON.stringify(cmdJson),
+                  );
+
+                  refreshDevInfos();
+                  setTimeout(() => {
+                    showDialogDevInfo();
+                  }, 200);
+                }}>
+                {devPros.name}
+              </Text>
+              <Text style={styles.info} onPress={showDialogDevConfig}>
+                {devPros.id}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.itemBottom}>
+            <Text style={styles.info}>{mainStatusText()}</Text>
+          </View>
+        </Pressable>
+      </View>
+      <Portal>
+        <Dialog
+          visible={dlgDevInfoVisible}
+          onDismiss={hideDialogDevInfo}
+          style={styles.dialog}>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备信息`}</Dialog.Title>
+          <Dialog.ScrollArea>
+            <ScrollView style={styles.settingDialogContent}>
+              <DataTable>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'柜温: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.comDetectiontemperature) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  压缩机开启: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.comStartRunFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'蒸发器温度:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.defDetectionTemperature) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  化霜开始: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.defrostingFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'滴水开始:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.drippingFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  风机运行: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.fanRunFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'冷凝器温度:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.conDetectionTemperature) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  高温报警: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.highTempAlarmFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'高温保护: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.highTempProtectionFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'固件版本:'}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {devPros.firmwareVersion}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'柜温故障: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.cabinetTempeError)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  柜高温报警:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.highTempAlarm)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'柜低温报警: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.lowTempAlarm)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'    '}</Text>
+                    <Text style={styles.tableCellValue}>{'   '}</Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+              </DataTable>
+            </ScrollView>
+          </Dialog.ScrollArea>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevInfo}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogDevInfoOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgDevConfVisible}
+          onDismiss={hideDialogDevConfig}
+          style={styles.dialog}>
+          <Dialog.Title
+            style={styles.dialogTitle}>{`${devPros.id}-设备配置`}</Dialog.Title>
+          <Dialog.Content>
+            <View style={styles.input}>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>设备名称:</Text>
+                <TextInput
+                  value={devName}
+                  onChangeText={text => setDevName(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地名称:</Text>
+                <TextInput
+                  value={sceneName}
+                  onChangeText={text => setSceneName(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.textLabel}>场地ID:</Text>
+                <TextInput
+                  value={sceneId}
+                  onChangeText={text => setSceneId(text)}
+                  style={styles.dialogInput}
+                />
+              </View>
+            </View>
+            <Button
+              icon="restore"
+              mode="contained"
+              color="#FF0000"
+              compact={true}
+              labelStyle={{ fontSize: 15, color: 'white', fontWeight: 'bold' }}
+              style={{ marginHorizontal: 40, marginVertical: 35 }}
+              onPress={showDialogFactoryResetWarning}>
+              重置
+            </Button>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevConfig}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogDevConfOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgSettingVisible}
+          onDismiss={hideDialogDevSetting}
+          style={styles.dialog}>
+          <Dialog.Title style={styles.dialogTitle}>
+            设置 - 冰箱控制器
+          </Dialog.Title>
+          <Dialog.ScrollArea>
+            <View style={styles.settingDialogContent}>
+              <FlatList
+                data={settingsRefrgSensor}
+                renderItem={({ item }) => (
+                  <View style={styles.textContainer}>
+                    <Text style={styles.textLabel}>{`${item.name}:`}</Text>
+                    <TextInput
+                      value={settingsVarRefrgSensor[item.key].value}
+                      onChangeText={item.setter}
+                      style={styles.dialogInput}
+                      error={settingsVarRefrgSensor[item.key].error}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                )}
+              />
+            </View>
+            <Text style={styles.errorMessage}>{alarmMessage}</Text>
+          </Dialog.ScrollArea>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogDevSetting}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogSettingOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={dlgFactoryResetWarning}
+          onDismiss={hideDialogFactoryResetWarning}
+          style={[styles.dialog, { marginHorizontal: 50 }]}>
+          <Dialog.Title style={styles.warningTitle}>
+            <View style={[styles.textContainer, { marginTop: 40 }]}>
+              <MaterialCommunityIcons name="alert" color="#ff0000" size={35} />
+              <Text style={styles.warningTitle}>温馨提示</Text>
+            </View>
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.warningText}>
+              您将进行恢复出厂设置操作，之前的所有设置即将被擦除，是否继续？
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              mode="contained"
+              color={dialogButtonCancel.color}
+              onPress={hideDialogFactoryResetWarning}
+              contentStyle={dialogButtonCancel.contentStyle}
+              labelStyle={dialogButtonCancel.labelStyle}
+              style={styles.dialogButton}>
+              取消
+            </Button>
+            <Button
+              mode="contained"
+              color={dialogButtonOk.color}
+              onPress={onDialogFactoryResetOk}
+              contentStyle={dialogButtonOk.contentStyle}
+              labelStyle={dialogButtonOk.labelStyle}
+              style={styles.dialogButton}>
+              确定
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </>
+  );
+};
+
+const RefrgtorDCItem = ({ devPros }) => {
+  const [dlgDevInfoVisible, setDlgDevInfoVisible] = React.useState(false);
+  const [dlgDevConfVisible, setDlgDevConfVisible] = React.useState(false);
+  const [dlgSettingVisible, setDlgSettingVisible] = React.useState(false);
+  const [dlgFactoryResetWarning, setDlgFactoryResetWarning] =
+    React.useState(false);
+
+  const [devName, setDevName] = React.useState(devPros.name);
+  const [sceneName, setSceneName] = React.useState(devPros.sceneName);
+  const [sceneId, setSceneId] = React.useState(devPros.sceneId);
+
+  const [comFirstStartTimer, setComFirstStartTimer] = React.useState(
+    devPros.comFirstStartTimer,
+  );
+  const [comSetTemp, setComSetTemp] = React.useState(devPros.comSetTemp);
+  const [comMaxTempSetting, setComMaxTempSetting] = React.useState(
+    devPros.comMaxTempSetting,
+  );
+  const [comMinTempSetting, setComMinTempSetting] = React.useState(
+    devPros.comMinTempSetting,
+  );
+  const [comTempBacklash, setComTempBacklash] = React.useState(
+    devPros.comTempBacklash,
+  );
+  const [comDelayRunTime, setComDelayRunTime] = React.useState(
+    devPros.comDelayRunTime,
+  );
+  const [comFaultStartTime, setComFaultStartTime] = React.useState(
+    devPros.comFaultStartTime,
+  );
+  const [comFaultStopTime, setComFaultStopTime] = React.useState(
+    devPros.comFaultStopTime,
+  );
+  const [comAlarmTempUpOffset, setComAlarmTempUpOffset] = React.useState(
+    devPros.comAlarmTempUpOffset,
+  );
+  const [comAlarmTempDownOffset, setComAlarmTempDownOffset] = React.useState(
+    devPros.comAlarmTempDownOffset,
+  );
+  const [comAlarmTempUpOffsetDelay, setComAlarmTempUpOffsetDelay] =
+    React.useState(devPros.comAlarmTempUpOffsetDelay);
+  const [comAlarmTempDownOffsetDelay, setComAlarmTempDownOffsetDelay] =
+    React.useState(devPros.comAlarmTempDownOffsetDelay);
+
+  const [alarmMessage, setAlarmMessage] = React.useState('');
+
+  const dispatch = useDispatch();
+
+  const showDialogDevInfo = () => setDlgDevInfoVisible(true);
+  const hideDialogDevInfo = () => setDlgDevInfoVisible(false);
+
+  const showDialogFactoryResetWarning = () => setDlgFactoryResetWarning(true);
+  const hideDialogFactoryResetWarning = () => setDlgFactoryResetWarning(false);
+
+  const showDialogDevConfig = () => setDlgDevConfVisible(true);
+  const hideDialogDevConfig = () => setDlgDevConfVisible(false);
+
+  const showDialogDevSetting = () => setDlgSettingVisible(true);
+  const hideDialogDevSetting = () => setDlgSettingVisible(false);
+
+  const devCmdTopic = TOPIC_REFRGTOR_CMD_PREFIX + devPros.id;
+  const { sendCommand } = useMqttClient();
+
+  const showDialogErrorInfo = message => {
+    setAlarmMessage(message);
+    setTimeout(() => {
+      setAlarmMessage('');
+    }, 5000);
+  };
+
+  const settingsRefrgSensor = [
+    {
+      key: 'comFirstStartTimer',
+      name: '压缩机首启延时',
+      setter: text => {
+        let value = textToInt(text);
+        setComFirstStartTimer(value);
+        if (value < 1 || value > 60) {
+          showDialogErrorInfo('压缩机首启延时应介于1~60之间');
+          updateSettingsVarRefrgSensor('comFirstStartTimer', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comFirstStartTimer', value, false);
+        }
+      },
+    },
+    {
+      key: 'comSetTemp',
+      name: '柜温设置',
+      setter: text => {
+        let value = textToInt(text);
+        setComSetTemp(value);
+        if (value < comMinTempSetting || value > comMaxTempSetting) {
+          showDialogErrorInfo('柜温设置值应介于预定最大值与最小值之间');
+          updateSettingsVarRefrgSensor('comSetTemp', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comSetTemp', value, false);
+        }
+      },
+    },
+    {
+      key: 'comTempBacklash',
+      name: '温控回差',
+      setter: text => {
+        let value = textToInt(text);
+        setComTempBacklash(value);
+        if (value < 1 || value > 15) {
+          showDialogErrorInfo('温度控制回差应介于1~15之间');
+          updateSettingsVarRefrgSensor('comTempBacklash', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comTempBacklash', value, false);
+        }
+      },
+    },
+    {
+      key: 'comDelayRunTime',
+      name: '压缩机启动延时',
+      setter: text => {
+        let value = textToInt(text);
+        setComDelayRunTime(value);
+        if (value < 1 || value > 60) {
+          showDialogErrorInfo('压缩机启动延时应介于1~60之间');
+          updateSettingsVarRefrgSensor('comDelayRunTime', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comDelayRunTime', value, false);
+        }
+      },
+    },
+    {
+      key: 'comFaultStartTime',
+      name: '柜温故障开机时间',
+      setter: text => {
+        let value = textToInt(text);
+        setComFaultStartTime(value);
+        if (value < 1 || value > 120) {
+          showDialogErrorInfo('柜温故障开机时间应介于1~120之间');
+          updateSettingsVarRefrgSensor('comFaultStartTime', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comFaultStartTime', value, false);
+        }
+      },
+    },
+    {
+      key: 'comFaultStopTime',
+      name: '柜温故障停机时间',
+      setter: text => {
+        let value = textToInt(text);
+        setComFaultStopTime(value);
+        if (value < 1 || value > 120) {
+          showDialogErrorInfo('柜温故障停机时间应介于1~120之间');
+          updateSettingsVarRefrgSensor('comFaultStopTime', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comFaultStopTime', value, false);
+        }
+      },
+    },
+    {
+      key: 'comAlarmTempUpOffset',
+      name: '柜温上限报警偏移',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempUpOffset(value);
+        if (value < 0 || value > 25) {
+          showDialogErrorInfo('柜温上限报警偏移应介于0~25之间');
+          updateSettingsVarRefrgSensor('comAlarmTempUpOffset', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comAlarmTempUpOffset', value, false);
+        }
+      },
+    },
+    {
+      key: 'comAlarmTempDownOffset',
+      name: '柜温下限报警偏移',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempDownOffset(value);
+        if (value < 0 || value > 25) {
+          showDialogErrorInfo('柜温下限报警偏移应介于0~25之间');
+          updateSettingsVarRefrgSensor('comAlarmTempDownOffset', value, true);
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor('comAlarmTempDownOffset', value, false);
+        }
+      },
+    },
+    {
+      key: 'comAlarmTempUpOffsetDelay',
+      name: '柜温超上限报警延时',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempUpOffsetDelay(value);
+        if (value < 0 || value > 125) {
+          showDialogErrorInfo('柜温超上限报警延时应介于0~125之间');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempUpOffsetDelay',
+            value,
+            true,
+          );
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempUpOffsetDelay',
+            value,
+            false,
+          );
+        }
+      },
+    },
+    {
+      key: 'comAlarmTempDownOffsetDelay',
+      name: '柜温超下限报警延时',
+      setter: text => {
+        let value = textToInt(text);
+        setComAlarmTempDownOffsetDelay(value);
+        if (value < 0 || value > 125) {
+          showDialogErrorInfo('柜温超下限报警延时应介于0~125之间');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempDownOffsetDelay',
+            value,
+            true,
+          );
+        } else {
+          showDialogErrorInfo('');
+          updateSettingsVarRefrgSensor(
+            'comAlarmTempDownOffsetDelay',
+            value,
+            false,
+          );
+        }
+      },
+    },
+    {
+      key: 'comMaxTempSetting',
+      name: '柜温最大设置温度',
+      setter: text => {
+        let value = textToInt(text);
+        setComMaxTempSetting(value);
+        updateSettingsVarRefrgSensor('comMaxTempSetting', textToInt(text));
+      },
+    },
+    {
+      key: 'comMinTempSetting',
+      name: '柜温最小设置温度',
+      setter: text => {
+        let value = textToInt(text);
+        setComMinTempSetting(value);
+        updateSettingsVarRefrgSensor('comMinTempSetting', textToInt(text));
+      },
+    },
+  ];
+
+  const updateSettingsVarRefrgSensor = (key, value, error) => {
+    const settings = settingsVarRefrgSensor;
+    settings[key].value = value;
+    settings[key].error = error;
+    setSettingsVarRefrgSensor(settings);
+  };
+
+  const [settingsVarRefrgSensor, setSettingsVarRefrgSensor] = React.useState({
+    comFirstStartTimer: { value: intToText(comFirstStartTimer), error: false },
+    comSetTemp: { value: intToText(comSetTemp), error: false },
+    comTempBacklash: { value: intToText(comTempBacklash), error: false },
+
+    comDelayRunTime: { value: intToText(comDelayRunTime), error: false },
+    comFaultStartTime: { value: intToText(comFaultStartTime), error: false },
+    comFaultStopTime: { value: intToText(comFaultStopTime), error: false },
+    comAlarmTempUpOffset: {
+      value: intToText(comAlarmTempUpOffset),
+      error: false,
+    },
+    comAlarmTempDownOffset: {
+      value: intToText(comAlarmTempDownOffset),
+      error: false,
+    },
+    comAlarmTempUpOffsetDelay: {
+      value: intToText(comAlarmTempUpOffsetDelay),
+      error: false,
+    },
+    comAlarmTempDownOffsetDelay: {
+      value: intToText(comAlarmTempDownOffsetDelay),
+      error: false,
+    },
+    comMaxTempSetting: { value: intToText(comMaxTempSetting), error: false },
+    comMinTempSetting: { value: intToText(comMinTempSetting), error: false },
+  });
+
+  function onDialogDevInfoOk() {
+    if (sceneName !== devPros.sceneName) {
+      console.log(
+        'Device with id `' + devPros.id + '` changed to new scene ' + sceneName,
+      );
+    }
+
+    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
+    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Scene_Name: sceneNameUnicode,
+        Scene_Id: sceneId,
+        Device_Name: deviceNameUnicode,
+        // Remote_address: '',
+        // Remote_port: 1883,
+        // Mqtt_User_Name: '',
+        // Mqtt_password: '',
+        // Mqtt_Client_id: '',
+        // Wifi_ssid: '',
+        // Wifi_password: '',
+      },
+    };
+
+    hideDialogDevInfo();
+    let newDevice = {
+      name: devName.slice(0, 16),
+      id: devPros.id,
+      devType: DEV_TYPE_REFRIGERATOR,
+      sceneId: sceneId,
+      sceneName: sceneName.slice(0, 16),
+    };
+    dispatch(syncDevice(newDevice));
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
+
+  const refreshDevInfos = () => {
+    setDevName(devPros.name);
+    setSceneName(devPros.sceneName);
+    setSceneId(devPros.sceneId);
+
+    setComFirstStartTimer(devPros.comFirstStartTimer);
+    setComSetTemp(devPros.comSetTemp);
+    setComTempBacklash(devPros.comTempBacklash);
+    setComDelayRunTime(devPros.comDelayRunTime);
+    setComFaultStartTime(devPros.comFaultStartTime);
+    setComFaultStopTime(devPros.comFaultStopTime);
+    setComHighTempAlarm(devPros.comHighTempAlarm);
+    setComLowTempAlarm(devPros.comLowTempAlarm);
+    setComAlarmTempUpOffset(devPros.comAlarmTempUpOffset);
+    setComAlarmTempDownOffset(devPros.comAlarmTempDownOffset);
+    setComAlarmTempUpOffsetDelay(devPros.comAlarmTempUpOffsetDelay);
+    setComAlarmTempDownOffsetDelay(devPros.comAlarmTempDownOffsetDelay);
+    setComMaxTempSetting(devPros.comMaxTempSetting);
+    setComMinTempSetting(devPros.comMinTempSetting);
+    setDefFrostingTemp(devPros.defFrostingTemp);
+    setDefStopDefrostingTemp(devPros.defStopDefrostingTemp);
+    setDefMaxDefrostingTimer(devPros.defMaxDefrostingTimer);
+    setDefLowTempAccumulatedTime(devPros.defLowTempAccumulatedTime);
+    setDefDefrostingMode(devPros.defDefrostingMode);
+    setDefDefrostingDisplayDelay(devPros.defDefrostingDisplayDelay);
+    setDefDrippingTime(devPros.defDrippingTime);
+    setFanFirstStartTimer(devPros.fanFirstStartTimer);
+    setFanFirstStartTimer(devPros.fanFirstStartTimer);
+    setFanOperatingMode(devPros.fanOperatingMode);
+    setConHighTempAlarmValue(devPros.conHighTempAlarmValue);
+    setConHighTempProtectionValue(devPros.conHighTempProtectionValue);
+    setConHighTempBacklash(devPros.conHighTempBacklash);
+
+    setSettingsVarRefrgSensor({
+      comFirstStartTimer: {
+        value: intToText(comFirstStartTimer),
+        error: false,
+      },
+      comSetTemp: { value: intToText(comSetTemp), error: false },
+      comTempBacklash: { value: intToText(comTempBacklash), error: false },
+
+      comDelayRunTime: { value: intToText(comDelayRunTime), error: false },
+      comFaultStartTime: { value: intToText(comFaultStartTime), error: false },
+      comFaultStopTime: { value: intToText(comFaultStopTime), error: false },
+      comHighTempAlarm: { value: intToText(comHighTempAlarm), error: false },
+      comLowTempAlarm: { value: intToText(comLowTempAlarm), error: false },
+      comAlarmTempUpOffset: {
+        value: intToText(comAlarmTempUpOffset),
+        error: false,
+      },
+      comAlarmTempDownOffset: {
+        value: intToText(comAlarmTempDownOffset),
+        error: false,
+      },
+      comAlarmTempUpOffsetDelay: {
+        value: intToText(comAlarmTempUpOffsetDelay),
+        error: false,
+      },
+      comAlarmTempDownOffsetDelay: {
+        value: intToText(comAlarmTempDownOffsetDelay),
+        error: false,
+      },
+      comMaxTempSetting: { value: intToText(comMaxTempSetting), error: false },
+      comMinTempSetting: { value: intToText(comMinTempSetting), error: false },
+      defFrostingTemp: { value: intToText(defFrostingTemp), error: false },
+      defStopDefrostingTemp: {
+        value: intToText(defStopDefrostingTemp),
+        error: false,
+      },
+      defMaxDefrostingTimer: {
+        value: intToText(defMaxDefrostingTimer),
+        error: false,
+      },
+      defLowTempAccumulatedTime: {
+        value: intToText(defLowTempAccumulatedTime),
+        error: false,
+      },
+      defDefrostingMode: { value: intToText(defDefrostingMode), error: false },
+      defDefrostingDisplayDelay: {
+        value: intToText(defDefrostingDisplayDelay),
+        error: false,
+      },
+      defDrippingTime: { value: intToText(defDrippingTime), error: false },
+      conHighTempAlarmValue: {
+        value: intToText(conHighTempAlarmValue),
+        error: false,
+      },
+      conHighTempProtectionValue: {
+        value: intToText(conHighTempProtectionValue),
+        error: false,
+      },
+      conHighTempBacklash: {
+        value: intToText(conHighTempBacklash),
+        error: false,
+      },
+      fanFirstStartTimer: {
+        value: intToText(fanFirstStartTimer),
+        error: false,
+      },
+      fanOperatingMode: {
+        value: intToText(fanOperatingMode),
+        error: false,
+      },
+    });
+  };
+
+  const onDialogFactoryResetOk = () => {
+    hideDialogFactoryResetWarning();
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Restore_factory: 1,
+      },
+    };
+
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  };
+
+  function onDialogDevConfOk() {
+    if (sceneName !== devPros.sceneName) {
+      console.log(
+        'Device with id `' + devPros.id + '` changed to new scene ' + sceneName,
+      );
+    }
+
+    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
+    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let cmdJson = {
+      device_id: devPros.id,
+      method: 'configure',
+      params: {
+        Scene_Name: sceneNameUnicode,
+        Scene_Id: sceneId,
+        Device_Name: deviceNameUnicode,
+        // Remote_address: '',
+        // Remote_port: 1883,
+        // Mqtt_User_Name: '',
+        // Mqtt_password: '',
+        // Mqtt_Client_id: '',
+        // Wifi_ssid: '',
+        // Wifi_password: '',
+      },
+    };
+
+    hideDialogDevInfo();
+    let newDevice = {
+      name: devName.slice(0, 16),
+      id: devPros.id,
+      devType: DEV_TYPE_SALE_TABLE,
+      sceneId: sceneId,
+      sceneName: sceneName.slice(0, 16),
+    };
+    dispatch(syncDevice(newDevice));
+    sendCommand(devCmdTopic, JSON.stringify(cmdJson));
+  }
+
+  const validateSettingValues = () => {
+    if (comFirstStartTimer < 1 || comFirstStartTimer > 60) {
+      showDialogErrorInfo('压缩机首启延时应介于1~60之间');
+      return false;
+    }
+    if (comSetTemp < comMinTempSetting || comSetTemp > comMaxTempSetting) {
+      showDialogErrorInfo('柜温设置值应介于预定最大值与最小值之间');
+      return false;
+    }
+    if (comTempBacklash < 1 || comTempBacklash > 15) {
+      showDialogErrorInfo('温度控制回差应介于1~15之间');
+      return false;
+    }
+    if (comDelayRunTime < 1 || comDelayRunTime > 60) {
+      showDialogErrorInfo('压缩机启动延时应介于1~60之间');
+      return false;
+    }
+    if (comFaultStartTime < 1 || comFaultStartTime > 120) {
+      showDialogErrorInfo('柜温故障开机时间应介于1~120之间');
+      return false;
+    }
+    if (comFaultStopTime < 1 || comFaultStopTime > 120) {
+      showDialogErrorInfo('柜温故障停机时间应介于1~120之间');
+      return false;
+    }
+    if (comAlarmTempUpOffset < 0 || comAlarmTempUpOffset > 25) {
+      showDialogErrorInfo('柜温上限报警偏移应介于0~25之间');
+      return false;
+    }
+    if (comAlarmTempDownOffset < 0 || comAlarmTempDownOffset > 25) {
+      showDialogErrorInfo('柜温下限报警偏移应介于0~25之间');
+      return false;
+    }
+    if (comAlarmTempUpOffsetDelay < 0 || comAlarmTempUpOffsetDelay > 125) {
+      showDialogErrorInfo('柜温超上限报警延时应介于0~125之间');
+      return false;
+    }
+    if (comAlarmTempDownOffsetDelay < 0 || comAlarmTempDownOffsetDelay > 125) {
+      showDialogErrorInfo('柜温超下限报警延时应介于0~125之间');
+      return false;
+    }
+    return true;
+  };
+
+  function onDialogSettingOk() {
+    if (!validateSettingValues()) {
+      return;
+    }
+
+    let cmdJson = {};
+
+    hideDialogDevSetting();
+    cmdJson = {
+      device_id: devPros.id,
+      method: 'control',
+      params: {
+        Com_First_Start_Timer: comFirstStartTimer,
+        Com_Set_temp: comSetTemp,
+        Com_Max_temp_setting: comMaxTempSetting,
+        Com_Min_temp_setting: comMinTempSetting,
+        Com_Temp_Backlash: comTempBacklash,
+        Com_Delay_Run_Time: comDelayRunTime,
+        Com_Fault_Start_Time: comFaultStartTime,
+        Com_Fault_Stop_Time: comFaultStopTime,
+        Com_Alarm_Temp_UpOffset: comAlarmTempUpOffset,
+        Com_Alarm_Temp_DownOffset: comAlarmTempDownOffset,
+        Com_Alarm_Temp_UpOffset_Delay: comAlarmTempUpOffsetDelay,
+        Com_Alarm_Temp_DownOffset_Delay: comAlarmTempDownOffsetDelay,
       },
     };
 
@@ -2331,6 +3217,8 @@ const Item = ({ devPros }) => {
     return SaleTableItem({ devPros });
   } else if (devPros.devType === DEV_TYPE_REFRIGERATOR) {
     return RefrgtorItem({ devPros });
+  } else if (devPros.devType === DEV_TYPE_DC_REFRIGERATOR) {
+    return RefrgtorDCItem({ devPros });
   } else {
     console.log('@@@@@@ERROR   Unknown device type');
     return (

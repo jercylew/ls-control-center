@@ -42,6 +42,7 @@ const updateDeviceInScene = (devData, scenes, sceneIndex, devIndex) => {
 };
 
 export const DEV_TYPE_REFRIGERATOR = 'refrgtor';
+export const DEV_TYPE_DC_REFRIGERATOR = 'dc_refrgtor';
 export const DEV_TYPE_SALE_TABLE = 'sale_table';
 
 export const slice = createSlice({

@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import {
   syncDevice,
   DEV_TYPE_REFRIGERATOR,
+  DEV_TYPE_DC_REFRIGERATOR,
   DEV_TYPE_SALE_TABLE,
 } from '../data/device-slice';
 import React, { createContext, useState, useContext, useEffect } from 'react';
@@ -15,6 +16,8 @@ const TOPIC_SALE_TABLE_STATUS = '$thing/up/status/sale_table';
 const TOPIC_SALE_TABLE_PROPERTY = '$thing/up/property/sale_table';
 const TOPIC_REFRG_STATUS = '$thing/up/status/refrigerator';
 const TOPIC_REFRG_PROPERTY = '$thing/up/property/refrigerator';
+const TOPIC_REFRG_DIRECT_COOL_STATUS = '$thing/up/status/DirectCooling';
+const TOPIC_REFRG_DIRECT_COOL_PROPERTY = '$thing/up/property/DirectCooling';
 const UNKNOWN_SCENE_NAME = '未知场地';
 const UNKNOWN_SCENE_ID = '00000-0000000000';
 const DEVICE_TIMER_ID_KEY = 'dev-timer-id';
@@ -301,6 +304,70 @@ export const MqttProvider = ({ children }) => {
     dispatch(syncDevice(newDevice));
   };
 
+  const handleDCRefrgStatusReport = (devId, reportData) => {
+    let newDevice = {
+      id: devId,
+      devType: DEV_TYPE_DC_REFRIGERATOR,
+      onlineStatus: true,
+
+      comFirstStartFlag: reportData.Com_First_Start_Flag,
+      comDetectionTemp: reportData.Com_Detection_temp,
+      comStartRunFlag: reportData.Com_Start_Run_Flag,
+      comCabinetTempeError: reportData.Com_Cabinet_Tempe_Error,
+      comHighTempAlarmFlag: reportData.Com_High_Temp_Alarm_Flag,
+      comLowTempAlarmFlag: reportData.Com_Low_Temp_Alarm_Flag,
+    };
+    dispatch(syncDevice(newDevice));
+  };
+
+  const handleDCRefrgPropertyReport = propData => {
+    let inSceneName;
+    let inSceneId = propData.Scene_Id;
+    if (
+      propData.Scene_Name === null ||
+      propData.Scene_Name === 'NA' ||
+      propData.Scene_Name === ''
+    ) {
+      inSceneName = UNKNOWN_SCENE_NAME;
+      inSceneId = UNKNOWN_SCENE_ID;
+    } else {
+      inSceneName = strFromUnicode(propData.Scene_Name);
+    }
+
+    let inDevName = propData.Device_Name;
+    if (propData.Device_Name.length >= 4) {
+      inDevName = strFromUnicode(propData.Device_Name);
+    }
+
+    let newDevice = {
+      name: inDevName,
+      id: propData.device_id,
+      devType: DEV_TYPE_DC_REFRIGERATOR,
+      sceneId: inSceneId,
+      sceneName: inSceneName,
+      onlineStatus: true,
+      firmwareVersion: propData.Firmware_information,
+
+      Com_First_Start_Timer: propData.params.Com_First_Start_Timer,
+      Com_Set_temp: propData.params.Com_Set_temp,
+      Com_Temp_Backlash: propData.params.Com_Temp_Backlash,
+      Com_Delay_Run_Time: propData.params.Com_Delay_Run_Time,
+      Com_Fault_Start_Time: propData.params.Com_Fault_Start_Time,
+      Com_Fault_Stop_Time: propData.params.Com_Fault_Stop_Time,
+      Com_High_Temp_Alarm: propData.params.Com_High_Temp_Alarm,
+      Com_Low_Temp_Alarm: propData.params.Com_Low_Temp_Alarm,
+      Com_Alarm_Temp_UpOffset: propData.params.Com_Alarm_Temp_UpOffset,
+      Com_Alarm_Temp_DownOffset: propData.params.Com_Alarm_Temp_DownOffset,
+      Com_Alarm_Temp_UpOffset_Delay:
+        propData.params.Com_Alarm_Temp_UpOffset_Delay,
+      Com_Alarm_Temp_DownOffset_Delay:
+        propData.params.Com_Alarm_Temp_DownOffset_Delay,
+      Com_Max_temp_setting: propData.params.Com_Max_temp_setting,
+      Com_Min_temp_setting: propData.params.Com_Min_temp_setting,
+    };
+    dispatch(syncDevice(newDevice));
+  };
+
   const handleMqttClientCreated = client => {
     client.on('closed', function () {
       console.log('mqtt.event.closed');
@@ -370,6 +437,22 @@ export const MqttProvider = ({ children }) => {
     } else if (msg.topic === TOPIC_REFRG_PROPERTY) {
       // console.log('Refrigerator property report');
       handleRefrgPropertyReport(dataJson); //Reuse sale table??
+    } else if (msg.topic === TOPIC_REFRG_DIRECT_COOL_STATUS) {
+      if ('method' in dataJson) {
+        if (dataJson.method === 'report') {
+          if ('params' in dataJson) {
+            handleDCRefrgStatusReport(dataJson.device_id, dataJson.params);
+          }
+        } else if (dataJson.method === 'control_reply') {
+          handleControlReply(dataJson.device_id, dataJson.status);
+        } else if (dataJson.method === 'configure_reply') {
+          handleConfigReply(dataJson.device_id, dataJson.status);
+        } else {
+          console.log('Unsupported message');
+        }
+      }
+    } else if (msg.topic === TOPIC_REFRG_DIRECT_COOL_PROPERTY) {
+      handleDCRefrgPropertyReport(dataJson); //Reuse sale table??
     } else {
       console.log('Unknown message with topic:' + msg.topic + ', ignore it!');
       return;
