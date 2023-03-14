@@ -204,19 +204,19 @@ export const MqttProvider = ({ children }) => {
       onlineStatus: true,
 
       comFirstStartFlag: reportData.Com_First_Start_Flag,
-      comDetectiontemperature: reportData.Com_Detection_temp,
+      comDetectionTemp: reportData.Com_Detection_temp,
       comStartRunFlag: reportData.Com_Start_Run_Flag,
       comCabinetTempeError: reportData.Com_Cabinet_Tempe_Error,
       comHighTempAlarmFlag: reportData.Com_High_Temp_Alarm_Flag,
       comLowTempAlarmFlag: reportData.Com_Low_Temp_Alarm_Flag,
-      defDetectionTemperature: reportData.Def_Detection_temp,
-      defDefrostingflag: reportData.Def_Defrosting_flag,
+      defDetectionTemp: reportData.Def_Detection_temp,
+      defDefrostingFlag: reportData.Def_Defrosting_flag,
       defDrippingFlag: reportData.Def_Dripping_Flag,
       fanFirstStartFlag: reportData.FAN_First_Start_Flag,
       fanRunFlag: reportData.FAN_Run_flag,
-      conDetectiontemp: reportData.Con_Detection_temp,
+      conDetectionTemp: reportData.Con_Detection_temp,
       conHighTempAlarmFlag: reportData.Con_High_Temp_Alarm_Flag,
-      conHighTempProtection_Flag: reportData.Con_High_Temp_Protection_Flag
+      conHighTempProtectionFlag: reportData.Con_High_Temp_Protection_Flag,
     };
     dispatch(syncDevice(newDevice));
   };
@@ -348,22 +348,21 @@ export const MqttProvider = ({ children }) => {
       onlineStatus: true,
       firmwareVersion: propData.Firmware_information,
 
-      Com_First_Start_Timer: propData.params.Com_First_Start_Timer,
-      Com_Set_temp: propData.params.Com_Set_temp,
-      Com_Temp_Backlash: propData.params.Com_Temp_Backlash,
-      Com_Delay_Run_Time: propData.params.Com_Delay_Run_Time,
-      Com_Fault_Start_Time: propData.params.Com_Fault_Start_Time,
-      Com_Fault_Stop_Time: propData.params.Com_Fault_Stop_Time,
-      Com_High_Temp_Alarm: propData.params.Com_High_Temp_Alarm,
-      Com_Low_Temp_Alarm: propData.params.Com_Low_Temp_Alarm,
-      Com_Alarm_Temp_UpOffset: propData.params.Com_Alarm_Temp_UpOffset,
-      Com_Alarm_Temp_DownOffset: propData.params.Com_Alarm_Temp_DownOffset,
-      Com_Alarm_Temp_UpOffset_Delay:
-        propData.params.Com_Alarm_Temp_UpOffset_Delay,
-      Com_Alarm_Temp_DownOffset_Delay:
+      comFirstStartTimer: propData.params.Com_First_Start_Timer,
+      comSetTemp: propData.params.Com_Set_temp,
+      comTempBacklash: propData.params.Com_Temp_Backlash,
+      comDelayRunTime: propData.params.Com_Delay_Run_Time,
+      comFaultStartTime: propData.params.Com_Fault_Start_Time,
+      comFaultStopTime: propData.params.Com_Fault_Stop_Time,
+      comHighTempAlarm: propData.params.Com_High_Temp_Alarm,
+      comLowTempAlarm: propData.params.Com_Low_Temp_Alarm,
+      comAlarmTempUpOffset: propData.params.Com_Alarm_Temp_UpOffset,
+      comAlarmTempDownOffset: propData.params.Com_Alarm_Temp_DownOffset,
+      comAlarmTempUpOffsetDelay: propData.params.Com_Alarm_Temp_UpOffset_Delay,
+      comAlarmTempDownOffsetDelay:
         propData.params.Com_Alarm_Temp_DownOffset_Delay,
-      Com_Max_temp_setting: propData.params.Com_Max_temp_setting,
-      Com_Min_temp_setting: propData.params.Com_Min_temp_setting,
+      comMaxTempSetting: propData.params.Com_Max_temp_setting,
+      comMinTempSetting: propData.params.Com_Min_temp_setting,
     };
     dispatch(syncDevice(newDevice));
   };
@@ -391,6 +390,8 @@ export const MqttProvider = ({ children }) => {
       client.subscribe(TOPIC_SALE_TABLE_PROPERTY, 0);
       client.subscribe(TOPIC_REFRG_STATUS, 0);
       client.subscribe(TOPIC_REFRG_PROPERTY, 0);
+      client.subscribe(TOPIC_REFRG_DIRECT_COOL_STATUS, 0);
+      client.subscribe(TOPIC_REFRG_DIRECT_COOL_PROPERTY, 0);
     });
     client.connect();
   };

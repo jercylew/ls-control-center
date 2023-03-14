@@ -36,6 +36,7 @@ const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
 const TOPIC_SALE_TABLE_GET_STATUS = '$thing/up/status/sale_table';
 const TOPIC_REFRGTOR_GET_STATUS = '$thing/up/status/refrigerator';
+const TOPIC_DC_REFRGTOR_GET_STATUS = '$thing/up/status/DirectCooling';
 
 const DeviceStack = createStackNavigator();
 
@@ -1971,7 +1972,7 @@ const RefrgtorItem = ({ devPros }) => {
 
   const mainStatusText = () => {
     const compressInfo = devPros.comStartRunFlag ? '压缩机开启 | ' : '';
-    const tempInfo = `柜温${intToText(devPros.comDetectiontemperature)}°C `;
+    const tempInfo = `柜温${intToText(devPros.comDetectionTemp)}°C `;
     const defrostInfo = devPros.defrostingFlag ? ' | 化霜中' : '';
     const drippingFlag = devPros.drippingFlag ? ' | 滴水中' : '';
 
@@ -1994,6 +1995,7 @@ const RefrgtorItem = ({ devPros }) => {
                 source={require('../res/icon-refreg.png')}
                 style={{ width: 40, height: 40, resizeMode: 'stretch' }}
               />
+              <Text>{'  风冷'}</Text>
             </View>
             <View>
               <Text
@@ -2005,7 +2007,7 @@ const RefrgtorItem = ({ devPros }) => {
                     method: 'get_status',
                   };
                   sendCommand(
-                    TOPIC_SALE_TABLE_GET_STATUS,
+                    TOPIC_REFRGTOR_GET_STATUS,
                     JSON.stringify(cmdJson),
                   );
 
@@ -2040,7 +2042,7 @@ const RefrgtorItem = ({ devPros }) => {
                   <DataTable.Cell>
                     <Text style={styles.tableCellKey}>{'柜温: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.comDetectiontemperature) + '°C'}
+                      {intToText(devPros.comDetectionTemp) + '°C'}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
@@ -2051,24 +2053,10 @@ const RefrgtorItem = ({ devPros }) => {
                   </DataTable.Cell>
                 </DataTable.Row>
                 <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'蒸发器温度:  '}</Text>
+                <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'冷凝器温度:  '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.defDetectionTemperature) + '°C'}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  化霜开始: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.defrostingFlag)}
-                    </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'滴水开始:  '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.drippingFlag)}
+                      {intToText(devPros.conDetectionTemp) + '°C'}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
@@ -2079,24 +2067,10 @@ const RefrgtorItem = ({ devPros }) => {
                   </DataTable.Cell>
                 </DataTable.Row>
                 <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'冷凝器温度:  '}</Text>
+                <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'压缩机首启: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.conDetectionTemperature) + '°C'}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  高温报警: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempAlarmFlag)}
-                    </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'高温保护: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempProtectionFlag)}
+                      {boolToText(devPros.comFirstStartFlag)}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
@@ -2108,28 +2082,70 @@ const RefrgtorItem = ({ devPros }) => {
                 </DataTable.Row>
                 <DataTable.Row style={styles.tableRow}>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'柜温故障: '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温传感器错误:'}</Text>
                     <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.cabinetTempeError)}
+                      {boolToText(devPros.comCabinetTempeError)}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  柜高温报警:  '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温高温报警:'}</Text>
                     <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempAlarm)}
+                      {boolToText(devPros.comHighTempAlarmFlag)}
                     </Text>
                   </DataTable.Cell>
                 </DataTable.Row>
                 <DataTable.Row style={styles.tableRow}>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'柜低温报警: '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温低温报警: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.lowTempAlarm)}
+                      {boolToText(devPros.comLowTempAlarmFlag)}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'    '}</Text>
-                    <Text style={styles.tableCellValue}>{'   '}</Text>
+                    <Text style={styles.tableCellKey}>{'风机运行: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.fanRunFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'化霜滴水: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.defDrippingFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'风机首次启动: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.fanFirstStartFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'冷凝器高温报警:'}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.conHighTempAlarmFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'冷凝器高温保护:'}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {boolToText(devPros.conHighTempProtectionFlag)}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'蒸发器温度:  '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.defDetectionTemp) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'  '}</Text>
+                    <Text style={styles.tableCellValue}> </Text>
                   </DataTable.Cell>
                 </DataTable.Row>
               </DataTable>
@@ -2651,27 +2667,12 @@ const RefrgtorDCItem = ({ devPros }) => {
     setComDelayRunTime(devPros.comDelayRunTime);
     setComFaultStartTime(devPros.comFaultStartTime);
     setComFaultStopTime(devPros.comFaultStopTime);
-    setComHighTempAlarm(devPros.comHighTempAlarm);
-    setComLowTempAlarm(devPros.comLowTempAlarm);
     setComAlarmTempUpOffset(devPros.comAlarmTempUpOffset);
     setComAlarmTempDownOffset(devPros.comAlarmTempDownOffset);
     setComAlarmTempUpOffsetDelay(devPros.comAlarmTempUpOffsetDelay);
     setComAlarmTempDownOffsetDelay(devPros.comAlarmTempDownOffsetDelay);
     setComMaxTempSetting(devPros.comMaxTempSetting);
     setComMinTempSetting(devPros.comMinTempSetting);
-    setDefFrostingTemp(devPros.defFrostingTemp);
-    setDefStopDefrostingTemp(devPros.defStopDefrostingTemp);
-    setDefMaxDefrostingTimer(devPros.defMaxDefrostingTimer);
-    setDefLowTempAccumulatedTime(devPros.defLowTempAccumulatedTime);
-    setDefDefrostingMode(devPros.defDefrostingMode);
-    setDefDefrostingDisplayDelay(devPros.defDefrostingDisplayDelay);
-    setDefDrippingTime(devPros.defDrippingTime);
-    setFanFirstStartTimer(devPros.fanFirstStartTimer);
-    setFanFirstStartTimer(devPros.fanFirstStartTimer);
-    setFanOperatingMode(devPros.fanOperatingMode);
-    setConHighTempAlarmValue(devPros.conHighTempAlarmValue);
-    setConHighTempProtectionValue(devPros.conHighTempProtectionValue);
-    setConHighTempBacklash(devPros.conHighTempBacklash);
 
     setSettingsVarRefrgSensor({
       comFirstStartTimer: {
@@ -2680,12 +2681,9 @@ const RefrgtorDCItem = ({ devPros }) => {
       },
       comSetTemp: { value: intToText(comSetTemp), error: false },
       comTempBacklash: { value: intToText(comTempBacklash), error: false },
-
       comDelayRunTime: { value: intToText(comDelayRunTime), error: false },
       comFaultStartTime: { value: intToText(comFaultStartTime), error: false },
       comFaultStopTime: { value: intToText(comFaultStopTime), error: false },
-      comHighTempAlarm: { value: intToText(comHighTempAlarm), error: false },
-      comLowTempAlarm: { value: intToText(comLowTempAlarm), error: false },
       comAlarmTempUpOffset: {
         value: intToText(comAlarmTempUpOffset),
         error: false,
@@ -2704,45 +2702,6 @@ const RefrgtorDCItem = ({ devPros }) => {
       },
       comMaxTempSetting: { value: intToText(comMaxTempSetting), error: false },
       comMinTempSetting: { value: intToText(comMinTempSetting), error: false },
-      defFrostingTemp: { value: intToText(defFrostingTemp), error: false },
-      defStopDefrostingTemp: {
-        value: intToText(defStopDefrostingTemp),
-        error: false,
-      },
-      defMaxDefrostingTimer: {
-        value: intToText(defMaxDefrostingTimer),
-        error: false,
-      },
-      defLowTempAccumulatedTime: {
-        value: intToText(defLowTempAccumulatedTime),
-        error: false,
-      },
-      defDefrostingMode: { value: intToText(defDefrostingMode), error: false },
-      defDefrostingDisplayDelay: {
-        value: intToText(defDefrostingDisplayDelay),
-        error: false,
-      },
-      defDrippingTime: { value: intToText(defDrippingTime), error: false },
-      conHighTempAlarmValue: {
-        value: intToText(conHighTempAlarmValue),
-        error: false,
-      },
-      conHighTempProtectionValue: {
-        value: intToText(conHighTempProtectionValue),
-        error: false,
-      },
-      conHighTempBacklash: {
-        value: intToText(conHighTempBacklash),
-        error: false,
-      },
-      fanFirstStartTimer: {
-        value: intToText(fanFirstStartTimer),
-        error: false,
-      },
-      fanOperatingMode: {
-        value: intToText(fanOperatingMode),
-        error: false,
-      },
     });
   };
 
@@ -2896,6 +2855,7 @@ const RefrgtorDCItem = ({ devPros }) => {
                 source={require('../res/icon-refreg.png')}
                 style={{ width: 40, height: 40, resizeMode: 'stretch' }}
               />
+              <Text>{'  直冷'}</Text>
             </View>
             <View>
               <Text
@@ -2907,7 +2867,7 @@ const RefrgtorDCItem = ({ devPros }) => {
                     method: 'get_status',
                   };
                   sendCommand(
-                    TOPIC_SALE_TABLE_GET_STATUS,
+                    TOPIC_DC_REFRGTOR_GET_STATUS,
                     JSON.stringify(cmdJson),
                   );
 
@@ -2940,98 +2900,44 @@ const RefrgtorDCItem = ({ devPros }) => {
               <DataTable>
                 <DataTable.Row style={styles.tableRow}>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'柜温: '}</Text>
+                    <Text style={styles.tableCellKey}>{'压缩机首启: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.comDetectiontemperature) + '°C'}
+                      {boolToText(devPros.comFirstStartFlag)}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  压缩机开启: '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温: '}</Text>
+                    <Text style={styles.tableCellValue}>
+                      {intToText(devPros.comDetectionTemp) + '°C'}
+                    </Text>
+                  </DataTable.Cell>
+                </DataTable.Row>
+                <DataTable.Row style={styles.tableRow}>
+                  <DataTable.Cell>
+                    <Text style={styles.tableCellKey}>{'压缩机启动:  '}</Text>
                     <Text style={styles.tableCellValue}>
                       {boolToText(devPros.comStartRunFlag)}
                     </Text>
                   </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'蒸发器温度:  '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温传感器错误:'}</Text>
                     <Text style={styles.tableCellValue}>
-                      {intToText(devPros.defDetectionTemperature) + '°C'}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  化霜开始: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.defrostingFlag)}
+                      {boolToText(devPros.comCabinetTempeError)}
                     </Text>
                   </DataTable.Cell>
                 </DataTable.Row>
                 <DataTable.Row style={styles.tableRow}>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'滴水开始:  '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温高温报警: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.drippingFlag)}
+                      {boolToText(devPros.comHighTempAlarmFlag)}
                     </Text>
                   </DataTable.Cell>
                   <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  风机运行: '}</Text>
+                    <Text style={styles.tableCellKey}>{'柜温低温报警: '}</Text>
                     <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.fanRunFlag)}
+                      {boolToText(devPros.comLowTempAlarmFlag)}
                     </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'冷凝器温度:  '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {intToText(devPros.conDetectionTemperature) + '°C'}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  高温报警: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempAlarmFlag)}
-                    </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'高温保护: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempProtectionFlag)}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'固件版本:'}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {devPros.firmwareVersion}
-                    </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'柜温故障: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.cabinetTempeError)}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'  柜高温报警:  '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.highTempAlarm)}
-                    </Text>
-                  </DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.Row style={styles.tableRow}>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'柜低温报警: '}</Text>
-                    <Text style={styles.tableCellValue}>
-                      {boolToText(devPros.lowTempAlarm)}
-                    </Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <Text style={styles.tableCellKey}>{'    '}</Text>
-                    <Text style={styles.tableCellValue}>{'   '}</Text>
                   </DataTable.Cell>
                 </DataTable.Row>
               </DataTable>
