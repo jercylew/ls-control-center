@@ -34,6 +34,7 @@ import { FlatGrid } from 'react-native-super-grid';
 
 const TOPIC_DEV_CMD_PREFIX = '$thing/down/control/sale_table/';
 const TOPIC_REFRGTOR_CMD_PREFIX = '$thing/down/control/refrigerator/';
+const TOPIC_REFRGTOR_DC_CMD_PREFIX = '$thing/down/control/DirectCooling';
 const TOPIC_SALE_TABLE_GET_STATUS = '$thing/up/status/sale_table';
 const TOPIC_REFRGTOR_GET_STATUS = '$thing/up/status/refrigerator';
 const TOPIC_DC_REFRGTOR_GET_STATUS = '$thing/up/status/DirectCooling';
@@ -180,8 +181,10 @@ const SaleTableItem = ({ devPros }) => {
       );
     }
 
-    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
-    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let sceneNameUnicode = sceneName
+      ? strToUnicode(sceneName.slice(0, 16))
+      : '';
+    let deviceNameUnicode = devName ? strToUnicode(devName.slice(0, 16)) : '';
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
@@ -203,20 +206,11 @@ const SaleTableItem = ({ devPros }) => {
 
     hideDialogDevInfo();
     let newDevice = {
-      name: devName.slice(0, 16),
+      name: devName ? devName.slice(0, 16) : '',
       id: devPros.id,
       devType: DEV_TYPE_SALE_TABLE,
       sceneId: sceneId,
-      sceneName: sceneName.slice(0, 16),
-      isHeating: null,
-      isUpWater: null,
-      netType: null,
-      detectionTemperature: null,
-      waterLevelDetection: null,
-      errorWaterLevel: null,
-      errorTemperature: null,
-      maxWaterLevel: null,
-      maxTemperature: null,
+      sceneName: sceneName ? sceneName.slice(0, 16) : '',
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -1641,8 +1635,10 @@ const RefrgtorItem = ({ devPros }) => {
       );
     }
 
-    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
-    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let sceneNameUnicode = sceneName
+      ? strToUnicode(sceneName.slice(0, 16))
+      : '';
+    let deviceNameUnicode = devName ? strToUnicode(devName.slice(0, 16)) : '';
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
@@ -1662,11 +1658,11 @@ const RefrgtorItem = ({ devPros }) => {
 
     hideDialogDevInfo();
     let newDevice = {
-      name: devName.slice(0, 16),
+      name: devName ? devName.slice(0, 16) : '',
       id: devPros.id,
       devType: DEV_TYPE_REFRIGERATOR,
       sceneId: sceneId,
-      sceneName: sceneName.slice(0, 16),
+      sceneName: sceneName ? sceneName.slice(0, 16) : '',
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -1798,8 +1794,10 @@ const RefrgtorItem = ({ devPros }) => {
       );
     }
 
-    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
-    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let sceneNameUnicode = sceneName
+      ? strToUnicode(sceneName.slice(0, 16))
+      : '';
+    let deviceNameUnicode = devName ? strToUnicode(devName.slice(0, 16)) : '';
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
@@ -1817,13 +1815,13 @@ const RefrgtorItem = ({ devPros }) => {
       },
     };
 
-    hideDialogDevInfo();
+    hideDialogDevConfig();
     let newDevice = {
-      name: devName.slice(0, 16),
+      name: devName ? devName.slice(0, 16) : '',
       id: devPros.id,
-      devType: DEV_TYPE_SALE_TABLE,
+      devType: DEV_TYPE_REFRIGERATOR,
       sceneId: sceneId,
-      sceneName: sceneName.slice(0, 16),
+      sceneName: sceneName ? sceneName.slice(0, 16) : '',
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -2386,7 +2384,7 @@ const RefrgtorDCItem = ({ devPros }) => {
   const showDialogDevSetting = () => setDlgSettingVisible(true);
   const hideDialogDevSetting = () => setDlgSettingVisible(false);
 
-  const devCmdTopic = TOPIC_REFRGTOR_CMD_PREFIX + devPros.id;
+  const devCmdTopic = TOPIC_REFRGTOR_DC_CMD_PREFIX + devPros.id;
   const { sendCommand } = useMqttClient();
 
   const showDialogErrorInfo = message => {
@@ -2625,8 +2623,10 @@ const RefrgtorDCItem = ({ devPros }) => {
       );
     }
 
-    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
-    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let sceneNameUnicode = sceneName
+      ? strToUnicode(sceneName.slice(0, 16))
+      : '';
+    let deviceNameUnicode = devName ? strToUnicode(devName.slice(0, 16)) : '';
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
@@ -2646,11 +2646,11 @@ const RefrgtorDCItem = ({ devPros }) => {
 
     hideDialogDevInfo();
     let newDevice = {
-      name: devName.slice(0, 16),
+      name: devName ? devName.slice(0, 16) : '',
       id: devPros.id,
-      devType: DEV_TYPE_REFRIGERATOR,
+      devType: DEV_TYPE_DC_REFRIGERATOR,
       sceneId: sceneId,
-      sceneName: sceneName.slice(0, 16),
+      sceneName: sceneName ? sceneName.slice(0, 16) : '',
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
@@ -2725,8 +2725,10 @@ const RefrgtorDCItem = ({ devPros }) => {
       );
     }
 
-    let sceneNameUnicode = strToUnicode(sceneName.slice(0, 16));
-    let deviceNameUnicode = strToUnicode(devName.slice(0, 16));
+    let sceneNameUnicode = sceneName
+      ? strToUnicode(sceneName.slice(0, 16))
+      : '';
+    let deviceNameUnicode = devName ? strToUnicode(devName.slice(0, 16)) : '';
     let cmdJson = {
       device_id: devPros.id,
       method: 'configure',
@@ -2744,13 +2746,13 @@ const RefrgtorDCItem = ({ devPros }) => {
       },
     };
 
-    hideDialogDevInfo();
+    hideDialogDevConfig();
     let newDevice = {
-      name: devName.slice(0, 16),
+      name: devName ? devName.slice(0, 16) : '',
       id: devPros.id,
-      devType: DEV_TYPE_SALE_TABLE,
+      devType: DEV_TYPE_DC_REFRIGERATOR,
       sceneId: sceneId,
-      sceneName: sceneName.slice(0, 16),
+      sceneName: sceneName ? sceneName.slice(0, 16) : '',
     };
     dispatch(syncDevice(newDevice));
     sendCommand(devCmdTopic, JSON.stringify(cmdJson));
