@@ -40,3 +40,8 @@ The signed apk for release is at `app/build/outputs/apk/release/app-release.apk`
 
 - iOS
 To be done
+
+## Screenshots
+![ls-control-center-1.jpg](./ls-control-center-1.jpg)
+![ls-control-center-2.jpg](./ls-control-center-2.jpg)
+![ls-control-center-3.jpg](./ls-control-center-3.jpg)
